@@ -1,5 +1,9 @@
 <template>
- 
+    <NuxtLayout>
+        <main class="h-screen">
+
+        </main>
+    </NuxtLayout>
 </template>
 
 
