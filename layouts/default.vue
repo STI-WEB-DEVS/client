@@ -1,12 +1,4 @@
 <template>
-  <!--
-    This example requires updating your template:
-
-    ```
-    <html class="h-full bg-white">
-    <body class="h-full">
-    ```
-  -->
   <div>
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
@@ -26,7 +18,6 @@
                 </div>
               </TransitionChild>
 
-              <!-- Sidebar component, swap this element with another sidebar if you like -->
               <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
                 <div class="relative flex h-16 shrink-0 items-center">
                   <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
@@ -36,10 +27,10 @@
                     <li>
                       <ul role="list" class="-mx-2 space-y-1">
                         <li v-for="item in navigation" :key="item.name">
-                          <a :href="item.href" :class="[item.current ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
+                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
                             <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
                             {{ item.name }}
-                          </a>
+                          </NuxtLink>
                         </li>
                       </ul>
                     </li>
@@ -58,9 +49,7 @@
       </Dialog>
     </TransitionRoot>
 
-    <!-- Static sidebar for desktop -->
     <div class="hidden bg-gray-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-      <!-- Sidebar component, swap this element with another sidebar if you like -->
       <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
         <div class="flex h-16 shrink-0 items-center">
           <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
@@ -70,10 +59,10 @@
             <li>
               <ul role="list" class="-mx-2 space-y-1">
                 <li v-for="item in navigation" :key="item.name">
-                  <a :href="item.href" :class="[item.current ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
+                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
                     <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
                     {{ item.name }}
-                  </a>
+                  </NuxtLink>
                 </li>
               </ul>
             </li>
@@ -95,24 +84,17 @@
           <Bars3Icon class="size-6" aria-hidden="true" />
         </button>
 
-        <!-- Separator -->
         <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
 
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <form class="grid flex-1 grid-cols-1" action="#" method="GET">
-            <input name="search" aria-label="Search" class="col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-none placeholder:text-gray-400 sm:text-sm/6" placeholder="Search" />
-            <MagnifyingGlassIcon class="pointer-events-none col-start-1 row-start-1 size-5 self-center text-gray-400" aria-hidden="true" />
-          </form>
-          <div class="flex items-center gap-x-4 lg:gap-x-6">
+          <div class="flex flex-1"></div> <div class="flex items-center gap-x-4 lg:gap-x-6">
             <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
               <span class="sr-only">View notifications</span>
               <BellIcon class="size-6" aria-hidden="true" />
             </button>
 
-            <!-- Separator -->
             <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true"></div>
 
-            <!-- Profile dropdown -->
             <Menu as="div" class="relative">
               <MenuButton class="relative flex items-center">
                 <span class="absolute -inset-1.5"></span>
@@ -137,7 +119,6 @@
 
       <main class="py-10">
         <div class="px-4 sm:px-6 lg:px-8">
-            <!-- Your content -->
             <slot></slot>
         </div>
       </main>
@@ -170,20 +151,19 @@ import {
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: HomeIcon, current: true },
-  { name: 'Team', href: '/team', icon: UsersIcon, current: false },
-  { name: 'Projects', href: '#', icon: FolderIcon, current: false },
-  { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
-  { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+  { name: 'Team', href: '/team', icon: UsersIcon },
+  { name: 'Projects', href: '#', icon: FolderIcon },
+  { name: 'Calendar', href: '#', icon: CalendarIcon },
+  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
+  { name: 'Reports', href: '#', icon: ChartPieIcon },
 ]
-const teams = [
-  { id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
-  { id: 2, name: 'Tailwind Labs', href: '#', initial: 'T', current: false },
-  { id: 3, name: 'Workcation', href: '#', initial: 'W', current: false },
-]
+
 const userNavigation = [
   { name: 'Your profile', href: '#' },
   { name: 'Sign out', href: '#' },
