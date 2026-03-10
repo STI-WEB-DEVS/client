@@ -3,26 +3,42 @@
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
         <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="transition-opacity ease-linear duration-300" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-green-950/80" /> </TransitionChild>
+          <div class="fixed inset-0 bg-green-950/80"></div>
+        </TransitionChild>
 
         <div class="fixed inset-0 flex">
           <TransitionChild as="template" enter="transition ease-in-out duration-300 transform" enter-from="-translate-x-full" enter-to="translate-x-0" leave="transition ease-in-out duration-300 transform" leave-from="translate-x-0" leave-to="-translate-x-full">
             <DialogPanel class="relative mr-16 flex w-full max-w-xs flex-1">
+              <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-300" leave-from="opacity-100" leave-to="opacity-0">
+                <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
+                  <button type="button" class="-m-2.5 p-2.5" @click="sidebarOpen = false">
+                    <span class="sr-only">Close sidebar</span>
+                    <XMarkIcon class="size-6 text-white" aria-hidden="true" />
+                  </button>
+                </div>
+              </TransitionChild>
+
               <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-green-950 px-6 pb-4 ring-1 ring-white/10">
-                <div class="flex h-16 shrink-0 items-center">
+                <div class="relative flex h-16 shrink-0 items-center">
                   <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=emerald&shade=500" alt="Trail Team" />
                 </div>
-                <nav class="flex flex-1 flex-col">
+                <nav class="relative flex flex-1 flex-col">
                   <ul role="list" class="flex flex-1 flex-col gap-y-7">
                     <li>
                       <ul role="list" class="-mx-2 space-y-1">
                         <li v-for="item in navigation" :key="item.name">
-                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-green-900 text-white' : 'text-green-300 hover:bg-green-900 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold transition']">
-                            <component :is="item.icon" :class="[route.path === item.href ? 'text-emerald-400' : 'text-green-400 group-hover:text-white', 'size-6 shrink-0']" aria-hidden="true" />
+                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-green-300 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
+                            <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
                             {{ item.name }}
                           </NuxtLink>
                         </li>
                       </ul>
+                    </li>
+                    <li class="mt-auto">
+                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-green-300 hover:bg-white/5 hover:text-white">
+                        <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
+                        Settings
+                      </a>
                     </li>
                   </ul>
                 </nav>
@@ -33,29 +49,26 @@
       </Dialog>
     </TransitionRoot>
 
-    <div class="hidden bg-green-950 ring-1 ring-white/5 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-      <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4 shadow-2xl">
+    <div class="hidden bg-green-950 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+      <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
         <div class="flex h-16 shrink-0 items-center">
-          <img class="h-9 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=emerald&shade=500" alt="Trail Team" />
-          <span class="ml-3 text-white font-black tracking-tight text-xl">Trail<span class="text-emerald-500">Team</span></span>
+          <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=emerald&shade=600" alt="Trail Team" />
         </div>
-        
         <nav class="flex flex-1 flex-col">
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
             <li>
               <ul role="list" class="-mx-2 space-y-1">
                 <li v-for="item in navigation" :key="item.name">
-                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/10 text-white ring-1 ring-white/20' : 'text-green-200 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-xl p-3 text-sm font-bold transition-all duration-200']">
-                    <component :is="item.icon" :class="[route.path === item.href ? 'text-emerald-400' : 'text-green-500 group-hover:text-emerald-300', 'size-6 shrink-0 transition-colors']" aria-hidden="true" />
+                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-green-300 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
+                    <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
                     {{ item.name }}
                   </NuxtLink>
                 </li>
               </ul>
             </li>
-            
-            <li class="mt-auto border-t border-white/5 pt-4">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-xl p-3 text-sm font-bold text-green-200 hover:bg-white/5 hover:text-white transition-all">
-                <Cog6ToothIcon class="size-6 shrink-0 text-green-500 group-hover:text-emerald-300" aria-hidden="true" />
+            <li class="mt-auto">
+              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-green-300 hover:bg-white/5 hover:text-white">
+                <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                 Settings
               </a>
             </li>
@@ -65,10 +78,47 @@
     </div>
 
     <div class="lg:pl-72">
-       <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-100 bg-white/80 backdrop-blur-md px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-         </div>
+      <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        <button type="button" class="-m-2.5 p-2.5 text-gray-700 hover:text-green-700 lg:hidden" @click="sidebarOpen = true">
+          <span class="sr-only">Open sidebar</span>
+          <Bars3Icon class="size-6" aria-hidden="true" />
+        </button>
 
-       <main class="py-10 bg-gray-50/50 min-h-screen">
+        <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
+
+        <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+          <div class="flex flex-1"></div>
+          <div class="flex items-center gap-x-4 lg:gap-x-6">
+            <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-green-600">
+              <span class="sr-only">View notifications</span>
+              <BellIcon class="size-6" aria-hidden="true" />
+            </button>
+
+            <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true"></div>
+
+            <Menu as="div" class="relative">
+              <MenuButton class="relative flex items-center">
+                <span class="absolute -inset-1.5"></span>
+                <span class="sr-only">Open user menu</span>
+                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="https://i.redd.it/5ctekgqbkkb91.jpg" alt="" />
+                <span class="hidden lg:flex lg:items-center">
+                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">James Andrew De Castro</span>
+                  <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
+                </span>
+              </MenuButton>
+              <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
+                <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
+                  <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
+                    <a :href="item.href" :class="[active ? 'bg-gray-50 text-green-700 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
+                  </MenuItem>
+                </MenuItems>
+              </transition>
+            </Menu>
+          </div>
+        </div>
+      </div>
+
+      <main class="py-10">
         <div class="px-4 sm:px-6 lg:px-8">
             <slot></slot>
         </div>
