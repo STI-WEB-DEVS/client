@@ -8,10 +8,13 @@ export class BaseService {
   protected async request(endpoint: string) {
     const fullUrl = this.baseUrl + endpoint;
 
-    return await $fetch(fullUrl, {
+    return await $fetch(fullUrl,   {
       onResponseError({ response }) {
         console.error(`[API Error ${response.status}]:`, response._data?.message || 'Unknown Error');
       }
     });
   }
+
+  
 }
+
