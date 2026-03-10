@@ -1,13 +1,13 @@
 <template>
     <NuxtLayout>
-        <Dashboard/>
+        <Calendar/>
     </NuxtLayout>
 </template>
 
 
 
 <script setup lang="ts">
-import Dashboard from '~/components/Dashboard.vue';
+import Calendar from '~/components/Calendar.vue';
 
 
 </script>
