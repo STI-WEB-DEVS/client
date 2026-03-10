@@ -1,6 +1,5 @@
 <template>
     <NuxtLayout>
-        <Dash/>
+        <SystemSettings/>
     </NuxtLayout>
 </template>
-

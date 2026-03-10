@@ -1,6 +1,5 @@
 <template>
     <NuxtLayout>
-        <Dash/>
+        <YourProfile/>
     </NuxtLayout>
 </template>
-
