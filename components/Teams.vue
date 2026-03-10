@@ -37,10 +37,4 @@ const teamService = new TeamService();
 onMounted(async () => {
   teams.value = await teamService.getTeams();
 });
-
-// Example handler for the button
-function viewDetails(team: any) {
-  alert(`Viewing details for ${team.name}`);
-  // Later you can route to a detail page or open a modal
-}
 </script>

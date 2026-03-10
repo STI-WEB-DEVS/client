@@ -32,48 +32,6 @@
                 <label class="block text-sm font-semibold text-slate-700">Phone</label>
                 <input type="tel" value="+63 912 345 6789" class="mt-1 block w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200 sm:text-sm" />
               </div>
-              <div class="sm:col-span-2">
-                <label class="block text-sm font-semibold text-slate-700">Title</label>
-                <input type="text" value="Operations Manager" class="mt-1 block w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200 sm:text-sm" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Preferences -->
-        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div class="border-b border-slate-100 bg-slate-50 px-6 py-4">
-            <h2 class="text-lg font-semibold text-slate-900">Preferences</h2>
-          </div>
-          <div class="px-6 py-6 space-y-4">
-            <div>
-              <label class="mb-2 block text-sm font-semibold text-slate-700">Language</label>
-              <select class="block w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-900 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200 sm:text-sm">
-                <option selected>English</option>
-                <option>Filipino</option>
-                <option>Spanish</option>
-              </select>
-            </div>
-            <div>
-              <label class="mb-2 block text-sm font-semibold text-slate-700">Theme</label>
-              <select class="block w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-900 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200 sm:text-sm">
-                <option selected>Light</option>
-                <option>Dark</option>
-                <option>Auto</option>
-              </select>
-            </div>
-            <div>
-              <label class="mb-2 block text-sm font-semibold text-slate-700">Notifications</label>
-              <div class="space-y-2">
-                <label class="flex items-center">
-                  <input type="checkbox" checked class="h-4 w-4 rounded border-slate-300 text-amber-500" />
-                  <span class="ml-2 text-sm text-slate-600">Email notifications</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" checked class="h-4 w-4 rounded border-slate-300 text-amber-500" />
-                  <span class="ml-2 text-sm text-slate-600">SMS notifications</span>
-                </label>
-              </div>
             </div>
           </div>
         </div>
@@ -99,38 +57,13 @@
           </div>
         </div>
       </div>
-
-      <div class="space-y-6">
-        <!-- Account Status -->
-        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div class="border-b border-slate-100 bg-slate-50 px-6 py-4">
-            <h2 class="text-sm font-semibold text-slate-900">Account Status</h2>
-          </div>
-          <div class="px-6 py-4 space-y-3 text-sm">
-            <div class="flex justify-between">
-              <span class="text-slate-600">Account Type</span>
-              <span class="font-medium text-slate-900">Admin</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Status</span>
-              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                Active
-              </span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-600">Member Since</span>
-              <span class="font-medium text-slate-900">Jan 15, 2024</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <div class="mt-6 flex justify-end gap-4">
+    <div class="mt-6 flex justify-right gap-4">
       <button class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
         Cancel
       </button>
-      <button class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+      <button class="rounded-xl bg-[#6D4C41] px-4 py-2 text-sm font-semibold text-white hover:bg-[#6D4C41]">
         Save Changes
       </button>
     </div>
