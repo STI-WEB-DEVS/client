@@ -20,7 +20,7 @@
 
               <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
                 <div class="relative flex h-16 shrink-0 items-center">
-                  <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+                  <img class="h-8 w-auto" src="https://lh3.googleusercontent.com/gg-dl/AOI_d__v-ac_7BaCyU8DJ4c-w6Ago20VeYSobCjZ7l5PNOo1RDANxOpwLkRVLMmQyH6POE15pvU8aVxVyOPc5N9Mry-bTghkHKVgDb5tKxTJgCjvSBvfQUREb8ew5fFMhL9fKGT7MjuQ9HS8vT4LBU2Ad646556HBfkK1vP4YXkzA4BVLlz-PA=s1600-rj" alt="Your Company" />
                 </div>
                 <nav class="relative flex flex-1 flex-col">
                   <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -35,10 +35,10 @@
                       </ul>
                     </li>
                     <li class="mt-auto">
-                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+                      <NuxtLink to="/settings" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                         <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                         Settings
-                      </a>
+                      </NuxtLink>
                     </li>
                   </ul>
                 </nav>
@@ -49,12 +49,12 @@
       </Dialog>
     </TransitionRoot>
 
-    <div class="hidden bg-gray-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+    <div class="hidden bg-[#0f2573] ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
       <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
-        <div class="flex h-16 shrink-0 items-center">
-          <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+        <div class="flex flex-col h-16 shrink-0 align-items items-center mt-4">
+          <img class="h-20 rounded-full" src="/event-ticketing-logo2.jpg" alt="Event Ticketing System" />
         </div>
-        <nav class="flex flex-1 flex-col">
+        <nav class="flex flex-1 flex-col mt-6">
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
             <li>
               <ul role="list" class="-mx-2 space-y-1">
@@ -67,10 +67,10 @@
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+              <NuxtLink to="/settings" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                 Settings
-              </a>
+              </NuxtLink>
             </li>
           </ul>
         </nav>
@@ -87,7 +87,8 @@
         <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
 
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <div class="flex flex-1"></div> <div class="flex items-center gap-x-4 lg:gap-x-6">
+          <div class="flex flex-1"></div>
+          <div class="flex items-center gap-x-4 lg:gap-x-6">
             <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
               <span class="sr-only">View notifications</span>
               <BellIcon class="size-6" aria-hidden="true" />
@@ -101,14 +102,27 @@
                 <span class="sr-only">Open user menu</span>
                 <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
                 <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Tom Cook</span>
+                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Sean Kenneth H. Axalan</span>
                   <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
                 </span>
               </MenuButton>
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
+                    <button 
+                      v-if="item.onClick" 
+                      @click="item.onClick" 
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full text-left px-3 py-1 text-sm/6 text-gray-900']"
+                    >
+                      {{ item.name }}
+                    </button>
+                    <NuxtLink 
+                      v-else 
+                      :to="item.href" 
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']"
+                    >
+                      {{ item.name }}
+                    </NuxtLink>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -129,45 +143,33 @@
 <script setup>
 import { ref } from 'vue'
 import {
-  Dialog,
-  DialogPanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  TransitionChild,
-  TransitionRoot,
+  Dialog, DialogPanel, Menu, MenuButton, MenuItem, MenuItems,
+  TransitionChild, TransitionRoot,
 } from '@headlessui/vue'
 import {
-  Bars3Icon,
-  BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
-  Cog6ToothIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UsersIcon,
-  XMarkIcon,
+  Bars3Icon, BellIcon, CalendarIcon, ChartPieIcon, Cog6ToothIcon,
+  DocumentDuplicateIcon, FolderIcon, HomeIcon, UsersIcon, XMarkIcon,
 } from '@heroicons/vue/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
-import { useRoute } from 'vue-router'
+import { ChevronDownIcon } from '@heroicons/vue/20/solid'
+import { useRoute, useRouter } from 'vue-router' 
 
 const route = useRoute()
+const router = useRouter() 
+
+const sidebarOpen = ref(false)
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Team', href: '/team', icon: UsersIcon }, 
+  { name: 'Projects', href: '/projects', icon: FolderIcon },
+  { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
+  { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
+  { name: 'Reports', href: '/reports', icon: ChartPieIcon },
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your profile', href: '/profile' }, 
+  { name: 'Settings', href: '/setting' },    
+  { name: 'Sign out', href: '/' }, 
 ]
-
-const sidebarOpen = ref(false)
 </script>

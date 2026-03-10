@@ -5,13 +5,13 @@ export class BaseService {
     this.baseUrl = baseUrl;
   }
 
-  protected async request(endpoint: string) {
+  protected async request<T>(endpoint: string): Promise<T> {
     const fullUrl = this.baseUrl + endpoint;
 
-    return await $fetch(fullUrl, {
+    return await $fetch<T>(fullUrl, {
       onResponseError({ response }) {
         console.error(`[API Error ${response.status}]:`, response._data?.message || 'Unknown Error');
       }
     });
   }
-}
+} 
