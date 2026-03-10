@@ -5,7 +5,6 @@
 
             <div v-if="isLoading" class="text-gray-500">Loading team...</div>
 
-            <!-- 3. Loop through users and pass data to the component -->
             <div v-else class="grid gap-4 md:grid-cols-2">
             <TeamCard 
                 v-for="team in teams" 
