@@ -1,5 +1,11 @@
 <template>
     <NuxtLayout>
-        <h1>Dashboard</h1>
+        <Dashboard/>
     </NuxtLayout>
 </template>
+
+<script setup lang="ts">
+import Dashboard from '~/components/Dashboard.vue';
+
+
+</script>

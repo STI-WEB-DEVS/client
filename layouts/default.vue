@@ -1,3 +1,4 @@
+
 <template>
   <div>
     <TransitionRoot as="template" :show="sidebarOpen">
@@ -166,8 +167,9 @@ const navigation = [
 
 const userNavigation = [
   { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Sign out', href: '/' },
 ]
 
 const sidebarOpen = ref(false)
+
 </script>
