@@ -160,10 +160,10 @@ const route = useRoute()
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'WIP', href: '#', icon: Bars3Icon },
-  { name: 'WIP', href: '#', icon: Bars3Icon },
-  { name: 'WIP', href: '#', icon: Bars3Icon },
-  { name: 'WIP', href: '#', icon: Bars3Icon }
+  { name: 'EventView', href: '/wipeventview', icon: Bars3Icon },
+  { name: 'InquryView', href: '/wipinquryview', icon: Bars3Icon },
+  { name: 'ProfileView', href: '/wipprofileview', icon: Bars3Icon },
+  { name: 'ReportView', href: '/wipreportsview', icon: Bars3Icon }
 ]
 
 const userNavigation = [
