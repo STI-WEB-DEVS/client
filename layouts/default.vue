@@ -141,13 +141,14 @@ import {
 import {
   Bars3Icon,
   BellIcon,
+  BoldIcon,
   CalendarIcon,
-  ChartPieIcon,
+  NewspaperIcon,
   Cog6ToothIcon,
-  DocumentDuplicateIcon,
+  CurrencyDollarIcon,
   FolderIcon,
   HomeIcon,
-  UsersIcon,
+  MapPinIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
@@ -157,16 +158,16 @@ const route = useRoute()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Bus', href: '/Bus', icon: BoldIcon },
+  { name: 'Route', href: '/Route', icon: MapPinIcon },
+  { name: 'Schedule', href: '/Schedule', icon: CalendarIcon },
+  { name: 'Fare', href: '/Fare', icon: CurrencyDollarIcon },
+  { name: 'News', href: '/News', icon: NewspaperIcon },
 ]
 
 const userNavigation = [
   { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Sign out', href: '/' },
 ]
 
 const sidebarOpen = ref(false)
