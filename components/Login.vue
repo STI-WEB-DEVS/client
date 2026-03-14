@@ -1,99 +1,148 @@
 <template>
-  <!--
-    This example requires updating your template:
-
-    ```
-    <html class="h-full bg-gray-50">
-    <body class="h-full">
-    ```
-  -->
-  <div class="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <img class="mx-auto h-10 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" />
-      <h2 class="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Sign in to your account</h2>
+  <main class="min-h-screen login-bg flex items-center justify-center p-4">
+    <!-- Background decorative elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute -top-1/4 -right-1/4 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl"></div>
+      <div class="absolute -bottom-1/4 -left-1/4 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl"></div>
     </div>
 
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-      <div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
-        <form class="space-y-6" method="POST" @submit.prevent="handleSubmit">
+    <div class="relative w-full max-w-md">
+      <!-- Logo card -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center size-16 rounded-2xl bg-amber-500/20 border border-amber-500/30 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-9 text-amber-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+          </svg>
+        </div>
+        <h1 class="text-3xl font-extrabold text-white tracking-tight">TailorTrack</h1>
+        <p class="text-slate-400 text-sm mt-1">Business Management System</p>
+      </div>
+
+      <!-- Login card -->
+      <div class="login-card rounded-2xl p-8 shadow-2xl">
+        <div class="mb-6">
+          <h2 class="text-xl font-bold text-white">Sign in</h2>
+          <p class="text-slate-400 text-sm mt-1">Access your tailoring dashboard</p>
+        </div>
+
+        <form class="space-y-5" @submit.prevent="handleSubmit">
           <div>
-            <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
-            <div class="mt-2">
-              <input type="email" name="email" id="email" autocomplete="email" required="" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-            </div>
+            <label for="email" class="block text-sm font-medium text-slate-300 mb-1.5">Email address</label>
+            <input
+              v-model="email"
+              type="email" id="email" name="email" autocomplete="email" required
+              placeholder="admin@tailortrack.com"
+              class="input-field"
+            />
           </div>
 
           <div>
-            <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
-            <div class="mt-2">
-              <input type="password" name="password" id="password" autocomplete="current-password" required="" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-            </div>
+            <label for="password" class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+            <input
+              v-model="password"
+              type="password" id="password" name="password" autocomplete="current-password" required
+              placeholder="••••••••"
+              class="input-field"
+            />
           </div>
 
           <div class="flex items-center justify-between">
-            <div class="flex gap-3">
-              <div class="flex h-6 shrink-0 items-center">
-                <div class="group grid size-4 grid-cols-1">
-                  <input id="remember-me" name="remember-me" type="checkbox" class="col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto" />
-                  <svg class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25" viewBox="0 0 14 14" fill="none">
-                    <path class="opacity-0 group-has-[:checked]:opacity-100" d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    <path class="opacity-0 group-has-[:indeterminate]:opacity-100" d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </div>
-              </div>
-              <label for="remember-me" class="block text-sm/6 text-gray-900">Remember me</label>
-            </div>
-
-            <div class="text-sm/6">
-              <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
-            </div>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" class="rounded border-slate-600 bg-slate-700 text-amber-500 focus:ring-amber-500 size-4" />
+              <span class="text-sm text-slate-400">Remember me</span>
+            </label>
+            <a href="#" class="text-sm text-amber-400 hover:text-amber-300 font-medium transition-colors">Forgot password?</a>
           </div>
 
-          <div>
-            <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</button>
-          </div>
+          <button
+            type="submit"
+            :disabled="loading"
+            class="btn-primary w-full"
+          >
+            <span v-if="!loading">Sign in to Dashboard</span>
+            <span v-else class="flex items-center justify-center gap-2">
+              <svg class="animate-spin size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              Signing in…
+            </span>
+          </button>
         </form>
 
-        <div>
-          <div class="mt-10 flex items-center gap-x-6">
-            <div class="w-full flex-1 border-t border-gray-200"></div>
-            <p class="text-nowrap text-sm/6 font-medium text-gray-900">Or continue with</p>
-            <div class="w-full flex-1 border-t border-gray-200"></div>
-          </div>
-
-          <div class="mt-6 grid grid-cols-2 gap-4">
-            <a href="#" class="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent">
-              <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
-                <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335" />
-                <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4" />
-                <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05" />
-                <path d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.2654 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z" fill="#34A853" />
-              </svg>
-              <span class="text-sm/6 font-semibold">Google</span>
-            </a>
-
-            <a href="#" class="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent">
-              <svg class="size-5 fill-[#24292F]" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd" />
-              </svg>
-              <span class="text-sm/6 font-semibold">GitHub</span>
-            </a>
-          </div>
+        <div class="mt-6 pt-6 border-t border-slate-700/50 text-center">
+          <p class="text-xs text-slate-500">
+            Cloud-Based Subscription Tailoring Business Management System
+          </p>
+          <p class="text-xs text-slate-600 mt-1">© 2026 TailorTrack. All rights reserved.</p>
         </div>
       </div>
-
-      <p class="mt-10 text-center text-sm/6 text-gray-500">
-        Not a member?
-        {{ ' ' }}
-        <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Start a 14 day free trial</a>
-      </p>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
-    const handleSubmit = async () => {
-    // Since there is no BE, we just trigger the redirect immediately
-    await navigateTo('/dashboard') 
-    }
+import { ref } from 'vue'
+
+const email = ref('')
+const password = ref('')
+const loading = ref(false)
+
+const handleSubmit = async () => {
+  loading.value = true
+  await new Promise(r => setTimeout(r, 800))
+  await navigateTo('/dashboard')
+  loading.value = false
+}
 </script>
+
+<style scoped>
+.login-bg {
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+  min-height: 100vh;
+  position: relative;
+}
+.login-card {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+}
+.input-field {
+  display: block;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 0.625rem;
+  padding: 0.625rem 0.875rem;
+  color: #fff;
+  font-size: 0.875rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+.input-field::placeholder { color: rgba(148,163,184,0.5); }
+.input-field:focus {
+  border-color: #F59E0B;
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+}
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #0F172A;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.625rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.01em;
+}
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FCD34D, #F59E0B);
+  box-shadow: 0 4px 20px rgba(245,158,11,0.4);
+  transform: translateY(-1px);
+}
+.btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+</style>
