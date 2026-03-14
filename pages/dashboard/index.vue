@@ -1,5 +1,7 @@
+
+
 <template>
     <NuxtLayout>
-       <Teams/>
+        <Dashboard/>
     </NuxtLayout>
 </template>
