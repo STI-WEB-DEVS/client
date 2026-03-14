@@ -35,7 +35,7 @@
                       </ul>
                     </li>
                     <li class="mt-auto">
-                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+                      <a href="/setting" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                         <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                         Settings
                       </a>
@@ -67,10 +67,16 @@
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
-                <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                Settings
-              </a>
+             <li class="mt-auto">
+  <NuxtLink 
+    to="/setting" 
+    class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white"
+    :class="{ 'bg-white/5 text-white': route.path === '/setting' }"
+  >
+    <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
+    Settings
+  </NuxtLink>
+</li>
             </li>
           </ul>
         </nav>
@@ -157,16 +163,16 @@ const route = useRoute()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Staff', href: '/team', icon: UsersIcon },
+  { name: 'JobOrderManagement', href: '/project', icon: FolderIcon },
+  { name: 'Appointments', href: '/appointment', icon: CalendarIcon },
+  { name: 'Inventory', href: '/inventory', icon: DocumentDuplicateIcon },
+  { name: 'Reports', href: '/report', icon: ChartPieIcon },
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your profile', href: '/profile' },
+  { name: 'Sign out', href: '/' },
 ]
 
 const sidebarOpen = ref(false)
