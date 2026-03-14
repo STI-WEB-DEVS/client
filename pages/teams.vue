@@ -1,6 +1,6 @@
 <template>
   <div>
-    
+    <!-- Header banner -->
     <div class="nm-team-banner mb-6">
       <div>
         <h2 class="font-display text-white text-xl font-bold leading-tight">NutriMatch Development Team</h2>
@@ -13,19 +13,19 @@
       </div>
     </div>
 
-    
+    <!-- Member cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
       <div
         v-for="member in TEAM_MEMBERS"
         :key="member.id"
         class="nm-card nm-member-card"
       >
-        
+        <!-- Accent bar -->
         <div class="h-1.5 rounded-t-xl" :style="{ background: member.color }"/>
 
         <div class="p-6">
           <div class="flex items-start gap-4">
-            
+            <!-- Avatar -->
             <div
               class="nm-avatar flex-shrink-0 w-16 h-16 text-xl"
               :style="{ background: `linear-gradient(135deg, ${member.color}, ${member.color}99)` }"
@@ -33,7 +33,7 @@
               {{ member.initials }}
             </div>
 
-            
+            <!-- Name + role -->
             <div class="flex-1 min-w-0">
               <div class="flex items-start justify-between gap-2">
                 <div>
@@ -56,7 +56,7 @@
 
           <div class="my-4" style="border-top:1px solid var(--border)"/>
 
-          
+          <!-- Responsibilities -->
           <div class="mb-4">
             <p class="text-[.68rem] font-bold uppercase tracking-widest mb-2" style="color:var(--muted)">Responsibilities</p>
             <div class="flex flex-wrap gap-1.5">
@@ -69,7 +69,7 @@
             </div>
           </div>
 
-          
+          <!-- Tech stack -->
           <div class="mb-4">
             <p class="text-[.68rem] font-bold uppercase tracking-widest mb-2" style="color:var(--muted)">Tech Stack</p>
             <div class="flex flex-wrap gap-1.5">
@@ -82,7 +82,7 @@
             </div>
           </div>
 
-          
+          <!-- Stats -->
           <div class="grid grid-cols-3 gap-2 mb-4">
             <div class="nm-mstat">
               <p class="nm-mstat-v">{{ member.contributions }}</p>
@@ -98,7 +98,7 @@
             </div>
           </div>
 
-          
+          <!-- Footer row -->
           <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--border)">
             <div class="flex items-center gap-1.5">
               <IdentificationIcon class="w-3.5 h-3.5" style="color:var(--muted)"/>
@@ -113,7 +113,7 @@
       </div>
     </div>
 
-    
+    <!-- Project info card -->
     <div class="nm-card p-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
