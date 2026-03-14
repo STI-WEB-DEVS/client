@@ -1,261 +1,198 @@
+<!-- pages/settings.vue -->
 <template>
-  <div>
-    <!-- Settings tab bar -->
-    <div class="nm-stabs mb-6">
-      <button
-        v-for="t in stabs" :key="t.val"
-        class="nm-stab" :class="{ active: activeTab === t.val }"
-        @click="activeTab = t.val"
-      >
-        <component :is="t.icon" class="w-4 h-4"/>
-        {{ t.label }}
-      </button>
-    </div>
+  <div class="max-w-4xl mx-auto space-y-6">
+    <h2 class="text-2xl font-bold text-gray-900">System Settings</h2>
 
-    <!-- ── General ──────────────────────────────── -->
-    <div v-if="activeTab === 'general'" class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-      <div class="lg:col-span-2 space-y-5">
-
-        <!-- Platform identity -->
-        <div class="nm-card p-6">
-          <p class="nm-sec-title mb-4">Platform Identity</p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div><label class="nm-label">Platform Name</label><input class="nm-input" value="NutriMatch"/></div>
-            <div><label class="nm-label">Support Email</label><input class="nm-input" type="email" value="support@nutrimatch.ph"/></div>
-            <div>
-              <label class="nm-label">Country / Region</label>
-              <select class="nm-input"><option>Philippines</option><option>Singapore</option></select>
-            </div>
-            <div>
-              <label class="nm-label">Timezone</label>
-              <select class="nm-input"><option>Asia/Manila (UTC+8)</option></select>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="nm-label">Platform Description</label>
-              <textarea class="nm-input resize-none" rows="3">Web-based clinical nutrition consultation and outcome monitoring system for structured Medical Nutrition Therapy.</textarea>
-            </div>
-          </div>
-        </div>
-
-        <!-- Consultation settings -->
-        <div class="nm-card p-6">
-          <p class="nm-sec-title mb-4">Consultation Settings</p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="nm-label">Default Session Duration</label>
-              <select class="nm-input"><option>30 minutes</option><option selected>60 minutes</option><option>90 minutes</option></select>
-            </div>
-            <div><label class="nm-label">Base Consultation Fee (₱)</label><input class="nm-input" type="number" value="500"/></div>
-            <div><label class="nm-label">Platform Commission (%)</label><input class="nm-input" type="number" value="15"/></div>
-            <div>
-              <label class="nm-label">Cancellation Window</label>
-              <select class="nm-input"><option>12 hours before</option><option selected>24 hours before</option></select>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-3">
-          <button class="nm-btn nm-btn-ghost">Discard</button>
-          <button class="nm-btn nm-btn-primary" @click="showToast('Settings saved successfully')">
-            <CheckIcon class="w-4 h-4"/> Save Settings
+    <!-- Settings Tabs -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="border-b border-gray-200">
+        <nav class="flex space-x-8 px-6" aria-label="Settings">
+          <button 
+            v-for="tab in tabs" 
+            :key="tab.id"
+            @click="activeTab = tab.id"
+            :class="[
+              activeTab === tab.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+              'py-4 px-1 border-b-2 font-medium text-sm'
+            ]"
+          >
+            {{ tab.name }}
           </button>
-        </div>
+        </nav>
       </div>
 
-      <!-- Right sidebar -->
-      <div class="space-y-4">
-        <!-- System status -->
-        <div class="nm-card p-5">
-          <p class="nm-sec-title mb-3">System Status</p>
-          <div class="space-y-2.5">
-            <div v-for="s in systemStatus" :key="s.label" class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full" :class="s.ok ? 'bg-emerald-400' : 'bg-red-400'"/>
-                <span class="text-sm">{{ s.label }}</span>
-              </div>
-              <span class="text-xs font-semibold" :class="s.ok ? 'text-emerald-600' : 'text-red-600'">
-                {{ s.ok ? 'Operational' : 'Degraded' }}
-              </span>
-            </div>
-          </div>
-          <p class="text-xs mt-3 pt-3 border-t" style="border-color:var(--border); color:var(--muted)">All systems nominal</p>
-        </div>
-
-        <!-- Data sources -->
-        <div class="nm-card p-5">
-          <p class="nm-sec-title mb-3">Food Data Sources</p>
-          <div class="space-y-3">
-            <div v-for="src in dataSources" :key="src.name" class="flex items-start gap-2.5">
-              <div class="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5"
-                   :style="{ background: src.color+'18' }">
-                <CircleStackIcon class="w-3.5 h-3.5" :style="{ color: src.color }"/>
+      <div class="p-6">
+        <!-- General Settings -->
+        <div v-if="activeTab === 'general'" class="space-y-6">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 mb-4">System Information</h3>
+            <div class="grid grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">System Name</label>
+                <input type="text" value="NutriMatch" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
               </div>
               <div>
-                <p class="text-sm font-semibold">{{ src.name }}</p>
-                <p class="text-xs" style="color:var(--muted)">{{ src.desc }}</p>
+                <label class="block text-sm font-medium text-gray-700">Version</label>
+                <input type="text" value="2.1.0" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700">System Description</label>
+                <textarea rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">Web-Based Clinical Nutrition Consultation and Outcome Monitoring System for Structured Medical Nutrition Therapy</textarea>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Version -->
-        <div class="nm-card p-5">
-          <p class="nm-sec-title mb-3">Version Info</p>
-          <div class="space-y-1.5 text-xs">
-            <div class="flex justify-between"><span style="color:var(--muted)">App Version</span><span class="font-bold font-mono">v1.0.0</span></div>
-            <div class="flex justify-between"><span style="color:var(--muted)">Framework</span><span class="font-bold">Nuxt 4 / Vue 3</span></div>
-            <div class="flex justify-between"><span style="color:var(--muted)">Environment</span><span class="nm-badge badge-active py-0.5">Production</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Security ─────────────────────────────── -->
-    <div v-if="activeTab === 'security'" class="max-w-3xl space-y-5">
-      <div class="nm-card p-6">
-        <p class="nm-sec-title mb-1">Authentication & Access</p>
-        <p class="text-sm mb-5" style="color:var(--muted)">Configure how users authenticate and access the system.</p>
-        <div class="space-y-4">
-          <div v-for="t in secToggles" :key="t.label" class="flex items-center justify-between py-3 border-b" style="border-color:var(--border)">
-            <div>
-              <p class="text-sm font-semibold">{{ t.label }}</p>
-              <p class="text-xs mt-0.5" style="color:var(--muted)">{{ t.desc }}</p>
-            </div>
-            <div class="nm-toggle" :class="{ on: t.val }" @click="t.val = !t.val"/>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div class="nm-card p-6">
-          <p class="nm-sec-title mb-4">PRC Verification Rules</p>
-          <div class="space-y-3">
-            <div>
-              <label class="nm-label">License Validity Period</label>
-              <select class="nm-input"><option>3 years (standard PRC)</option></select>
-            </div>
-            <div>
-              <label class="nm-label">Verification Method</label>
-              <select class="nm-input"><option>Manual Admin Review</option></select>
-            </div>
-            <div class="flex justify-end mt-2">
-              <button class="nm-btn nm-btn-primary text-sm" @click="showToast('PRC rules saved')">Save Rules</button>
-            </div>
-          </div>
-        </div>
-        <div class="nm-card p-6">
-          <p class="nm-sec-title mb-4">Session & Token</p>
-          <div class="space-y-3">
-            <div>
-              <label class="nm-label">Session Timeout</label>
-              <select class="nm-input"><option>30 minutes</option><option selected>1 hour</option></select>
-            </div>
-            <div>
-              <label class="nm-label">Max Login Attempts</label>
-              <input class="nm-input" type="number" value="5"/>
-            </div>
-            <div class="flex justify-end mt-2">
-              <button class="nm-btn nm-btn-primary text-sm" @click="showToast('Session settings saved')">Save</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Notifications ────────────────────────── -->
-    <div v-if="activeTab === 'notifications'" class="max-w-2xl">
-      <div class="nm-card p-6">
-        <p class="nm-sec-title mb-1">Notification Preferences</p>
-        <p class="text-sm mb-5" style="color:var(--muted)">Control when and how NutriMatch sends alerts.</p>
-        <div class="space-y-6">
-          <div v-for="group in notifGroups" :key="group.title">
-            <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--muted)">{{ group.title }}</p>
-            <div class="space-y-3">
-              <div v-for="n in group.items" :key="n.label"
-                   class="flex items-center justify-between py-3 border-b" style="border-color:var(--border)">
-                <div>
-                  <p class="text-sm font-semibold">{{ n.label }}</p>
-                  <p class="text-xs mt-0.5" style="color:var(--muted)">{{ n.desc }}</p>
+          <div class="pt-6 border-t border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Branding</h3>
+            <div class="grid grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Primary Color</label>
+                <div class="mt-1 flex items-center space-x-3">
+                  <input type="color" value="#419a4a" class="w-10 h-10 rounded border border-gray-300">
+                  <input type="text" value="#419a4a" class="flex-1 px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
                 </div>
-                <div class="nm-toggle" :class="{ on: n.val }" @click="n.val = !n.val"/>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Secondary Color</label>
+                <div class="mt-1 flex items-center space-x-3">
+                  <input type="color" value="#2f8037" class="w-10 h-10 rounded border border-gray-300">
+                  <input type="text" value="#2f8037" class="flex-1 px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="flex justify-end mt-5 pt-4 border-t" style="border-color:var(--border)">
-          <button class="nm-btn nm-btn-primary" @click="showToast('Notification preferences saved')">Save Preferences</button>
+
+        <!-- Security Settings -->
+        <div v-if="activeTab === 'security'" class="space-y-6">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Authentication</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">Two-Factor Authentication</p>
+                  <p class="text-sm text-gray-500">Require 2FA for all admin accounts</p>
+                </div>
+                <button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2" :class="twoFAEnabled ? 'bg-primary-600' : 'bg-gray-200'" @click="twoFAEnabled = !twoFAEnabled">
+                  <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out" :class="twoFAEnabled ? 'translate-x-5' : 'translate-x-0'"></span>
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">Session Timeout</p>
+                  <p class="text-sm text-gray-500">Automatically log out after inactivity</p>
+                </div>
+                <select class="px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-200">
+                  <option>30 minutes</option>
+                  <option>1 hour</option>
+                  <option>2 hours</option>
+                  <option>4 hours</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-6 border-t border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Password Policy</h3>
+            <div class="space-y-4">
+              <div class="flex items-center space-x-4">
+                <input type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                <label class="text-sm text-gray-700">Require strong passwords (uppercase, numbers, symbols)</label>
+              </div>
+              <div class="flex items-center space-x-4">
+                <input type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" checked>
+                <label class="text-sm text-gray-700">Force password change every 90 days</label>
+              </div>
+              <div class="flex items-center space-x-4">
+                <input type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" checked>
+                <label class="text-sm text-gray-700">Prevent password reuse (last 5 passwords)</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications -->
+        <div v-if="activeTab === 'notifications'" class="space-y-6">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Email Notifications</h3>
+            <div class="space-y-4">
+              <div v-for="notification in emailNotifications" :key="notification.id" class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
+                  <p class="text-sm text-gray-500">{{ notification.description }}</p>
+                </div>
+                <input type="checkbox" :checked="notification.enabled" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Integrations -->
+        <div v-if="activeTab === 'integrations'" class="space-y-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div class="p-4 border border-gray-200 rounded-xl">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">...</svg>
+                  </div>
+                  <div>
+                    <h4 class="font-medium text-gray-900">USDA FoodData Central</h4>
+                    <p class="text-xs text-gray-500">Connected</p>
+                  </div>
+                </div>
+                <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Active</span>
+              </div>
+              <button class="text-sm text-primary-600 hover:text-primary-700">Configure</button>
+            </div>
+
+            <div class="p-4 border border-gray-200 rounded-xl">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">...</svg>
+                  </div>
+                  <div>
+                    <h4 class="font-medium text-gray-900">Philippine Food Data</h4>
+                    <p class="text-xs text-gray-500">Connected</p>
+                  </div>
+                </div>
+                <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Active</span>
+              </div>
+              <button class="text-sm text-primary-600 hover:text-primary-700">Configure</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Toast -->
-    <transition name="toast">
-      <div v-if="toastVisible" class="nm-toast">
-        <CheckCircleIcon class="w-4 h-4"/>
-        {{ toastMsg }}
+      <!-- Save Button -->
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+        <button class="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700">Save Changes</button>
       </div>
-    </transition>
+    </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { Cog6ToothIcon, ShieldCheckIcon, BellIcon, CheckIcon, CheckCircleIcon, CircleStackIcon } from '@heroicons/vue/24/outline'
-
-definePageMeta({ layout: 'admin' })
+<script setup>
+definePageMeta({
+  layout: 'default'
+})
 
 const activeTab = ref('general')
-const toastVisible = ref(false)
-const toastMsg = ref('')
+const twoFAEnabled = ref(false)
 
-function showToast(msg: string) {
-  toastMsg.value = msg
-  toastVisible.value = true
-  setTimeout(() => { toastVisible.value = false }, 2600)
-}
-
-const stabs = [
-  { val:'general',       label:'General',       icon: Cog6ToothIcon },
-  { val:'security',      label:'Security',      icon: ShieldCheckIcon },
-  { val:'notifications', label:'Notifications', icon: BellIcon },
+const tabs = [
+  { id: 'general', name: 'General' },
+  { id: 'security', name: 'Security' },
+  { id: 'notifications', name: 'Notifications' },
+  { id: 'integrations', name: 'Integrations' }
 ]
 
-const systemStatus = [
-  { label:'API Gateway',         ok:true },
-  { label:'Authentication',      ok:true },
-  { label:'Database',            ok:true },
-  { label:'File Storage',        ok:true },
-  { label:'Email Notifications', ok:true },
-  { label:'Payment Gateway',     ok:true },
+const emailNotifications = [
+  { id: 1, title: 'New Patient Registration', description: 'Get notified when a new patient registers', enabled: true },
+  { id: 2, title: 'Consultation Reminders', description: 'Receive reminders for upcoming consultations', enabled: true },
+  { id: 3, title: 'System Updates', description: 'Notifications about system maintenance and updates', enabled: false },
+  { id: 4, title: 'Payment Notifications', description: 'Get notified about successful payments', enabled: true }
 ]
-
-const dataSources = [
-  { name:'DOST-FNRI Philippine Food Tables', desc:'Localized food composition data', color:'#0d6b6b' },
-  { name:'USDA FoodData Central',            desc:'International nutrient database', color:'#d97706' },
-  { name:'FNRI Food Exchange Lists',         desc:'Diet exchange system for Filipinos', color:'#7c3aed' },
-]
-
-const secToggles = reactive([
-  { label:'Two-Factor Authentication (2FA)', desc:'Require OTP for all admin logins', val:true },
-  { label:'PRC License Auto-Expiry Check',  desc:'Automatically flag expired RND licenses', val:true },
-  { label:'Force Password Reset (90 days)', desc:'Require password change every 90 days', val:false },
-  { label:'Audit Log (All Actions)',         desc:'Log every user action for compliance', val:true },
-  { label:'IP Whitelist Mode',               desc:'Restrict admin access to approved IPs', val:false },
-])
-
-const notifGroups = reactive([
-  { title:'Client Alerts', items:[
-    { label:'Appointment Reminders', desc:'Send 24h and 1h reminders to clients', val:true },
-    { label:'Lab Result Updates',    desc:'Notify clients when new results are uploaded', val:true },
-    { label:'Progress Reports',      desc:'Weekly summary of nutrition progress', val:false },
-  ]},
-  { title:'Dietitian Alerts', items:[
-    { label:'New Patient Matched',   desc:'Notify RND when a new client is assigned', val:true },
-    { label:'Missed Consultation',   desc:'Alert RND of no-shows or cancellations', val:true },
-  ]},
-  { title:'Admin Alerts', items:[
-    { label:'Pending Verifications', desc:'Alert when new RND submits for verification', val:true },
-    { label:'Payment Disputes',      desc:'Notify admin of flagged transactions', val:true },
-    { label:'System Error Reports',  desc:'Email admin on critical system errors', val:true },
-  ]},
-])
 </script>
