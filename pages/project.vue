@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Team from '~/components/team.vue';
+import Project from '~/components/project.vue';
 
 </script>
 
 <template>
     <NuxtLayout>
-        <Team/>
+        <Project/>
     </NuxtLayout>
 </template>

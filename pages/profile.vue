@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Team from '~/components/team.vue';
+import Profile from '~/layouts/profile.vue';
 
 </script>
 
 <template>
     <NuxtLayout>
-        <Team/>
+        <Profile/>
     </NuxtLayout>
 </template>

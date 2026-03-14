@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Team from '~/components/team.vue';
+import Calendar from '~/components/calendar.vue';
 
 </script>
 
 <template>
     <NuxtLayout>
-        <Team/>
+        <Calendar/>
     </NuxtLayout>
 </template>
