@@ -67,7 +67,7 @@
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+              <a href="/setting" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                 Settings
               </a>
@@ -158,15 +158,16 @@ const route = useRoute()
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Programs', href: '/program', icon: FolderIcon },
+  { name: 'Schedule', href: '/schedule', icon: CalendarIcon },
+  { name: 'Inventory', href: '/inventory', icon: DocumentDuplicateIcon },
+  { name: 'Reports', href: '/report', icon: ChartPieIcon },
+
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your profile', href: '/profile' },
+  { name: 'Sign out', href: '/' },
 ]
 
 const sidebarOpen = ref(false)
