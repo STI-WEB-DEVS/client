@@ -25,14 +25,14 @@
           Elevate <em style="color: #C9A96E;">every</em><br />spa experience
         </p>
         <p class="mt-5 text-sm leading-relaxed" style="color: rgba(255,255,255,0.45); max-width: 340px;">
-          Manage subscriptions, monitor tenants, and oversee platform operations — all in one place.
+          Manage subscriptions, monitor Spa Owners, and oversee platform operations — all in one place.
         </p>
 
         <!-- Stats row -->
         <div class="mt-10 flex gap-8">
           <div>
             <p class="text-2xl font-bold text-white">38+</p>
-            <p class="text-xs mt-0.5" style="color: rgba(255,255,255,0.4);">Active Tenants</p>
+            <p class="text-xs mt-0.5" style="color: rgba(255,255,255,0.4);">Active Spa Owners</p>
           </div>
           <div class="w-px" style="background-color: rgba(255,255,255,0.1);"></div>
           <div>
