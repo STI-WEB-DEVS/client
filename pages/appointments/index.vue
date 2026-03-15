@@ -5,7 +5,7 @@
         <h2 class="text-2xl font-bold text-slate-800">Appointments</h2>
         <p class="text-sm text-slate-500 mt-0.5">Schedule fittings, consultations and order pickups</p>
       </div>
-      <button @click="openAddAppt" class="btn-amber">+ New Appointment</button>
+      <button @click="openAddAppt" class="btn-teal">+ New Appointment</button>
     </div>
 
     <!-- Calendar strip -->
@@ -36,21 +36,23 @@
         </div>
         <div class="grid gap-3">
           <div v-for="appt in group.items" :key="appt.id" class="appt-card">
-            <div class="flex items-start justify-between">
-              <div class="flex items-start gap-4">
-                <div :class="['appt-type-icon',typeColor(appt.type)]">
-                  <component :is="typeIcon(appt.type)" class="size-4" />
-                </div>
-                <div>
-                  <p class="font-semibold text-slate-800">{{ appt.customer }}</p>
-                  <p class="text-sm text-slate-500 mt-0.5">{{ appt.type }}</p>
-                  <p class="text-xs text-slate-400 mt-1">📍 {{ appt.location }} &nbsp;·&nbsp; ⏰ {{ appt.time }}</p>
-                </div>
+            <!-- Top row: icon + info -->
+            <div class="flex items-start gap-3 min-w-0">
+              <div :class="['appt-type-icon',typeColor(appt.type)]">
+                <component :is="typeIcon(appt.type)" class="size-4" />
               </div>
-              <div class="flex items-center gap-2">
-                <span :class="appt.status==='Confirmed'?'badge-green':'badge-yellow'">{{ appt.status }}</span>
+              <div class="min-w-0 flex-1">
+                <p class="font-semibold text-slate-800 truncate">{{ appt.customer }}</p>
+                <p class="text-sm text-slate-500 mt-0.5">{{ appt.type }}</p>
+                <p class="text-xs text-slate-400 mt-1">📍 {{ appt.location }} &nbsp;·&nbsp; ⏰ {{ appt.time }}</p>
+              </div>
+            </div>
+            <!-- Bottom row: badge + actions (wraps on mobile) -->
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100 flex-wrap">
+              <span :class="appt.status==='Confirmed'?'badge-green':'badge-yellow'">{{ appt.status }}</span>
+              <div class="ml-auto flex items-center gap-1 flex-wrap">
                 <button @click="viewAppt(appt)" class="action-btn text-blue-600 hover:bg-blue-50">View</button>
-                <button @click="editAppt(appt)" class="action-btn text-amber-600 hover:bg-amber-50">Edit</button>
+                <button @click="editAppt(appt)" class="action-btn text-teal-600 hover:bg-teal-50">Edit</button>
                 <button @click="deleteAppt(appt)" class="action-btn text-red-600 hover:bg-red-50">Delete</button>
               </div>
             </div>
@@ -80,14 +82,14 @@
           </div>
           <div class="flex justify-end gap-3 pt-2">
             <button @click="editAppt(selected)" class="btn-outline">Edit</button>
-            <button @click="closeModals" class="btn-amber">Close</button>
+            <button @click="closeModals" class="btn-teal">Close</button>
           </div>
         </div>
 
         <!-- Add / Edit form -->
         <form v-else @submit.prevent="saveAppt" class="p-6 space-y-4">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="form-group col-span-2"><label>Customer *</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="form-group sm:col-span-2"><label>Customer *</label>
               <input v-model="form.customer" type="text" class="form-input" placeholder="Customer name" required />
             </div>
             <div class="form-group"><label>Appointment Type *</label>
@@ -107,18 +109,18 @@
             <div class="form-group"><label>Time *</label>
               <input v-model="form.time" type="time" class="form-input" required />
             </div>
-            <div class="form-group col-span-2"><label>Location</label>
+            <div class="form-group sm:col-span-2"><label>Location</label>
               <select v-model="form.location" class="form-input">
                 <option>Shop</option><option>Home Visit</option><option>Online (Video Call)</option>
               </select>
             </div>
-            <div class="form-group col-span-2"><label>Notes</label>
+            <div class="form-group sm:col-span-2"><label>Notes</label>
               <textarea v-model="form.notes" class="form-input" rows="2" placeholder="Optional notes..."></textarea>
             </div>
           </div>
           <div class="flex justify-end gap-3 pt-2">
             <button type="button" @click="closeModals" class="btn-outline">Cancel</button>
-            <button type="submit" class="btn-amber">{{ apptMode==='edit'?'Update':'Schedule' }}</button>
+            <button type="submit" class="btn-teal">{{ apptMode==='edit'?'Update':'Schedule' }}</button>
           </div>
         </form>
       </div>
@@ -203,21 +205,21 @@ const confirmDelete = () => { const i=appointments.findIndex(x=>x.id===deleteTar
 const closeModals = () => { showModal.value=false; showDeleteConfirm.value=false }
 
 const typeIcon = (t:string) => t==='Final Fitting'||t==='Measurement'?ScissorsIcon:t==='Consultation'?UserIcon:ArchiveBoxIcon
-const typeColor = (t:string) => t==='Final Fitting'||t==='Measurement'?'bg-amber-100 text-amber-600':t==='Consultation'?'bg-blue-100 text-blue-600':'bg-emerald-100 text-emerald-600'
+const typeColor = (t:string) => t==='Final Fitting'||t==='Measurement'?'bg-teal-50 text-teal-600':t==='Consultation'?'bg-blue-100 text-blue-600':'bg-emerald-100 text-emerald-600'
 </script>
 
 <style scoped>
 .card{background:white;border-radius:1rem;padding:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.06);border:1px solid rgba(15,23,42,0.06);}
-.btn-amber{background:linear-gradient(135deg,#F59E0B,#D97706);color:#0F172A;font-weight:700;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:none;cursor:pointer;transition:all 0.15s;}
-.btn-amber:hover{box-shadow:0 4px 12px rgba(245,158,11,0.35);transform:translateY(-1px);}
+.btn-teal{background:linear-gradient(135deg,#009E97,#007A75);color:#fff;font-weight:700;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:none;cursor:pointer;transition:all 0.15s;}
+.btn-teal:hover{box-shadow:0 4px 12px rgba(0,158,151,0.35);transform:translateY(-1px);}
 .btn-outline{background:white;color:#64748B;font-weight:600;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:1px solid #E2E8F0;cursor:pointer;}
 .btn-danger{background:#DC2626;color:white;font-weight:700;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:none;cursor:pointer;}
 .cal-nav{font-size:0.85rem;color:#64748B;font-weight:600;background:#F1F5F9;border:none;border-radius:0.5rem;padding:0.3rem 0.75rem;cursor:pointer;}
 .cal-day{position:relative;text-align:center;padding:0.45rem 0;font-size:0.8rem;color:#64748B;border-radius:0.5rem;}
-.cal-today{background:#F59E0B;color:white;font-weight:700;}
+.cal-today{background:#009E97;color:white;font-weight:700;}
 .cal-has-event{font-weight:600;color:#0F172A;}
-.cal-dot{display:block;width:4px;height:4px;border-radius:50%;background:#F59E0B;margin:2px auto 0;}
-.day-badge{width:40px;height:40px;border-radius:0.625rem;background:linear-gradient(135deg,#F59E0B,#D97706);color:#0F172A;font-weight:800;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cal-dot{display:block;width:4px;height:4px;border-radius:50%;background:#009E97;margin:2px auto 0;}
+.day-badge{width:40px;height:40px;border-radius:0.625rem;background:linear-gradient(135deg,#009E97,#007A75);color:#fff;font-weight:800;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .appt-card{background:white;border-radius:0.875rem;padding:1.25rem;box-shadow:0 1px 3px rgba(0,0,0,0.06);border:1px solid rgba(15,23,42,0.06);}
 .appt-type-icon{padding:0.5rem;border-radius:0.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .badge-green{display:inline-block;font-size:0.7rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:9999px;background:#F0FDF4;color:#16A34A;}
@@ -234,5 +236,5 @@ const typeColor = (t:string) => t==='Final Fitting'||t==='Measurement'?'bg-amber
 .info-val{font-size:0.875rem;font-weight:600;color:#0F172A;}
 .form-group label{display:block;font-size:0.8rem;font-weight:600;color:#64748B;margin-bottom:0.375rem;}
 .form-input{width:100%;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:0.625rem;padding:0.6rem 0.875rem;font-size:0.875rem;color:#0F172A;outline:none;}
-.form-input:focus{border-color:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,0.12);}
+.form-input:focus{border-color:#009E97;box-shadow:0 0 0 3px rgba(0,158,151,0.12);}
 </style>

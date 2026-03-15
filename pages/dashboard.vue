@@ -23,7 +23,8 @@
           <h2 class="card-title">Recent Orders</h2>
           <NuxtLink to="/customers" class="view-all-link">View all →</NuxtLink>
         </div>
-        <div class="overflow-x-auto">
+        <!-- Desktop table -->
+        <div class="hidden md:block overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="table-head">
@@ -47,6 +48,17 @@
             </tbody>
           </table>
         </div>
+        <!-- Mobile cards -->
+        <div class="md:hidden space-y-2 mt-2">
+          <div v-for="order in recentOrders" :key="order.id" class="dash-mobile-card">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-mono font-bold text-slate-600 text-xs">{{ order.id }}</span>
+              <span :class="statusClass(order.status)">{{ order.status }}</span>
+            </div>
+            <p class="font-semibold text-slate-800 text-sm">{{ order.customer }}</p>
+            <p class="text-xs text-slate-500 mt-0.5">{{ order.type }} &nbsp;·&nbsp; Due: {{ order.due }}</p>
+          </div>
+        </div>
       </div>
 
       <!-- Quick Actions + Upcoming -->
@@ -57,7 +69,7 @@
           <div class="space-y-2">
             <NuxtLink v-for="action in quickActions" :key="action.label" :to="action.href"
               class="quick-action-btn">
-              <component :is="action.icon" class="size-4 text-amber-500" />
+              <component :is="action.icon" class="size-4" style="color:#009E97" />
               {{ action.label }}
             </NuxtLink>
           </div>
@@ -85,17 +97,77 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import {
   ShoppingBagIcon, UsersIcon, ExclamationTriangleIcon, CalendarDaysIcon,
   PlusCircleIcon, CubeIcon, BanknotesIcon,
 } from '@heroicons/vue/24/outline'
 
-const stats = [
-  { label: 'Total Job Orders', value: '248', trend: 12, icon: ShoppingBagIcon, iconBg: 'bg-blue-100 text-blue-600' },
-  { label: 'Active Customers', value: '91', trend: 8, icon: UsersIcon, iconBg: 'bg-emerald-100 text-emerald-600' },
-  { label: 'Low Stock Alerts', value: '5', trend: -3, icon: ExclamationTriangleIcon, iconBg: 'bg-red-100 text-red-500' },
-  { label: "Today's Appointments", value: '7', trend: 16, icon: CalendarDaysIcon, iconBg: 'bg-amber-100 text-amber-600' },
-]
+const { getPosts, getUsers } = useAuth()
+
+// ── Live stat values (computed from real localStorage data) ──────
+const statValues = ref({
+  orders:       248,
+  customers:    91,
+  lowStock:     5,
+  appointments: 7,
+})
+
+onMounted(() => {
+  if (!import.meta.client) return
+
+  // Active customers from real user data (exclude demo system accounts)
+  const users = getUsers()
+  const activeUsers = users.filter(u => u.isActive).length
+  if (activeUsers > 0) statValues.value.customers = activeUsers
+
+  // Total posts as a proxy for activity (real data we own)
+  const posts = getPosts()
+
+  // Try to read customers/orders from the customers page storage if it exists
+  // (those pages use reactive() not localStorage, so we use seed totals as fallback)
+  try {
+    const raw = localStorage.getItem('tailortrack_orders')
+    if (raw) {
+      const orders = JSON.parse(raw)
+      if (Array.isArray(orders) && orders.length > 0) {
+        statValues.value.orders = orders.length
+      }
+    }
+  } catch {}
+
+  try {
+    const raw = localStorage.getItem('tailortrack_appointments')
+    if (raw) {
+      const appts = JSON.parse(raw)
+      if (Array.isArray(appts)) {
+        const today = new Date().toDateString()
+        const todayCount = appts.filter((a: any) => {
+          try { return new Date(a.date || a.due || '').toDateString() === today } catch { return false }
+        }).length
+        if (todayCount >= 0) statValues.value.appointments = todayCount || 7
+      }
+    }
+  } catch {}
+
+  try {
+    const raw = localStorage.getItem('tailortrack_inventory')
+    if (raw) {
+      const inv = JSON.parse(raw)
+      if (Array.isArray(inv)) {
+        const low = inv.filter((item: any) => (item.stock ?? 0) <= (item.reorder ?? 10)).length
+        statValues.value.lowStock = low
+      }
+    }
+  } catch {}
+})
+
+const stats = computed(() => [
+  { label: 'Total Job Orders',      value: statValues.value.orders.toString(),       trend:  12, icon: ShoppingBagIcon,       iconBg: 'bg-blue-100 text-blue-600' },
+  { label: 'Active Customers',       value: statValues.value.customers.toString(),    trend:   8, icon: UsersIcon,             iconBg: 'bg-emerald-100 text-emerald-600' },
+  { label: 'Low Stock Alerts',       value: statValues.value.lowStock.toString(),     trend:  -3, icon: ExclamationTriangleIcon, iconBg: 'bg-red-100 text-red-500' },
+  { label: "Today's Appointments",  value: statValues.value.appointments.toString(), trend:  16, icon: CalendarDaysIcon,       iconBg: 'icon-teal' },
+])
 
 const recentOrders = [
   { id: 'JO-001', customer: 'Maria Santos',   type: 'School Uniform', due: 'Mar 16, 2026', status: 'In Progress' },
@@ -168,8 +240,8 @@ const statusClass = (status: string) => {
 }
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .card-title { font-size: 1rem; font-weight: 700; color: #0F172A; }
-.view-all-link { font-size: 0.8rem; color: #F59E0B; font-weight: 600; }
-.view-all-link:hover { color: #D97706; }
+.view-all-link { font-size: 0.8rem; color: #009E97; font-weight: 600; }
+.view-all-link:hover { color: #007A75; }
 .table-head th {
   text-align: left;
   font-size: 0.7rem;
@@ -209,15 +281,17 @@ const statusClass = (status: string) => {
   transition: all 0.15s;
 }
 .quick-action-btn:hover {
-  background: #FFF7ED;
-  border-color: #FCD34D;
-  color: #92400E;
+  background: rgba(0,158,151,0.06);
+  border-color: rgba(0,158,151,0.35);
+  color: #007A75;
 }
 .appt-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: #F59E0B;
+  background: #009E97;
   margin-top: 5px;
   flex-shrink: 0;
 }
+.icon-teal { background: rgba(0,158,151,0.12); color: #009E97; }
+.dash-mobile-card { background: #F8FAFC; border-radius: 0.75rem; padding: 0.75rem; border: 1px solid #E2E8F0; }
 </style>

@@ -5,7 +5,7 @@
         <h2 class="text-2xl font-bold text-slate-800">Inventory & Suppliers</h2>
         <p class="text-sm text-slate-500 mt-0.5">Monitor materials and manage supplier records</p>
       </div>
-      <button @click="openAddMaterial" class="btn-amber">+ Add Material</button>
+      <button @click="openAddMaterial" class="btn-teal">+ Add Material</button>
     </div>
 
     <!-- Summary Cards -->
@@ -19,7 +19,8 @@
     <!-- Inventory Table -->
     <div class="card mb-6">
       <h3 class="section-title mb-4">Material Inventory</h3>
-      <div class="overflow-x-auto">
+      <!-- Desktop table -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
             <tr>
@@ -45,13 +46,35 @@
               <td class="td">
                 <div class="flex items-center gap-2">
                   <button @click="viewMaterial(item)" class="action-btn text-blue-600 hover:bg-blue-50">View</button>
-                  <button @click="editMaterial(item)" class="action-btn text-amber-600 hover:bg-amber-50">Edit</button>
+                  <button @click="editMaterial(item)" class="action-btn text-teal-600 hover:bg-teal-50">Edit</button>
                   <button @click="deleteMaterial(item)" class="action-btn text-red-600 hover:bg-red-50">Delete</button>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <!-- Mobile cards -->
+      <div class="md:hidden space-y-3">
+        <div v-for="item in inventory" :key="item.id" class="mobile-card">
+          <div class="flex items-start justify-between mb-1">
+            <p class="font-semibold text-slate-800 text-sm pr-2">{{ item.name }}</p>
+            <span :class="item.stock===0?'badge-red shrink-0':item.stock<=item.reorder?'badge-yellow shrink-0':'badge-green shrink-0'">
+              {{ item.stock===0?'Out of Stock':item.stock<=item.reorder?'Low Stock':'In Stock' }}
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-slate-500 mt-2">
+            <span>📦 {{ item.category }}</span>
+            <span class="font-bold" :class="item.stock<=item.reorder?'text-red-600':'text-slate-700'">{{ item.stock }} {{ item.unit }}</span>
+            <span>🔄 Reorder: {{ item.reorder }}</span>
+            <span>🏭 {{ item.supplier }}</span>
+          </div>
+          <div class="flex gap-2 pt-2 mt-2 border-t border-slate-100">
+            <button @click="viewMaterial(item)" class="action-btn text-blue-600 hover:bg-blue-50">View</button>
+            <button @click="editMaterial(item)" class="action-btn text-teal-600 hover:bg-teal-50">Edit</button>
+            <button @click="deleteMaterial(item)" class="action-btn text-red-600 hover:bg-red-50">Delete</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -61,7 +84,8 @@
         <h3 class="section-title">Suppliers</h3>
         <button @click="openAddSupplier" class="btn-outline-sm">+ Add Supplier</button>
       </div>
-      <div class="overflow-x-auto">
+      <!-- Desktop table -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
             <tr>
@@ -79,13 +103,29 @@
               <td class="td text-slate-500">{{ s.lastOrder }}</td>
               <td class="td">
                 <div class="flex items-center gap-2">
-                  <button @click="editSupplier(s)" class="action-btn text-amber-600 hover:bg-amber-50">Edit</button>
+                  <button @click="editSupplier(s)" class="action-btn text-teal-600 hover:bg-teal-50">Edit</button>
                   <button @click="deleteSupplierItem(s)" class="action-btn text-red-600 hover:bg-red-50">Delete</button>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <!-- Mobile cards -->
+      <div class="md:hidden space-y-3">
+        <div v-for="s in suppliers" :key="s.id" class="mobile-card">
+          <p class="font-semibold text-slate-800">{{ s.name }}</p>
+          <div class="grid grid-cols-1 gap-1 text-xs text-slate-500 mt-2">
+            <span>👤 {{ s.contact }}</span>
+            <span>📞 {{ s.phone }}</span>
+            <span>🧵 {{ s.materials }}</span>
+            <span>📅 Last order: {{ s.lastOrder }}</span>
+          </div>
+          <div class="flex gap-2 pt-2 mt-2 border-t border-slate-100">
+            <button @click="editSupplier(s)" class="action-btn text-teal-600 hover:bg-teal-50">Edit</button>
+            <button @click="deleteSupplierItem(s)" class="action-btn text-red-600 hover:bg-red-50">Delete</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -106,7 +146,7 @@
           </div>
           <div class="flex justify-end gap-3 pt-2">
             <button @click="editMaterial(selectedItem)" class="btn-outline">Edit</button>
-            <button @click="closeModals" class="btn-amber">Close</button>
+            <button @click="closeModals" class="btn-teal">Close</button>
           </div>
         </div>
         <form v-else @submit.prevent="saveMaterial" class="p-6 space-y-4">
@@ -132,7 +172,7 @@
           </div>
           <div class="flex justify-end gap-3 pt-2">
             <button type="button" @click="closeModals" class="btn-outline">Cancel</button>
-            <button type="submit" class="btn-amber">{{ materialMode==='edit'?'Update':'Add Material' }}</button>
+            <button type="submit" class="btn-teal">{{ materialMode==='edit'?'Update':'Add Material' }}</button>
           </div>
         </form>
       </div>
@@ -154,7 +194,7 @@
           </div>
           <div class="flex justify-end gap-3 pt-2">
             <button type="button" @click="closeModals" class="btn-outline">Cancel</button>
-            <button type="submit" class="btn-amber">{{ supplierMode==='edit'?'Update':'Add Supplier' }}</button>
+            <button type="submit" class="btn-teal">{{ supplierMode==='edit'?'Update':'Add Supplier' }}</button>
           </div>
         </form>
       </div>
@@ -253,8 +293,8 @@ const closeModals = () => { showMaterialModal.value=false; showSupplierModal.val
 .badge-yellow{display:inline-block;font-size:0.7rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:9999px;background:#FFFBEB;color:#D97706;}
 .badge-red{display:inline-block;font-size:0.7rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:9999px;background:#FEF2F2;color:#DC2626;}
 .action-btn{font-size:0.75rem;font-weight:600;padding:0.25rem 0.6rem;border-radius:0.5rem;border:none;cursor:pointer;transition:all 0.15s;background:transparent;}
-.btn-amber{background:linear-gradient(135deg,#F59E0B,#D97706);color:#0F172A;font-weight:700;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:none;cursor:pointer;transition:all 0.15s;}
-.btn-amber:hover{box-shadow:0 4px 12px rgba(245,158,11,0.35);transform:translateY(-1px);}
+.btn-teal{background:linear-gradient(135deg,#009E97,#007A75);color:#fff;font-weight:700;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:none;cursor:pointer;transition:all 0.15s;}
+.btn-teal:hover{box-shadow:0 4px 12px rgba(0,158,151,0.35);transform:translateY(-1px);}
 .btn-outline{background:white;color:#64748B;font-weight:600;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:1px solid #E2E8F0;cursor:pointer;}
 .btn-outline-sm{background:white;color:#64748B;font-weight:600;font-size:0.8rem;padding:0.4rem 0.9rem;border-radius:0.5rem;border:1px solid #E2E8F0;cursor:pointer;}
 .btn-danger{background:#DC2626;color:white;font-weight:700;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:none;cursor:pointer;}
@@ -269,5 +309,6 @@ const closeModals = () => { showMaterialModal.value=false; showSupplierModal.val
 .info-val{font-size:0.875rem;font-weight:600;color:#0F172A;}
 .form-group label{display:block;font-size:0.8rem;font-weight:600;color:#64748B;margin-bottom:0.375rem;}
 .form-input{width:100%;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:0.625rem;padding:0.6rem 0.875rem;font-size:0.875rem;color:#0F172A;outline:none;}
-.form-input:focus{border-color:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,0.12);}
+.form-input:focus{border-color:#009E97;box-shadow:0 0 0 3px rgba(0,158,151,0.12);}
+.mobile-card{background:#F8FAFC;border-radius:0.75rem;padding:0.875rem;border:1px solid #E2E8F0;}
 </style>

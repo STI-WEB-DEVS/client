@@ -5,7 +5,7 @@
         <h2 class="text-2xl font-bold text-slate-800">Billing & Payments</h2>
         <p class="text-sm text-slate-500 mt-0.5">Generate invoices and track payment records</p>
       </div>
-      <button @click="openAddInvoice" class="btn-amber">+ New Invoice</button>
+      <button @click="openAddInvoice" class="btn-teal">+ New Invoice</button>
     </div>
 
     <!-- Summary -->
@@ -18,13 +18,14 @@
 
     <!-- Invoices -->
     <div class="card">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="section-title">Invoices</h3>
-        <div class="flex gap-2">
-          <button v-for="f in filters" :key="f" @click="activeFilter=f" :class="['filter-btn',activeFilter===f?'filter-active':'']">{{ f }}</button>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <h3 class="section-title shrink-0">Invoices</h3>
+        <div class="flex gap-2 overflow-x-auto pb-1">
+          <button v-for="f in filters" :key="f" @click="activeFilter=f" :class="['filter-btn shrink-0',activeFilter===f?'filter-active':'']">{{ f }}</button>
         </div>
       </div>
-      <div class="overflow-x-auto">
+      <!-- Desktop table -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
             <tr>
@@ -45,13 +46,33 @@
                 <div class="flex items-center gap-1">
                   <button @click="viewInvoice(inv)" class="action-btn text-blue-600 hover:bg-blue-50">View</button>
                   <button @click="printInvoice(inv)" class="action-btn text-emerald-600 hover:bg-emerald-50">Print</button>
-                  <button @click="editInvoice(inv)" class="action-btn text-amber-600 hover:bg-amber-50">Edit</button>
+                  <button @click="editInvoice(inv)" class="action-btn text-teal-600 hover:bg-teal-50">Edit</button>
                   <button @click="deleteInvoice(inv)" class="action-btn text-red-600 hover:bg-red-50">Delete</button>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <!-- Mobile cards -->
+      <div class="md:hidden space-y-3">
+        <div v-for="inv in filteredInvoices" :key="inv.id" class="mobile-card">
+          <div class="flex items-start justify-between mb-1">
+            <span class="font-mono font-bold text-slate-600 text-sm">{{ inv.id }}</span>
+            <span :class="statusClass(inv.status)">{{ inv.status }}</span>
+          </div>
+          <p class="font-semibold text-slate-800">{{ inv.customer }}</p>
+          <p class="text-2xl font-extrabold mt-1" style="color:#009E97">₱ {{ inv.amount.toLocaleString() }}</p>
+          <div class="text-xs text-slate-400 mt-1 space-y-0.5">
+            <p>Ref: {{ inv.order }} &nbsp;·&nbsp; {{ inv.date }}</p>
+          </div>
+          <div class="flex gap-1 flex-wrap pt-2 mt-2 border-t border-slate-100">
+            <button @click="viewInvoice(inv)" class="action-btn text-blue-600 hover:bg-blue-50">View</button>
+            <button @click="printInvoice(inv)" class="action-btn text-emerald-600 hover:bg-emerald-50">Print</button>
+            <button @click="editInvoice(inv)" class="action-btn text-teal-600 hover:bg-teal-50">Edit</button>
+            <button @click="deleteInvoice(inv)" class="action-btn text-red-600 hover:bg-red-50">Delete</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -72,7 +93,7 @@
           <div class="flex justify-between items-start mb-8">
             <div>
               <div class="flex items-center gap-2 mb-1">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-6 text-amber-500">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#009E97" stroke-width="2" class="size-6">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                 </svg>
                 <span class="text-xl font-extrabold text-slate-800">TailorTrack</span>
@@ -82,7 +103,7 @@
             </div>
             <div class="text-right">
               <p class="text-2xl font-extrabold text-slate-800">INVOICE</p>
-              <p class="font-mono font-bold text-amber-600 text-lg mt-1">{{ selected?.id }}</p>
+              <p class="font-mono font-bold text-lg mt-1" style="color:#009E97">{{ selected?.id }}</p>
               <span :class="statusClass(selected?.status)" class="mt-2 inline-block">{{ selected?.status }}</span>
             </div>
           </div>
@@ -100,22 +121,22 @@
             <tbody><tr class="border-b border-slate-100"><td class="p-3">{{ selected?.description || selected?.type }}</td><td class="p-3 text-slate-500">{{ selected?.order }}</td><td class="p-3 text-right font-bold">₱ {{ selected?.amount?.toLocaleString() }}</td></tr></tbody>
             <tfoot>
               <tr><td colspan="2" class="p-3 text-right font-semibold text-slate-600">Subtotal</td><td class="p-3 text-right font-semibold">₱ {{ selected?.amount?.toLocaleString() }}</td></tr>
-              <tr class="bg-slate-50"><td colspan="2" class="p-3 text-right font-extrabold text-slate-800">TOTAL</td><td class="p-3 text-right font-extrabold text-lg text-amber-600">₱ {{ selected?.amount?.toLocaleString() }}</td></tr>
+              <tr class="bg-slate-50"><td colspan="2" class="p-3 text-right font-extrabold text-slate-800">TOTAL</td><td class="p-3 text-right font-extrabold text-lg" style="color:#009E97">₱ {{ selected?.amount?.toLocaleString() }}</td></tr>
             </tfoot>
           </table>
           <div class="border-t border-slate-200 pt-4 text-xs text-slate-400 text-center">Thank you for trusting TailorTrack! · Generated {{ new Date().toLocaleDateString() }}</div>
           <div class="flex justify-end gap-3 mt-6 print:hidden">
             <button @click="editInvoice(selected)" class="btn-outline">Edit</button>
-            <button @click="closeModals" class="btn-amber">Close</button>
+            <button @click="closeModals" class="btn-teal">Close</button>
           </div>
         </div>
 
         <!-- ADD / EDIT form -->
         <form v-else @submit.prevent="saveInvoice" class="p-6 space-y-4">
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="form-group"><label>Customer *</label><input v-model="form.customer" type="text" class="form-input" required placeholder="Customer name" /></div>
             <div class="form-group"><label>Order Reference</label><input v-model="form.order" type="text" class="form-input" placeholder="e.g. JO-001" /></div>
-            <div class="form-group col-span-2"><label>Description</label><input v-model="form.description" type="text" class="form-input" placeholder="e.g. School Uniform x2" /></div>
+            <div class="form-group sm:col-span-2"><label>Description</label><input v-model="form.description" type="text" class="form-input" placeholder="e.g. School Uniform x2" /></div>
             <div class="form-group"><label>Amount (₱) *</label><input v-model.number="form.amount" type="number" min="0" class="form-input" required /></div>
             <div class="form-group"><label>Status</label>
               <select v-model="form.status" class="form-input">
@@ -127,7 +148,7 @@
           </div>
           <div class="flex justify-end gap-3 pt-2">
             <button type="button" @click="closeModals" class="btn-outline">Cancel</button>
-            <button type="submit" class="btn-amber">{{ invMode==='edit'?'Update Invoice':'Create Invoice' }}</button>
+            <button type="submit" class="btn-teal">{{ invMode==='edit'?'Update Invoice':'Create Invoice' }}</button>
           </div>
         </form>
       </div>
@@ -232,10 +253,10 @@ const statusClass = (s:string) => {
 .badge-red{display:inline-block;font-size:0.7rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:9999px;background:#FEF2F2;color:#DC2626;}
 .badge-gray{display:inline-block;font-size:0.7rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:9999px;background:#F1F5F9;color:#475569;}
 .filter-btn{font-size:0.75rem;font-weight:600;padding:0.3rem 0.75rem;border-radius:0.5rem;border:1px solid #E2E8F0;background:white;color:#64748B;cursor:pointer;}
-.filter-active{background:#F59E0B;border-color:#F59E0B;color:#0F172A;}
+.filter-active{background:#009E97;border-color:#009E97;color:#fff;}
 .action-btn{font-size:0.75rem;font-weight:600;padding:0.25rem 0.6rem;border-radius:0.5rem;border:none;cursor:pointer;transition:all 0.15s;background:transparent;}
-.btn-amber{background:linear-gradient(135deg,#F59E0B,#D97706);color:#0F172A;font-weight:700;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:none;cursor:pointer;transition:all 0.15s;}
-.btn-amber:hover{box-shadow:0 4px 12px rgba(245,158,11,0.35);transform:translateY(-1px);}
+.btn-teal{background:linear-gradient(135deg,#009E97,#007A75);color:#fff;font-weight:700;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:none;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn-teal:hover{box-shadow:0 4px 12px rgba(0,158,151,0.35);transform:translateY(-1px);}
 .btn-outline{background:white;color:#64748B;font-weight:600;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:1px solid #E2E8F0;cursor:pointer;}
 .btn-danger{background:#DC2626;color:white;font-weight:700;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:0.625rem;border:none;cursor:pointer;}
 .btn-print{background:#F0FDF4;color:#16A34A;font-weight:600;font-size:0.8rem;padding:0.4rem 0.875rem;border-radius:0.5rem;border:1px solid #BBF7D0;cursor:pointer;}
@@ -247,6 +268,7 @@ const statusClass = (s:string) => {
 .modal-close:hover{background:#F1F5F9;}
 .form-group label{display:block;font-size:0.8rem;font-weight:600;color:#64748B;margin-bottom:0.375rem;}
 .form-input{width:100%;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:0.625rem;padding:0.6rem 0.875rem;font-size:0.875rem;color:#0F172A;outline:none;}
-.form-input:focus{border-color:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,0.12);}
+.form-input:focus{border-color:#009E97;box-shadow:0 0 0 3px rgba(0,158,151,0.12);}
+.mobile-card{background:#F8FAFC;border-radius:0.75rem;padding:0.875rem;border:1px solid #E2E8F0;}
 @media print{.modal-overlay{position:static!important;background:none!important;} .modal-box{box-shadow:none!important;max-height:none!important;} .print\\:hidden{display:none!important;} body *:not(#print-area):not(#print-area *){display:none!important;} #print-area{display:block!important;}}
 </style>

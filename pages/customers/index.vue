@@ -5,7 +5,7 @@
         <h2 class="text-2xl font-bold text-slate-800">Customers & Orders</h2>
         <p class="text-sm text-slate-500 mt-0.5">Manage customer profiles and job orders</p>
       </div>
-      <button @click="openAdd" class="btn-amber">+ New Customer</button>
+      <button @click="openAdd" class="btn-teal">+ New Customer</button>
     </div>
 
     <!-- Tabs -->
@@ -16,7 +16,8 @@
 
     <!-- Customers Table -->
     <div v-if="activeTab === 'Customers'" class="card">
-      <div class="overflow-x-auto">
+      <!-- Desktop table -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
             <tr>
@@ -43,7 +44,7 @@
               <td class="td">
                 <div class="flex items-center gap-2">
                   <button @click="viewCustomer(c)" class="action-btn text-blue-600 hover:bg-blue-50">View</button>
-                  <button @click="editCustomer(c)" class="action-btn text-amber-600 hover:bg-amber-50">Edit</button>
+                  <button @click="editCustomer(c)" class="action-btn text-teal-600 hover:bg-teal-50">Edit</button>
                   <button @click="deleteCustomer(c)" class="action-btn text-red-600 hover:bg-red-50">Delete</button>
                 </div>
               </td>
@@ -51,15 +52,39 @@
           </tbody>
         </table>
       </div>
+      <!-- Mobile cards -->
+      <div class="md:hidden space-y-3">
+        <div v-for="c in customers" :key="c.id" class="mobile-card">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="avatar">{{ c.name[0] }}</div>
+            <div class="min-w-0">
+              <p class="font-semibold text-slate-800 truncate">{{ c.name }}</p>
+              <p class="text-xs text-slate-400 truncate">{{ c.email }}</p>
+            </div>
+            <span :class="c.active ? 'badge-green ml-auto shrink-0' : 'badge-gray ml-auto shrink-0'">{{ c.active ? 'Active' : 'Inactive' }}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs text-slate-500 mb-3">
+            <span>📞 {{ c.phone }}</span>
+            <span>🛍 {{ c.orders }} orders</span>
+            <span class="col-span-2">📅 Last: {{ c.lastOrder }}</span>
+          </div>
+          <div class="flex gap-2 pt-2 border-t border-slate-100">
+            <button @click="viewCustomer(c)" class="action-btn text-blue-600 hover:bg-blue-50">View</button>
+            <button @click="editCustomer(c)" class="action-btn text-teal-600 hover:bg-teal-50">Edit</button>
+            <button @click="deleteCustomer(c)" class="action-btn text-red-600 hover:bg-red-50">Delete</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Job Orders Table -->
     <div v-if="activeTab === 'Job Orders'" class="card">
       <div class="flex justify-between items-center mb-4">
         <h3 class="section-title">Job Orders</h3>
-        <button @click="openAddOrder" class="btn-amber">+ New Order</button>
+        <button @click="openAddOrder" class="btn-teal">+ New Order</button>
       </div>
-      <div class="overflow-x-auto">
+      <!-- Desktop table -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
             <tr>
@@ -79,13 +104,30 @@
               <td class="td">
                 <div class="flex items-center gap-2">
                   <button @click="viewOrder(o)" class="action-btn text-blue-600 hover:bg-blue-50">View</button>
-                  <button @click="editOrder(o)" class="action-btn text-amber-600 hover:bg-amber-50">Edit</button>
+                  <button @click="editOrder(o)" class="action-btn text-teal-600 hover:bg-teal-50">Edit</button>
                   <button @click="deleteOrder(o)" class="action-btn text-red-600 hover:bg-red-50">Delete</button>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <!-- Mobile cards -->
+      <div class="md:hidden space-y-3">
+        <div v-for="o in orders" :key="o.id" class="mobile-card">
+          <div class="flex items-start justify-between mb-2">
+            <span class="font-mono font-bold text-slate-600 text-sm">{{ o.id }}</span>
+            <span :class="statusClass(o.status)">{{ o.status }}</span>
+          </div>
+          <p class="font-semibold text-slate-800">{{ o.customer }}</p>
+          <p class="text-sm text-slate-500 mt-0.5">{{ o.type }}</p>
+          <p class="text-xs text-slate-400 mt-1">📅 Due: {{ o.due }}</p>
+          <div class="flex gap-2 pt-2 mt-2 border-t border-slate-100">
+            <button @click="viewOrder(o)" class="action-btn text-blue-600 hover:bg-blue-50">View</button>
+            <button @click="editOrder(o)" class="action-btn text-teal-600 hover:bg-teal-50">Edit</button>
+            <button @click="deleteOrder(o)" class="action-btn text-red-600 hover:bg-red-50">Delete</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -101,7 +143,7 @@
             <div class="avatar-lg">{{ selectedCustomer?.name?.[0] }}</div>
             <div>
               <h4 class="text-xl font-bold text-slate-800">{{ selectedCustomer?.name }}</h4>
-              <p class="text-amber-600 font-semibold text-sm">Customer #{{ selectedCustomer?.id }}</p>
+              <p class="font-semibold text-sm" style="color:#009E97">Customer #{{ selectedCustomer?.id }}</p>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-3">
@@ -137,12 +179,12 @@
           </div>
           <div class="flex justify-end gap-3 pt-2">
             <button type="button" @click="closeModals" class="btn-outline">Cancel</button>
-            <button type="submit" class="btn-amber">{{ modalMode === 'edit' ? 'Update' : 'Add Customer' }}</button>
+            <button type="submit" class="btn-teal">{{ modalMode === 'edit' ? 'Update' : 'Add Customer' }}</button>
           </div>
         </form>
         <div v-if="modalMode === 'view'" class="px-6 pb-6 flex justify-end gap-3">
           <button @click="editCustomer(selectedCustomer)" class="btn-outline">Edit</button>
-          <button @click="closeModals" class="btn-amber">Close</button>
+          <button @click="closeModals" class="btn-teal">Close</button>
         </div>
       </div>
     </div>
@@ -165,7 +207,7 @@
           </div>
           <div class="flex justify-end gap-3 pt-2">
             <button @click="editOrder(selectedOrder)" class="btn-outline">Edit</button>
-            <button @click="closeModals" class="btn-amber">Close</button>
+            <button @click="closeModals" class="btn-teal">Close</button>
           </div>
         </div>
         <form v-else @submit.prevent="saveOrder" class="p-6 space-y-4">
@@ -186,7 +228,7 @@
           </div>
           <div class="flex justify-end gap-3 pt-2">
             <button type="button" @click="closeModals" class="btn-outline">Cancel</button>
-            <button type="submit" class="btn-amber">{{ orderModalMode === 'edit' ? 'Update Order' : 'Create Order' }}</button>
+            <button type="submit" class="btn-teal">{{ orderModalMode === 'edit' ? 'Update Order' : 'Create Order' }}</button>
           </div>
         </form>
       </div>
@@ -307,15 +349,15 @@ const statusClass = (s: string) => {
 .th { text-align:left; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#94A3B8; padding:0.6rem 0.875rem; background:#F8FAFC; }
 .td { padding:0.85rem 0.875rem; }
 .tr-hover:hover td { background:#FAFBFC; }
-.avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#F59E0B,#D97706); color:white; font-weight:700; font-size:0.8rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.avatar-lg { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,#F59E0B,#D97706); color:white; font-weight:800; font-size:1.4rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#009E97,#007A75); color:white; font-weight:700; font-size:0.8rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.avatar-lg { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,#009E97,#007A75); color:white; font-weight:800; font-size:1.4rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .badge-green { display:inline-block; font-size:0.7rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:9999px; background:#F0FDF4; color:#16A34A; }
 .badge-gray { display:inline-block; font-size:0.7rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:9999px; background:#F1F5F9; color:#475569; }
 .badge-blue { display:inline-block; font-size:0.7rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:9999px; background:#EFF6FF; color:#2563EB; }
 .badge-yellow { display:inline-block; font-size:0.7rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:9999px; background:#FFFBEB; color:#D97706; }
 .action-btn { font-size:0.75rem; font-weight:600; padding:0.25rem 0.6rem; border-radius:0.5rem; border:none; cursor:pointer; transition:all 0.15s; background:transparent; }
-.btn-amber { background:linear-gradient(135deg,#F59E0B,#D97706); color:#0F172A; font-weight:700; font-size:0.85rem; padding:0.6rem 1.25rem; border-radius:0.625rem; border:none; cursor:pointer; transition:all 0.15s; }
-.btn-amber:hover { box-shadow:0 4px 12px rgba(245,158,11,0.35); transform:translateY(-1px); }
+.btn-teal { background:linear-gradient(135deg,#009E97,#007A75); color:#fff; font-weight:700; font-size:0.85rem; padding:0.6rem 1.25rem; border-radius:0.625rem; border:none; cursor:pointer; transition:all 0.15s; }
+.btn-teal:hover { box-shadow:0 4px 12px rgba(0,158,151,0.35); transform:translateY(-1px); }
 .btn-outline { background:white; color:#64748B; font-weight:600; font-size:0.85rem; padding:0.6rem 1.25rem; border-radius:0.625rem; border:1px solid #E2E8F0; cursor:pointer; transition:all 0.15s; }
 .btn-outline:hover { background:#F8FAFC; }
 .btn-danger { background:#DC2626; color:white; font-weight:700; font-size:0.85rem; padding:0.6rem 1.25rem; border-radius:0.625rem; border:none; cursor:pointer; }
@@ -333,5 +375,6 @@ const statusClass = (s: string) => {
 .info-val { font-size:0.875rem; font-weight:600; color:#0F172A; }
 .form-group label { display:block; font-size:0.8rem; font-weight:600; color:#64748B; margin-bottom:0.375rem; }
 .form-input { width:100%; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:0.625rem; padding:0.6rem 0.875rem; font-size:0.875rem; color:#0F172A; outline:none; }
-.form-input:focus { border-color:#F59E0B; box-shadow:0 0 0 3px rgba(245,158,11,0.12); }
+.form-input:focus { border-color:#009E97; box-shadow:0 0 0 3px rgba(0,158,151,0.12); }
+.mobile-card { background:#F8FAFC; border-radius:0.75rem; padding:0.875rem; border:1px solid #E2E8F0; }
 </style>
