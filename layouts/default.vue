@@ -222,8 +222,8 @@
           <Menu as="div" class="relative">
             <MenuButton class="flex items-center gap-x-3 group">
               <img
-                class="size-10 rounded-full ring-2 ring-[#c9a96e]/30 group-hover:ring-[#c9a96e]/60 transition-all"
-                src="/Nicolaii-gwapa.jpg"
+                class="size-8 rounded-full ring-2 ring-[#c9a96e]/30 group-hover:ring-[#c9a96e]/60 transition-all"
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                 alt="User"
               />
               <span class="hidden lg:flex lg:flex-col lg:items-start">
@@ -243,10 +243,17 @@
             >
               <MenuItems class="dropdown-menu absolute right-0 z-10 mt-2.5 w-44 origin-top-right">
                 <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                  <a :href="item.href" :class="['dropdown-item', { active }]">
+                  <NuxtLink :to="item.href" :class="['dropdown-item', { active }]">
                     <component :is="item.icon" class="size-4" />
                     {{ item.name }}
-                  </a>
+                  </NuxtLink>
+                </MenuItem>
+                <div class="dropdown-divider"></div>
+                <MenuItem v-slot="{ active }">
+                  <button :class="['dropdown-item dropdown-signout', { active }]" @click="signOut">
+                    <ArrowRightOnRectangleIcon class="size-4" />
+                    Sign Out
+                  </button>
                 </MenuItem>
               </MenuItems>
             </transition>
@@ -298,30 +305,41 @@ import {
   CurrencyDollarIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route       = useRoute()
 const sidebarOpen = ref(false)
 
-// ── NAVIGATION ──
+// ── NAVIGATION (exactly 6 links) ──
 const navigation = [
   { name: 'Dashboard',    href: '/dashboard',    icon: HomeIcon },
-  { name: 'Appointments', href: '/appointments', icon: CalendarIcon,         badge: '4' },
+  { name: 'Appointments', href: '/appointments', icon: CalendarIcon,         badge: '3' },
   { name: 'Clients',      href: '/clients',      icon: UsersIcon },
-  { name: 'Therapists',   href: '/therapists',   icon: UserGroupIcon },
+  { name: 'Team',         href: '/team',         icon: UserGroupIcon },
   { name: 'Services',     href: '/services',     icon: SparklesIcon },
   { name: 'Reports',      href: '/reports',      icon: ChartPieIcon },
-  { name: 'Documents',    href: '/documents',    icon: DocumentDuplicateIcon },
 ]
 
 const userNavigation = [
   { name: 'Your Profile', href: '/myprofile', icon: UserIcon },
-  { name: 'Sign Out',     href: '/Logout',        icon: ArrowRightOnRectangleIcon },
 ]
 
-const currentPageName = computed(() =>
-  navigation.find(n => n.href === route.path)?.name ?? 'Dashboard'
-)
+// ── SIGN OUT ──
+const router = useRouter()
+function signOut() {
+  router.push('/logout')
+}
+
+const currentPageName = computed(() => {
+  const extra = {
+    '/settings':  'Settings',
+    '/myprofile': 'My Profile',
+    '/team':      'Team',
+  }
+  return navigation.find(n => n.href === route.path)?.name
+    ?? extra[route.path]
+    ?? 'Dashboard'
+})
 
 // ── NOTIFICATIONS ──
 const showNotifs = ref(false)
@@ -597,7 +615,20 @@ const vClickOutside = {
   color: #1a1a14;
 }
 
-/* ── MAIN CONTENT ── */
+.dropdown-divider {
+  height: 1px;
+  background: rgba(201,169,110,0.12);
+  margin: 0.3rem 0;
+}
+.dropdown-signout {
+  width: 100%;
+  text-align: left;
+  color: #c0725a !important;
+}
+.dropdown-signout:hover {
+  background: rgba(192,114,90,0.08) !important;
+  color: #c0725a !important;
+}
 .main-content {
   padding: 2.5rem 0;
   min-height: calc(100vh - 4rem);

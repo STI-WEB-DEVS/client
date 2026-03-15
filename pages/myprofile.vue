@@ -408,7 +408,7 @@ const tabs = [
 
 // ── PROFILE ──
 const profile = reactive({
-  name:        'Nicole Santos',
+  name:        'Nicolaii Gwapa',
   role:        'Spa Manager',
   avatar:      '/Nicolaii-gwapa.jpg',
   location:    'Davao City, Philippines',
