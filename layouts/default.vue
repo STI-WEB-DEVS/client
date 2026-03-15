@@ -3,7 +3,7 @@
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
         <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="" leave="transition-opacity ease-linear duration-300" leave-from="" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-900/80"></div>
+          <div class="fixed inset-0 bg-[#1C3028]/80"></div>
         </TransitionChild>
 
         <div class="fixed inset-0 flex">
@@ -18,27 +18,28 @@
                 </div>
               </TransitionChild>
 
-              <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
+              <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-[#1C3028] px-6 pb-4 ring-1 ring-white/10">
                 <div class="relative flex h-16 shrink-0 items-center">
-                  <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+                  <span style="font-family: Georgia, serif; font-size: 1.4rem; color: #f5f0e8; letter-spacing: 0.05em;">Servor<span style="color: #C9A96E;">a</span></span>
                 </div>
                 <nav class="relative flex flex-1 flex-col">
                   <ul role="list" class="flex flex-1 flex-col gap-y-7">
                     <li>
-                      <ul role="list" class="-mx-2 space-y-1">
+                      <p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: rgba(255,255,255,0.3);">Main Menu</p>
+<ul role="list" class="-mx-2 space-y-1">
                         <li v-for="item in navigation" :key="item.name">
-                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
-                            <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
+                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/10 text-white border-l-2 border-[#C9A96E]' : 'text-gray-400 hover:bg-white/5 hover:text-white border-l-2 border-transparent', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold transition-all']">
+                            <component :is="item.icon" :class="['size-6 shrink-0', route.path === item.href ? 'text-[#C9A96E]' : '']" aria-hidden="true" />
                             {{ item.name }}
                           </NuxtLink>
                         </li>
                       </ul>
                     </li>
                     <li class="mt-auto">
-                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+                      <NuxtLink to="/settings" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                         <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                         Settings
-                      </a>
+                      </NuxtLink>
                     </li>
                   </ul>
                 </nav>
@@ -49,28 +50,30 @@
       </Dialog>
     </TransitionRoot>
 
-    <div class="hidden bg-gray-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+    <div class="hidden bg-[#1C3028] ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
       <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
-        <div class="flex h-16 shrink-0 items-center">
-          <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+        <div class="pt-6 pb-4 border-b border-white/10">
+          <span style="font-family: Georgia, serif; font-size: 1.4rem; color: white; letter-spacing: 0.05em;">Servor<span style="color: #C9A96E;">a</span></span>
+          <p class="text-xs mt-1" style="color: rgba(255,255,255,0.3);">Spa Management Platform</p>
         </div>
         <nav class="flex flex-1 flex-col">
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
             <li>
-              <ul role="list" class="-mx-2 space-y-1">
+              <p class="text-xs font-semibold uppercase tracking-widest mb-3" style="color: rgba(255,255,255,0.3);">Main Menu</p>
+<ul role="list" class="-mx-2 space-y-1">
                 <li v-for="item in navigation" :key="item.name">
-                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
-                    <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
+                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/10 text-white border-l-2 border-[#C9A96E]' : 'text-gray-400 hover:bg-white/5 hover:text-white border-l-2 border-transparent', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold transition-all']">
+                    <component :is="item.icon" :class="['size-6 shrink-0', route.path === item.href ? 'text-[#C9A96E]' : '']" aria-hidden="true" />
                     {{ item.name }}
                   </NuxtLink>
                 </li>
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+              <NuxtLink to="/settings" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white border-l-2 border-transparent hover:border-[#C9A96E] transition-all">
                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                 Settings
-              </a>
+              </NuxtLink>
             </li>
           </ul>
         </nav>
@@ -84,7 +87,7 @@
           <Bars3Icon class="size-6" aria-hidden="true" />
         </button>
 
-        <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
+        <div class="h-6 w-px bg-[#1C3028]/10 lg:hidden" aria-hidden="true"></div>
 
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
           <div class="flex flex-1"></div> <div class="flex items-center gap-x-4 lg:gap-x-6">
@@ -93,15 +96,15 @@
               <BellIcon class="size-6" aria-hidden="true" />
             </button>
 
-            <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true"></div>
+            <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-[#1C3028]/10" aria-hidden="true"></div>
 
             <Menu as="div" class="relative">
               <MenuButton class="relative flex items-center">
                 <span class="absolute -inset-1.5"></span>
                 <span class="sr-only">Open user menu</span>
-                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="https://cdn-images.dzcdn.net/images/artist/56c65ac9ea451119ddc8c0b02915d103/1900x1900-000000-80-0-0.jpg" alt="" />
                 <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Tom Cook</span>
+                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Nika Espantaleon</span>
                   <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
                 </span>
               </MenuButton>
@@ -144,9 +147,11 @@ import {
   CalendarIcon,
   ChartPieIcon,
   Cog6ToothIcon,
+  CreditCardIcon,
   DocumentDuplicateIcon,
-  FolderIcon,
   HomeIcon,
+  LifebuoyIcon,
+  MegaphoneIcon,
   UsersIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
@@ -158,15 +163,15 @@ const route = useRoute()
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Subscriptions', href: '/subscriptions', icon: CreditCardIcon },
+  { name: 'Announcements', href: '/announcements', icon: MegaphoneIcon },
+  { name: 'Support', href: '/support', icon: LifebuoyIcon },
+  { name: 'Reports', href: '/reports', icon: ChartPieIcon },
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your profile', href: '/profile' },
+  { name: 'Sign out', href: '/' },
 ]
 
 const sidebarOpen = ref(false)
