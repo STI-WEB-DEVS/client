@@ -1,5 +1,5 @@
 <template>
   <NuxtLayout>
-    <Team/>
+    <Patient/>
   </NuxtLayout>
 </template>

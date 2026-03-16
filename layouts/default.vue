@@ -20,14 +20,14 @@
 
               <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
                 <div class="relative flex h-16 shrink-0 items-center">
-                  <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+                  <img class="h-8 w-auto" src="" alt="Your Company" />
                 </div>
                 <nav class="relative flex flex-1 flex-col">
                   <ul role="list" class="flex flex-1 flex-col gap-y-7">
                     <li>
                       <ul role="list" class="-mx-2 space-y-1">
                         <li v-for="item in navigation" :key="item.name">
-                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
+                         <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-black' : 'text-white hover:bg-white/5 hover:text-black', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
                             <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
                             {{ item.name }}
                           </NuxtLink>
@@ -49,17 +49,18 @@
       </Dialog>
     </TransitionRoot>
 
-    <div class="hidden bg-gray-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+    <div class="hidden ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col" style="background-color: #5AA7A7;">
       <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
         <div class="flex h-16 shrink-0 items-center">
-          <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+          
+         <img class=" h-28 w-auto" src="/Resources/nutrimatchlogo.png" alt="NutriMatch" />
         </div>
         <nav class="flex flex-1 flex-col">
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
             <li>
               <ul role="list" class="-mx-2 space-y-1">
                 <li v-for="item in navigation" :key="item.name">
-                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
+                 <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-black' : 'text-white hover:bg-white/5 hover:text-black', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
                     <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
                     {{ item.name }}
                   </NuxtLink>
@@ -67,10 +68,12 @@
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
-                <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                Settings
-              </a>
+                  <NuxtLink to="/settings"
+                    :class="[route.path === '/settings' ? 'bg-white/5 text-black' : 'text-white hover:bg-white/5 hover:text-black',
+                      'group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
+                      <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
+                      Settings
+                  </NuxtLink>
             </li>
           </ul>
         </nav>
@@ -153,20 +156,20 @@ import {
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import { useRoute } from 'vue-router'
 
-const route = useRoute()
+const route = useRoute() 
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Team', href: '/Team', icon: UsersIcon },
+  { name: 'Admin', href: '/Admin', icon: UsersIcon },
+  { name: 'Consultation', href: '/Consultation', icon: CalendarIcon },
+  { name: 'Patient', href: '/Patient', icon: FolderIcon },
+  { name: 'Dietitian', href: '/Dietitian', icon: FolderIcon },
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your profile', href: '/Profile' },
+  { name: 'Sign out', href: '/LogOut' },
 ]
 
 const sidebarOpen = ref(false)
