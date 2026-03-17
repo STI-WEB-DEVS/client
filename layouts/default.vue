@@ -19,9 +19,21 @@
               </TransitionChild>
 
               <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
-                <div class="relative flex h-16 shrink-0 items-center">
-                  <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+
+                <!-- Mobile Logo -->
+                <div class="flex h-16 shrink-0 items-center">
+                  <svg viewBox="0 0 320 60" class="h-9 w-auto" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="22" y1="6" x2="22" y2="54" stroke="#1D9E75" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M18 54 Q22 60 26 54" fill="#1D9E75"/>
+                    <ellipse cx="22" cy="11" rx="4" ry="5.5" fill="none" stroke="#1D9E75" stroke-width="1.8"/>
+                    <path d="M22 16 C22 22,14 24,14 30 C14 36,30 38,30 44 C30 50,22 52,22 54" fill="none" stroke="#5DCAA5" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="5 3"/>
+                    <circle cx="10" cy="30" r="2.5" fill="#1D9E75"/>
+                    <circle cx="10" cy="42" r="2.5" fill="#1D9E75"/>
+                    <text x="46" y="40" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#ffffff" letter-spacing="4">SUTURA</text>
+                    <text x="48" y="54" font-family="Georgia, serif" font-size="9" fill="#5DCAA5" letter-spacing="3.5">TAILORING SYSTEM</text>
+                  </svg>
                 </div>
+
                 <nav class="relative flex flex-1 flex-col">
                   <ul role="list" class="flex flex-1 flex-col gap-y-7">
                     <li>
@@ -35,10 +47,14 @@
                       </ul>
                     </li>
                     <li class="mt-auto">
-                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+                      <NuxtLink
+                        to="/setting"
+                        class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white"
+                        :class="{ 'bg-white/5 text-white': route.path === '/setting' }"
+                      >
                         <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                         Settings
-                      </a>
+                      </NuxtLink>
                     </li>
                   </ul>
                 </nav>
@@ -49,11 +65,24 @@
       </Dialog>
     </TransitionRoot>
 
+    <!-- Desktop Sidebar -->
     <div class="hidden bg-gray-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
       <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
+
+        <!-- Desktop Logo -->
         <div class="flex h-16 shrink-0 items-center">
-          <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+          <svg viewBox="0 0 320 60" class="h-9 w-auto" xmlns="http://www.w3.org/2000/svg">
+            <line x1="22" y1="6" x2="22" y2="54" stroke="#1D9E75" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M18 54 Q22 60 26 54" fill="#1D9E75"/>
+            <ellipse cx="22" cy="11" rx="4" ry="5.5" fill="none" stroke="#1D9E75" stroke-width="1.8"/>
+            <path d="M22 16 C22 22,14 24,14 30 C14 36,30 38,30 44 C30 50,22 52,22 54" fill="none" stroke="#5DCAA5" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="5 3"/>
+            <circle cx="10" cy="30" r="2.5" fill="#1D9E75"/>
+            <circle cx="10" cy="42" r="2.5" fill="#1D9E75"/>
+            <text x="46" y="40" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#ffffff" letter-spacing="4">SUTURA</text>
+            <text x="48" y="54" font-family="Georgia, serif" font-size="9" fill="#5DCAA5" letter-spacing="3.5">TAILORING SYSTEM</text>
+          </svg>
         </div>
+
         <nav class="flex flex-1 flex-col">
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
             <li>
@@ -67,10 +96,14 @@
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+              <NuxtLink
+                to="/setting"
+                class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white"
+                :class="{ 'bg-white/5 text-white': route.path === '/setting' }"
+              >
                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                 Settings
-              </a>
+              </NuxtLink>
             </li>
           </ul>
         </nav>
@@ -87,7 +120,8 @@
         <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
 
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <div class="flex flex-1"></div> <div class="flex items-center gap-x-4 lg:gap-x-6">
+          <div class="flex flex-1"></div>
+          <div class="flex items-center gap-x-4 lg:gap-x-6">
             <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
               <span class="sr-only">View notifications</span>
               <BellIcon class="size-6" aria-hidden="true" />
@@ -119,7 +153,7 @@
 
       <main class="py-10">
         <div class="px-4 sm:px-6 lg:px-8">
-            <slot></slot>
+          <slot></slot>
         </div>
       </main>
     </div>
@@ -150,23 +184,23 @@ import {
   UsersIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
+import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Dashboard',          href: '/dashboard',   icon: HomeIcon              },
+  { name: 'Team',               href: '/team',         icon: UsersIcon             },
+  { name: 'JobOrderManagement', href: '/project',      icon: FolderIcon            },
+  { name: 'Appointments',       href: '/appointment',  icon: CalendarIcon          },
+  { name: 'Inventory',          href: '/inventory',    icon: DocumentDuplicateIcon },
+  { name: 'Reports',            href: '/report',       icon: ChartPieIcon          },
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your profile', href: '/profile' },
+  { name: 'Sign out',     href: '/'        },
 ]
 
 const sidebarOpen = ref(false)
