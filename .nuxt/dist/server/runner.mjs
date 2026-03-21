@@ -1,0 +1,1 @@
+export { default } from "file:///C:/Users/Administrator/Downloads/nutrimatch_hover_v3/nutrimatch_v3/node_modules/@nuxt/vite-builder/dist/vite-node-runner.mjs"

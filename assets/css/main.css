@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F9F6EA;
+  }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: #4CAF82; border-radius: 4px; }
+}
+
+@layer components {
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer w-full;
+  }
+  /* Active: full green bg, everything white */
+  .sidebar-link.active {
+    @apply bg-[#4CAF82] text-white;
+  }
+  /* Inactive: icon is #2E8B50, label is muted gray — NO hover */
+  .sidebar-link:not(.active) {
+    @apply text-[#2E8B50];
+  }
+  .sidebar-link:not(.active) span {
+    @apply text-[#8fa8bc];
+  }
+  .card {
+    @apply bg-white rounded-xl p-5;
+  }
+  .btn-green {
+    @apply bg-[#4CAF82] hover:bg-[#3d9670] text-white font-medium px-3 py-1.5 rounded-lg text-xs transition-colors;
+  }
+}
