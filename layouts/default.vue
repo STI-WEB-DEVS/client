@@ -1,173 +1,101 @@
 <template>
-  <div>
-    <TransitionRoot as="template" :show="sidebarOpen">
-      <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
-        <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="" leave="transition-opacity ease-linear duration-300" leave-from="" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-900/80"></div>
-        </TransitionChild>
-
-        <div class="fixed inset-0 flex">
-          <TransitionChild as="template" enter="transition ease-in-out duration-300 transform" enter-from="-translate-x-full" enter-to="translate-x-0" leave="transition ease-in-out duration-300 transform" leave-from="translate-x-0" leave-to="-translate-x-full">
-            <DialogPanel class="relative mr-16 flex w-full max-w-xs flex-1">
-              <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0" enter-to="" leave="ease-in-out duration-300" leave-from="" leave-to="opacity-0">
-                <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
-                  <button type="button" class="-m-2.5 p-2.5" @click="sidebarOpen = false">
-                    <span class="sr-only">Close sidebar</span>
-                    <XMarkIcon class="size-6 text-white" aria-hidden="true" />
-                  </button>
-                </div>
-              </TransitionChild>
-
-              <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
-                <div class="relative flex h-16 shrink-0 items-center">
-                  <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
-                </div>
-                <nav class="relative flex flex-1 flex-col">
-                  <ul role="list" class="flex flex-1 flex-col gap-y-7">
-                    <li>
-                      <ul role="list" class="-mx-2 space-y-1">
-                        <li v-for="item in navigation" :key="item.name">
-                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
-                            <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
-                            {{ item.name }}
-                          </NuxtLink>
-                        </li>
-                      </ul>
-                    </li>
-                    <li class="mt-auto">
-                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
-                        <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                        Settings
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
-      </Dialog>
-    </TransitionRoot>
-
-    <div class="hidden bg-gray-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-      <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
-        <div class="flex h-16 shrink-0 items-center">
-          <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
-        </div>
-        <nav class="flex flex-1 flex-col">
-          <ul role="list" class="flex flex-1 flex-col gap-y-7">
-            <li>
-              <ul role="list" class="-mx-2 space-y-1">
-                <li v-for="item in navigation" :key="item.name">
-                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
-                    <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
-                    {{ item.name }}
-                  </NuxtLink>
-                </li>
-              </ul>
-            </li>
-            <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
-                <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                Settings
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
-
-    <div class="lg:pl-72">
-      <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-        <button type="button" class="-m-2.5 p-2.5 text-gray-700 hover:text-gray-900 lg:hidden" @click="sidebarOpen = true">
-          <span class="sr-only">Open sidebar</span>
-          <Bars3Icon class="size-6" aria-hidden="true" />
-        </button>
-
-        <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
-
-        <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <div class="flex flex-1"></div> <div class="flex items-center gap-x-4 lg:gap-x-6">
-            <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
-              <span class="sr-only">View notifications</span>
-              <BellIcon class="size-6" aria-hidden="true" />
-            </button>
-
-            <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true"></div>
-
-            <Menu as="div" class="relative">
-              <MenuButton class="relative flex items-center">
-                <span class="absolute -inset-1.5"></span>
-                <span class="sr-only">Open user menu</span>
-                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
-                <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Tom Cook</span>
-                  <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
-                </span>
-              </MenuButton>
-              <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
-                <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
-                  <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
-                  </MenuItem>
-                </MenuItems>
-              </transition>
-            </Menu>
+  <div class="flex min-h-screen bg-slate-50 font-sans text-slate-900">
+    <aside class="w-72 bg-slate-900 text-white flex flex-col fixed h-full shadow-2xl z-20">
+      <div class="p-8">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <span class="text-2xl font-black">P</span>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold tracking-tight">SmartPark</h1>
+            <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">Operations v2</p>
           </div>
         </div>
       </div>
 
-      <main class="py-10">
-        <div class="px-4 sm:px-6 lg:px-8">
-            <slot></slot>
+      <nav class="flex-1 px-4 space-y-2 mt-4">
+        <NuxtLink 
+          v-for="link in navLinks" 
+          :key="link.path" 
+          :to="link.path"
+          class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group hover:bg-slate-800"
+          active-class="bg-emerald-600 text-white shadow-lg shadow-emerald-900/50"
+        >
+          <span class="text-xl group-hover:scale-110 transition-transform">{{ link.icon }}</span>
+          <span class="font-medium text-sm">{{ link.name }}</span>
+        </NuxtLink>
+      </nav>
+
+      <div class="p-6 border-t border-slate-800">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-8 h-8 rounded-full bg-slate-700 border border-slate-600"></div>
+          <div class="overflow-hidden text-ellipsis">
+            <p class="text-xs font-bold truncate">Admin User</p>
+            <p class="text-[10px] text-slate-500 truncate">admin@smartpark.io</p>
+          </div>
         </div>
-      </main>
-    </div>
+        
+        <button 
+          @click="handleSignOut"
+          class="w-full flex items-center justify-center gap-2 py-3 bg-rose-500/10 text-rose-400 rounded-xl text-xs font-bold hover:bg-rose-500 hover:text-white transition-all"
+        >
+          <span>Logout System</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="flex-1 ml-72">
+      <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10">
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+          SmartPark / {{ currentRouteName }}
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
+          <button class="text-slate-400 hover:text-slate-600">🔔</button>
+        </div>
+      </header>
+
+      <div class="relative">
+        <slot />
+      </div>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import {
-  Dialog,
-  DialogPanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  TransitionChild,
-  TransitionRoot,
-} from '@headlessui/vue'
-import {
-  Bars3Icon,
-  BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
-  Cog6ToothIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UsersIcon,
-  XMarkIcon,
-} from '@heroicons/vue/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
-import { useRoute } from 'vue-router'
+// Navigation Definition (Exactly 6 Links as per Requirement 1.2)
+const navLinks = [
+  { name: 'Dashboard', path: '/dashboard', icon: '📊' },
+  { name: 'Parking Zones', path: '/zones', icon: '🗺️' },
+  { name: 'Real-time Occupancy', path: '/occupancy', icon: '📡' },
+  { name: 'Team Members', path: '/team', icon: '👥' },
+  { name: 'System Settings', path: '/settings', icon: '⚙️' },
+  { name: 'User Profile', path: '/profile', icon: '👤' }
+];
 
-const route = useRoute()
+const route = useRoute();
+const currentRouteName = computed(() => {
+  const current = navLinks.find(l => l.path === route.path);
+  return current ? current.name : 'Overview';
+});
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
-]
-
-const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
-]
-
-const sidebarOpen = ref(false)
+// Requirement 1.5: Sign Out Flow
+const handleSignOut = () => {
+  // Clear any local state here if needed
+  navigateTo('/login');
+};
 </script>
+
+<style>
+/* Smooth Nuxt Page Transitions */
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.2s;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(5px);
+}
+</style>
+
