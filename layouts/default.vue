@@ -3,7 +3,7 @@
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
         <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="" leave="transition-opacity ease-linear duration-300" leave-from="" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-900/80"></div>
+          <div class="fixed inset-0 bg-green-900/80"></div>
         </TransitionChild>
 
         <div class="fixed inset-0 flex">
@@ -18,9 +18,9 @@
                 </div>
               </TransitionChild>
 
-              <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
+              <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-green-900 px-6 pb-4 ring-1 ring-white/10">
                 <div class="relative flex h-16 shrink-0 items-center">
-                  <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+                  <img class="h-8 w-auto" src="" alt="Your Company" />
                 </div>
                 <nav class="relative flex flex-1 flex-col">
                   <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -35,9 +35,9 @@
                       </ul>
                     </li>
                     <li class="mt-auto">
-                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+                      <a href="/settings" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                         <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                        Settings
+                        settings
                       </a>
                     </li>
                   </ul>
@@ -49,17 +49,17 @@
       </Dialog>
     </TransitionRoot>
 
-    <div class="hidden bg-gray-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+    <div class="hidden bg-green-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
       <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
         <div class="flex h-16 shrink-0 items-center">
-          <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+          <img class="h-8 w-auto" src="" alt="Your Company" />
         </div>
         <nav class="flex flex-1 flex-col">
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
             <li>
               <ul role="list" class="-mx-2 space-y-1">
                 <li v-for="item in navigation" :key="item.name">
-                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
+                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-white-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
                     <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
                     {{ item.name }}
                   </NuxtLink>
@@ -67,7 +67,7 @@
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+              <a href="/settings" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                 Settings
               </a>
@@ -99,9 +99,9 @@
               <MenuButton class="relative flex items-center">
                 <span class="absolute -inset-1.5"></span>
                 <span class="sr-only">Open user menu</span>
-                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="https://cdn.britannica.com/05/236505-050-17B6E34A/Elon-Musk-2022.jpg" alt="" />
                 <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Tom Cook</span>
+                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Dedrich Bryce Arce</span>
                   <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
                 </span>
               </MenuButton>
@@ -158,15 +158,15 @@ const route = useRoute()
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Projects', href: '/projects', icon: FolderIcon },
+  { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
+  { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
+  { name: 'Reports', href: '/reports', icon: ChartPieIcon },
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your profile', href: '/profile' },
+  { name: 'Sign out', href: '/' },
 ]
 
 const sidebarOpen = ref(false)
