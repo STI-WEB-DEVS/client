@@ -1,6 +1,6 @@
 <template>
     <NuxtLayout>
-        <Dashboard />
+        <Projects/>
     </NuxtLayout>
 </template>
 
@@ -19,7 +19,7 @@
 
 
 <script setup lang="ts">
-import Dashboard from '~/components/Dashboard.vue';
+import Projects from '~/components/Projects.vue';
 
 
 </script>

@@ -35,7 +35,7 @@
                       </ul>
                     </li>
                     <li class="mt-auto">
-                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+                      <a href="profile" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                         <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                         Settings
                       </a>
@@ -67,7 +67,7 @@
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+              <a href="/settings" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                 Settings
               </a>
@@ -99,9 +99,9 @@
               <MenuButton class="relative flex items-center">
                 <span class="absolute -inset-1.5"></span>
                 <span class="sr-only">Open user menu</span>
-                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="c:\Users\My PC\Downloads\IMG_0005.jpg" alt="" />
                 <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Tom Cook</span>
+                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Justine Mantua</span>
                   <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
                 </span>
               </MenuButton>
@@ -158,15 +158,15 @@ const route = useRoute()
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Projects', href: '/projects', icon: FolderIcon },
+  { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
+  { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
+  { name: 'Reports', href: '/reports', icon: ChartPieIcon }, 
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your profile', href: '/profile' },
+  { name: 'Sign out', href: '/' },
 ]
 
 const sidebarOpen = ref(false)
