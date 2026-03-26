@@ -21,7 +21,7 @@
 
               <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
                 <div class="relative flex h-16 shrink-0 items-center">
-                  <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+                  <img class="h-8 w-auto" :src="logo" alt="Your Company" />
                 </div>
                 <nav class="relative flex flex-1 flex-col">
                   <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -51,9 +51,9 @@
     </TransitionRoot>
 
     <div class="hidden bg-gray-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-      <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
-        <div class="flex h-16 shrink-0 items-center">
-          <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
+      <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#543923]/100 px-6 pb-4">
+        <div class="flex h-16 shrink-0 items-center"> 
+          <img class="h-40 w-auto" :src="logo" alt="Your Company" />
         </div>
         <nav class="flex flex-1 flex-col">
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -68,7 +68,7 @@
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+              <a href="/settings" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                 Settings
               </a>
@@ -128,6 +128,8 @@
 </template>
 
 <script setup>
+import logo from '~/assets/EntryPoint.png'
+
 import { ref } from 'vue'
 import {
   Dialog,
@@ -147,26 +149,34 @@ import {
   Cog6ToothIcon,
   DocumentDuplicateIcon,
   FolderIcon,
-  HomeIcon,
+  HomeIcon, 
   UsersIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import { useRoute } from 'vue-router'
+import { 
+  IconBooks, 
+  IconHandStop,
+  IconHeartRateMonitor,
+  IconUser,
+  IconFolderOpen,
+  IconUsersGroup
+} from '@tabler/icons-vue'
 
 const route = useRoute()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Cataloging', href: '/cataloging', icon: IconBooks },
+  { name: 'Borrowing', href: '/borrowing', icon: IconHandStop },
+  { name: 'Facilities', href: '/facilities', icon: IconHeartRateMonitor },
+  { name: 'Students', href: '/students', icon: IconUser },
+  { name: 'Team', href: '/team', icon: IconUsersGroup },
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
+  { name: 'Your profile', href: '/profile' },
   { name: 'Sign out', href: '/' },
 ]
 
