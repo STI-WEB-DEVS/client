@@ -51,7 +51,7 @@
 
 
 <script setup lang="ts">
-import Login from '~/components/Login.vue';
+import Login from '~/components/AuthenticationModule.vue';
 
 
 </script>
