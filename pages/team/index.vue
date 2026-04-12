@@ -55,11 +55,8 @@
 <script setup lang="ts">
 import { TeamService } from '~/api/Team/TeamService';
 
-// 1. Instantiate the service
 const teamService = new TeamService();
 
-// 2. Use useAsyncData to fetch the data
-// 'teams' is a unique key for Nuxt's internal cache
 const { data: teams, pending, error } = await useAsyncData('teams', () => 
     teamService.getTeams()
 );
