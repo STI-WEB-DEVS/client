@@ -1,17 +1,39 @@
 export class BaseService {
-  protected baseUrl: string;
+  async request<T>(url: string, method: string, params: object = {}): Promise<T> {
+    const runtimeConfig = useRuntimeConfig();
+    let config: any = {
+      baseURL: runtimeConfig.public.apiBaseURL,
+      method: method,
+      headers: {
+        Accept: 'application/json',
+      },
+    };
 
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
+    if (method.toUpperCase() === 'GET') {
+      config.params = params;
+    } else {
+      config.body = params;
+    }
 
-  protected async request(endpoint: string) {
-    const fullUrl = this.baseUrl + endpoint;
+    try {
+      return await $fetch<T>(url, config);
+    } catch (error: any) {
+      const status = error.response?.status;
+      const data = error.response?._data;
 
-    return await $fetch(fullUrl, {
-      onResponseError({ response }) {
-        console.error(`[API Error ${response.status}]:`, response._data?.message || 'Unknown Error');
+      switch (status) {
+        case 400:
+        case 404:
+        case 422:
+        case 429:
+          throw new Error(data?.message || "Validation or Request Error");
+        case 500:
+          throw new Error("Server error. Please try again or contact the administrator.");
+        default:
+          throw new Error("Something went wrong. Please try again.");
       }
-    });
+    }
   }
 }
+
+export default BaseService;

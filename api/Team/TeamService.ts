@@ -1,11 +1,11 @@
 import { BaseService } from "../BaseService"; 
 
 export class TeamService extends BaseService {
-  constructor() {
-    super('https://jsonplaceholder.typicode.com');
+  async getTeams() {
+    return this.request('/users', 'GET');
   }
 
-  async getTeams() {
-    return this.request('/users');
+  async createTeam(teamData: object) {
+    return this.request('/teams', 'POST', teamData);
   }
 }
