@@ -1,3 +1,5 @@
+import { useAuth } from '../composables/useAuth'
+
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
