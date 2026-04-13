@@ -1,8 +1,9 @@
 import { BaseService } from "../BaseService"; 
 
 export class TeamService extends BaseService {
-  async getTeams() {
-    return this.request('/users', 'GET');
+  // Updated method name and route to fetch from customers
+  async getCustomers() {
+    return this.request('/customers', 'GET');
   }
 
   async createTeam(teamData: object) {
