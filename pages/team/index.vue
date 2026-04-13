@@ -2,8 +2,8 @@
   <NuxtLayout>
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold text-gray-900">Team</h1>
-        <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, email, and company.</p>
+        <h1 class="text-base font-semibold text-gray-900">Customers</h1>
+        <p class="mt-2 text-sm text-gray-700">A list of all the customers in your account including their name, email, and company.</p>
       </div>
     </div>
 
@@ -54,10 +54,17 @@
 
 <script setup lang="ts">
 import { TeamService } from '~/api/Team/TeamService';
+import type { TeamUser } from '~/api/Team/TeamService';
 
 const teamService = new TeamService();
 
-const { data: teams, pending, error } = await useAsyncData('teams', () => 
-    teamService.getTeams()
+const { data: teamsData, pending, error } = await useAsyncData<TeamUser[]>(
+  'teams',
+  () => teamService.getTeams(),
+  {
+    default: () => [],
+  }
 );
+
+const teams = computed(() => teamsData.value);
 </script>

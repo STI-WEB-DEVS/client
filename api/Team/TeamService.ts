@@ -1,8 +1,18 @@
 import { BaseService } from "../BaseService"; 
 
+export interface TeamUser {
+  id: number;
+  name: string;
+  email: string;
+  company?: {
+    name: string;
+  } | null;
+  website?: string;
+}
+
 export class TeamService extends BaseService {
-  async getTeams() {
-    return this.request('/users', 'GET');
+  async getTeams(): Promise<TeamUser[]> {
+    return this.request<TeamUser[]>('/teams', 'GET');
   }
 
   async createTeam(teamData: object) {
