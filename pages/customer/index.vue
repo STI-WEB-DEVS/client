@@ -2,7 +2,7 @@
   <NuxtLayout>
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold text-gray-900">Team</h1>
+        <h1 class="text-base font-semibold text-gray-900">Customers</h1>
         <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, email, and company.</p>
       </div>
     </div>
@@ -24,8 +24,6 @@
                 <tr>
                   <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Company</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Website</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
@@ -35,12 +33,6 @@
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     {{ user.email }}
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.company?.name || 'N/A' }}
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.website }}
                   </td>
                 </tr>
               </tbody>
@@ -57,7 +49,7 @@ import { TeamService } from '~/api/Team/TeamService';
 
 const teamService = new TeamService();
 
-const { data: teams, pending, error } = await useAsyncData('teams', () => 
+const { data: teams, pending, error } = await useAsyncData('customers', () => 
     teamService.getTeams()
 );
 </script>
