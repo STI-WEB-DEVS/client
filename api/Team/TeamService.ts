@@ -2,7 +2,8 @@ import { BaseService } from "../BaseService";
 
 export class TeamService extends BaseService {
   async getTeams() {
-    return this.request('/users', 'GET');
+    // Note: Ensure your backend actually uses /customers for the Team list
+    return this.request('/customers', 'GET');
   }
 
   async createTeam(teamData: object) {
