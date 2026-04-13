@@ -4,7 +4,8 @@ export class BaseService {
 
     const runtimeConfig = useRuntimeConfig();
 
-    const token = localStorage.getItem("token");
+    const token = useCookie("token").value;
+
 
 
 
