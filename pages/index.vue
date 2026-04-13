@@ -20,7 +20,10 @@
 
 
 <script setup lang="ts">
-import Login from '~/components/Authenticate123.vue';
+
+
+import Login from '~/components/Login.vue';
+
 
 
 </script>
