@@ -49,7 +49,22 @@ import { TeamService } from '~/api/Team/TeamService';
 
 const teamService = new TeamService();
 
-const { data: teams, pending, error } = await useAsyncData('customers', () => 
-    teamService.getTeams()
-);
+const { data: teams, pending, error } = await useAsyncData('customers', async () => {
+
+    const response = await teamService.getTeams();
+
+    
+
+    /** 
+
+     * FIX: If your API returns { data: [...] }, return response.data.
+
+     * If it returns the array directly, return response.
+
+     */
+
+    return Array.isArray(response) ? response : (response as any).data;
+
+});
+
 </script>

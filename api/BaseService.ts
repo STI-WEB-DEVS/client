@@ -1,44 +1,84 @@
+
 export class BaseService {
-  async request<T>(url: string, method: string, params: object = {}): Promise<T> {
+
+  async request<T>(url: string, method: string, data: object = {}): Promise<T> {
+
     const runtimeConfig = useRuntimeConfig();
 
-    // Retrieve token from localStorage
-    const token = localStorage.getItem("authToken");
+    const token = useCookie('auth_token'); // Nuxt helper: works on SSR and Client
 
-    let config: any = {
+
+
+    const options: any = {
+
       baseURL: runtimeConfig.public.apiBaseURL,
-      method: method,
+
+      method,
+
       headers: {
-        Accept: "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}), // Add token if available
+
+        Accept: 'application/json',
+
+        ...(token.value && { Authorization: `Bearer ${token.value}` }),
+
       },
+
     };
 
-    if (method.toUpperCase() === "GET") {
-      config.params = params;
+
+
+    if (method.toUpperCase() === 'GET') {
+
+      options.params = data;
+
     } else {
-      config.body = params;
+
+      options.body = data;
+
     }
+
+
 
     try {
-      return await $fetch<T>(url, config);
-    } catch (error: any) {
-      const status = error.response?.status;
-      const data = error.response?._data;
 
-      switch (status) {
-        case 400:
-        case 404:
-        case 422:
-        case 429:
-          throw new Error(data?.message || "Validation or Request Error");
-        case 500:
-          throw new Error("Server error. Please try again or contact the administrator.");
-        default:
-          throw new Error("Something went wrong. Please try again.");
+      const response = await $fetch<T>(url, options);
+
+
+
+      // Handle token storage for Auth calls
+
+      if ((url.includes('login') || url.includes('register')) && (response as any).token) {
+
+        token.value = (response as any).token;
+
       }
-    }
-  }
-}
 
-export default BaseService;
+
+
+      return response;
+
+    } catch (error: any) {
+
+      const status = error.response?.status;
+
+      
+
+      if (status === 401) {
+
+        token.value = null; // Clear cookie
+
+        throw new Error("Session expired.");
+
+      }
+
+      
+
+      // ... rest of your error handling
+
+      throw error;
+
+    }
+
+  }
+
+}
