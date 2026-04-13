@@ -2,10 +2,10 @@
   <NuxtLayout>
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold text-gray-900">Team</h1>
+        <h1 class="text-base font-semibold text-gray-900">Customers</h1>
         <p class="mt-2 text-sm text-gray-700">
-          A list of all the users in your account including their name, email,
-          and company.
+          A list of all customers in your account including their name and
+          email.
         </p>
       </div>
     </div>
@@ -41,18 +41,6 @@
                   >
                     Email
                   </th>
-                  <th
-                    scope="col"
-                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Company
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Website
-                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
@@ -64,12 +52,6 @@
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     {{ customer.email }}
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ customer.company?.name || "N/A" }}
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ customer.website }}
                   </td>
                 </tr>
               </tbody>
@@ -90,5 +72,7 @@ const {
   data: customers,
   pending,
   error,
-} = await useAsyncData("customers", () => customerService.getCustomers());
+} = await useAsyncData("customers", () => customerService.getCustomers(), {
+  transform: (response: any) => response.data,
+});
 </script>

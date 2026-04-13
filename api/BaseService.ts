@@ -1,15 +1,20 @@
 export class BaseService {
-  async request<T>(url: string, method: string, params: object = {}): Promise<T> {
+  async request<T>(
+    url: string,
+    method: string,
+    params: object = {},
+  ): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
     let config: any = {
       baseURL: runtimeConfig.public.apiBaseURL,
       method: method,
       headers: {
-        Accept: 'application/json',
+        Accept: "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     };
 
-    if (method.toUpperCase() === 'GET') {
+    if (method.toUpperCase() === "GET") {
       config.params = params;
     } else {
       config.body = params;
@@ -28,7 +33,9 @@ export class BaseService {
         case 429:
           throw new Error(data?.message || "Validation or Request Error");
         case 500:
-          throw new Error("Server error. Please try again or contact the administrator.");
+          throw new Error(
+            "Server error. Please try again or contact the administrator.",
+          );
         default:
           throw new Error("Something went wrong. Please try again.");
       }

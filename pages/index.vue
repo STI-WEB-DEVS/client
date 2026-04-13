@@ -1,26 +1,7 @@
 <template>
-    <main class="h-screen">
-        <Login/>
-    </main>
+  <main class="h-screen">
+    <Login />
+  </main>
 </template>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<script setup lang="ts">
-import Login from '~/components/Login.vue';
-
-
-</script>
+<script setup lang="ts"></script>
