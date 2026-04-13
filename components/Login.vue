@@ -84,6 +84,8 @@
   </div>
 </template>
 
+
+
 <script setup lang="ts">
 import { ref } from 'vue';
 import { AuthService } from '~/api/Auth/AuthService';
@@ -100,7 +102,26 @@ const handleSubmit = async () => {
   isLoading.value = true;
 
   try {
-    await authService.login(email.value, password.value);
+    // 1. Call the login service
+    const response = await authService.login(email.value, password.value);
+
+    // 2. Save to Cookies
+    // We define the cookies here; useCookie handles the client/server sync automatically
+    const token = useCookie('auth_token', {
+      maxAge: 60 * 60 * 24 * 7, // Expires in 7 days
+      sameSite: 'lax',
+      secure: !process.dev, // Only send over HTTPS in production
+    });
+    
+    const userProfile = useCookie('user_profile', {
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    // Assign the values from the API response
+    token.value = response.token;
+    userProfile.value = JSON.stringify(response.user);
+
+    // 3. Redirect to dashboard
     await navigateTo('/dashboard');
   } catch (err: any) {
     error.value = err.message;
