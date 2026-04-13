@@ -1,3 +1,4 @@
+<!-- pages/teams.vue -->
 <template>
   <NuxtLayout>
     <div class="sm:flex sm:items-center">
@@ -7,14 +8,17 @@
       </div>
     </div>
 
+    <!-- Loading State -->
     <div v-if="pending" class="mt-8 flex justify-center">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
     </div>
 
+    <!-- Error State -->
     <div v-else-if="error" class="mt-8 rounded-md bg-red-50 p-4">
-      <p class="text-sm text-red-700">{{ error.message }}</p>
+      <p class="text-sm text-red-700">{{ error.message || 'Failed to load teams' }}</p>
     </div>
 
+    <!-- Data State -->
     <div v-else class="mt-8 flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -29,7 +33,8 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="user in teams" :key="user.id">
+                <!-- Ensure 'teams' is treated as an array -->
+                <tr v-for="user in (teams as any[])" :key="user.id">
                   <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                     {{ user.name }}
                   </td>
@@ -55,9 +60,16 @@
 <script setup lang="ts">
 import { TeamService } from '~/api/Team/TeamService';
 
+// Initialize service inside the component context
 const teamService = new TeamService();
 
-const { data: teams, pending, error } = await useAsyncData('teams', () => 
-    teamService.getTeams()
-);
+const { data: teams, pending, error } = await useAsyncData('teams', async () => {
+    const response = await teamService.getTeams();
+    
+    /** 
+     * FIX: If your API returns { data: [...] }, return response.data.
+     * If it returns the array directly, return response.
+     */
+    return Array.isArray(response) ? response : (response as any).data;
+});
 </script>
