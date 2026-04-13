@@ -100,7 +100,11 @@ const handleSubmit = async () => {
   isLoading.value = true;
 
   try {
-    await authService.login(email.value, password.value);
+    
+    const response =  await authService.login(email.value, password.value);
+    if (response && response.token)
+    localStorage.setItem("authToken", response.token);
+
     await navigateTo('/dashboard');
   } catch (err: any) {
     error.value = err.message;

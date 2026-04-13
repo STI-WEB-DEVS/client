@@ -1,16 +1,20 @@
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
+
+    // Retrieve token from localStorage
+    const token = localStorage.getItem("authToken");
+
     let config: any = {
       baseURL: runtimeConfig.public.apiBaseURL,
       method: method,
       headers: {
-        Accept: 'application/json',
-        
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // Add token if available
       },
     };
 
-    if (method.toUpperCase() === 'GET') {
+    if (method.toUpperCase() === "GET") {
       config.params = params;
     } else {
       config.body = params;
