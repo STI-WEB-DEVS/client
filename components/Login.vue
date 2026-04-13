@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { AuthService } from '~/api/Auth/AuthService';
+import { AuthService } from '~/api/Auth/AuthService'; // Kuhaa ang .ts diri
 
 const email = ref('');
 const password = ref('');
@@ -100,9 +100,13 @@ const handleSubmit = async () => {
   isLoading.value = true;
 
   try {
+    // Ang AuthService na ang bahala mo-save sa token sa localStorage
     await authService.login(email.value, password.value);
+    
+    // Inig human, balhin sa dashboard
     await navigateTo('/dashboard');
   } catch (err: any) {
+    // I-display ang error message gikan sa Laravel
     error.value = err.message;
   } finally {
     isLoading.value = false;

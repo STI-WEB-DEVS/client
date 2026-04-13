@@ -2,17 +2,20 @@
   <NuxtLayout>
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold text-gray-900">Team</h1>
-        <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, email, and company.</p>
+        <h1 class="text-base font-semibold text-gray-900">Customers List</h1>
+        <p class="mt-2 text-sm text-gray-700">A list of all customers generated via Laravel Tinker.</p>
       </div>
     </div>
 
-    <div v-if="pending" class="mt-8 flex justify-center">
+    <div v-if="pending" class="mt-8 flex justify-center py-10">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
     </div>
 
-    <div v-else-if="error" class="mt-8 rounded-md bg-red-50 p-4">
-      <p class="text-sm text-red-700">{{ error.message }}</p>
+    <div v-else-if="error" class="mt-8 rounded-md bg-red-50 p-4 text-center">
+      <p class="text-sm text-red-700">Failed to load customers: {{ error.message }}</p>
+      <button @click="refresh" class="mt-2 text-xs font-semibold text-red-600 underline hover:text-red-800">
+        Try Again
+      </button>
     </div>
 
     <div v-else class="mt-8 flow-root">
@@ -29,18 +32,24 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="user in teams" :key="user.id">
+                <tr v-for="customer in teams?.data" :key="customer.uuid" class="hover:bg-gray-50 transition-colors">
                   <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                    {{ user.name }}
+                    {{ customer.name }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.email }}
+                    {{ customer.email }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.company?.name || 'N/A' }}
+                    {{ customer.company?.name || 'N/A' }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.website }}
+                    {{ customer.website || 'N/A' }}
+                  </td>
+                </tr>
+
+                <tr v-if="!teams?.data || teams?.data.length === 0">
+                  <td colspan="4" class="py-10 text-center text-sm text-gray-400">
+                    No customers found in the database.
                   </td>
                 </tr>
               </tbody>
@@ -55,9 +64,16 @@
 <script setup lang="ts">
 import { TeamService } from '~/api/Team/TeamService';
 
+// Initialize Service
 const teamService = new TeamService();
 
-const { data: teams, pending, error } = await useAsyncData('teams', () => 
-    teamService.getTeams()
+// Fetch data using useAsyncData
+const { data: teams, pending, error, refresh } = await useAsyncData(
+  'teams', 
+  () => teamService.getTeams(),
+  { 
+    server: false,   // Importante kini kay ang token naa sa localStorage (Client side only)
+    immediate: true, // Mo-fetch dayon inig load sa page
+  }
 );
 </script>
