@@ -1,51 +1,44 @@
 <template>
   <NuxtLayout>
-    <div class="sm:flex sm:items-center">
-      <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold text-gray-900">Team</h1>
-        <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, email, and company.</p>
+    <div class="p-8">
+      <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+          <h1 class="text-base font-semibold text-gray-900">Team Members</h1>
+          <p class="mt-2 text-sm text-gray-700">A list of names and emails from your account.</p>
+        </div>
       </div>
-    </div>
 
-    <div v-if="pending" class="mt-8 flex justify-center">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-    </div>
+      <div v-if="pending" class="mt-8 flex justify-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
 
-    <div v-else-if="error" class="mt-8 rounded-md bg-red-50 p-4">
-      <p class="text-sm text-red-700">{{ error.message }}</p>
-    </div>
+      <div v-else-if="error" class="mt-8 rounded-md bg-red-50 p-4">
+        <p class="text-sm text-red-700">Error: {{ error.message }}</p>
+      </div>
 
-    <div v-else class="mt-8 flow-root">
-      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-            <table class="min-w-full divide-y divide-gray-300">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Company</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Website</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="user in teams" :key="user.id">
-                  <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                    {{ user.name }}
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.email }}
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.company?.name || 'N/A' }}
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.website }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <div v-else class="mt-8 flow-root">
+        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+          <table class="min-w-full divide-y divide-gray-300">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">Name</th>
+                <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+              <tr v-for="user in (teams || [])" :key="user.id">
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
+                  {{ user.name || user.full_name || user.username || 'No name provided' }}
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {{ user.email }}
+                </td>
+              </tr>
+              <tr v-if="teams && teams.length === 0">
+                <td colspan="2" class="py-10 text-center text-gray-500">No members found.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -57,7 +50,13 @@ import { TeamService } from '~/api/Team/TeamService';
 
 const teamService = new TeamService();
 
-const { data: teams, pending, error } = await useAsyncData('teams', () => 
-    teamService.getTeams()
-);
+const { data: teams, pending, error } = await useAsyncData('teams', async () => {
+    const response = await teamService.getTeams();
+    
+    // Most APIs wrap data in a 'data' object. 
+    // This line handles both raw arrays and wrapped objects.
+    return Array.isArray(response) ? response : (response.data || response.customers || []);
+}, { 
+    server: false // Keeps the request on the client to access your LocalStorage token
+});
 </script>
