@@ -6,6 +6,7 @@ export class BaseService {
       method: method,
       headers: {
         Accept: 'application/json',
+        
       },
     };
 
