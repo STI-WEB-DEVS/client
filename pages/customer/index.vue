@@ -45,11 +45,12 @@
 </template>
 
 <script setup lang="ts">
-import { TeamService } from '~/api/Team/TeamService';
+import { CustomerService } from '~/api/Customer/CustomerService';
 
-const teamService = new TeamService();
+const customerService = new CustomerService();
 
-const { data: teams, pending, error } = await useAsyncData('customers', () => 
-    teamService.getTeams()
+const { data: customers, pending, error } = await useAsyncData('customers', () =>
+  customerService.getCustomers()
 );
 </script>
+
