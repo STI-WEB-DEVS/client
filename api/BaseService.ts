@@ -1,6 +1,8 @@
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
+    const token = localStorage.getItem('token'); // get token from local storage
+
     let config: any = {
       baseURL: runtimeConfig.public.apiBaseURL,
       method: method,
@@ -8,6 +10,11 @@ export class BaseService {
         Accept: 'application/json',
       },
     };
+
+    // Attach Authorization header if token exists
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
 
     if (method.toUpperCase() === 'GET') {
       config.params = params;
@@ -29,6 +36,8 @@ export class BaseService {
           throw new Error(data?.message || "Validation or Request Error");
         case 500:
           throw new Error("Server error. Please try again or contact the administrator.");
+        case 401:
+          throw new Error("Unauthorized. Please log in again.");
         default:
           throw new Error("Something went wrong. Please try again.");
       }

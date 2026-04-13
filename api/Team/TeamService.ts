@@ -4,6 +4,9 @@ export class TeamService extends BaseService {
   async getTeams() {
     return this.request('/users', 'GET');
   }
+  async getCustomers() {
+    return this.request('/customers', 'GET');
+  }
 
   async createTeam(teamData: object) {
     return this.request('/teams', 'POST', teamData);
