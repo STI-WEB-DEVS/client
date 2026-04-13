@@ -1,22 +1,34 @@
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
-    let config: any = {
+
+    // Read token from localStorage
+    const token = process.client ? localStorage.getItem("token") : null;
+
+    const config: any = {
       baseURL: runtimeConfig.public.apiBaseURL,
-      method: method,
+      method: method.toUpperCase(),
       headers: {
-        Accept: 'application/json',
-      },
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },  
     };
 
-    if (method.toUpperCase() === 'GET') {
+    if (config.method === "GET") {
       config.params = params;
     } else {
       config.body = params;
     }
 
     try {
-      return await $fetch<T>(url, config);
+      const response = await $fetch<T>(url, config);
+
+      // If the response contains a new token, save it
+      if (process.client && (response as any)?.token) {
+        localStorage.setItem("token", (response as any).token);
+      }
+
+      return response;
     } catch (error: any) {
       const status = error.response?.status;
       const data = error.response?._data;
