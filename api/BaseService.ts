@@ -1,12 +1,24 @@
+// ~/api/BaseService.ts
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
+
+    const headers: any = {
+      Accept: 'application/json',
+    };
+
+    // Attach token from localStorage (only on client)
+    if (process.client) {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+    }
+
     let config: any = {
       baseURL: runtimeConfig.public.apiBaseURL,
       method: method,
-      headers: {
-        Accept: 'application/json',
-      },
+      headers,
     };
 
     if (method.toUpperCase() === 'GET') {
@@ -35,5 +47,3 @@ export class BaseService {
     }
   }
 }
-
-export default BaseService;

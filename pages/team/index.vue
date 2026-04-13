@@ -2,19 +2,24 @@
   <NuxtLayout>
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold text-gray-900">Team</h1>
-        <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, email, and company.</p>
+        <h1 class="text-base font-semibold text-gray-900">Customers</h1>
+        <p class="mt-2 text-sm text-gray-700">
+          A list of all customers in your account.
+        </p>
       </div>
     </div>
 
+    <!-- Loading -->
     <div v-if="pending" class="mt-8 flex justify-center">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
     </div>
 
+    <!-- Error -->
     <div v-else-if="error" class="mt-8 rounded-md bg-red-50 p-4">
-      <p class="text-sm text-red-700">{{ error.message }}</p>
+      <p class="text-sm text-red-700">{{ error.message || 'Failed to load customers' }}</p>
     </div>
 
+    <!-- Table -->
     <div v-else class="mt-8 flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -24,23 +29,23 @@
                 <tr>
                   <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Company</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Website</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">UUID</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Created At</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="user in teams" :key="user.id">
+                <tr v-for="customer in customers" :key="customer.id || customer.uuid">
                   <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                    {{ user.name }}
+                    {{ customer.name || 'N/A' }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.email }}
+                    {{ customer.email || 'N/A' }}
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 font-mono">
+                    {{ customer.uuid || 'N/A' }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.company?.name || 'N/A' }}
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.website }}
+                    {{ formatDate(customer.created_at) }}
                   </td>
                 </tr>
               </tbody>
@@ -57,7 +62,30 @@ import { TeamService } from '~/api/Team/TeamService';
 
 const teamService = new TeamService();
 
-const { data: teams, pending, error } = await useAsyncData('teams', () => 
-    teamService.getTeams()
+const { data: rawData, pending, error } = await useAsyncData(
+  'customers',
+  () => teamService.getTeams(),
+  {
+    default: () => ({ data: [] }),
+    watch: false
+  }
 );
+
+// Handle both direct array and Laravel wrapped { data: [...] } response
+const customers = computed(() => {
+  if (!rawData.value) return [];
+  return Array.isArray(rawData.value) ? rawData.value : rawData.value.data || [];
+});
+
+// Simple date formatter
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return 'N/A';
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
 </script>
