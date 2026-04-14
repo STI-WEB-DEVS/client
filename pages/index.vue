@@ -22,7 +22,7 @@
 <script setup lang="ts">
 
 
-import Login from '~/components/Auth.vue';
+import Login from '~/components/Login.vue';
 
 
 
