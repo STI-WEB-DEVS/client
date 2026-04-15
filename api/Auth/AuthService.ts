@@ -1,7 +1,22 @@
 import { BaseService } from "../BaseService";
 
-export class AuthService extends BaseService {
-  async login(email: string, password: string) {
-    return this.request('/login', 'POST', { email, password });
-  }
-}
+const base = new BaseService();
+
+export const AuthService = {
+	async login(email: string, password: string) {
+		const res: any = await base.request("/login", "POST", {
+			email,
+			password,
+		});
+
+		const token = res.token;
+
+		if (!token) {
+			throw new Error("Token not found in response");
+		}
+
+		localStorage.setItem("authToken", token);
+
+		return res;
+	},
+};

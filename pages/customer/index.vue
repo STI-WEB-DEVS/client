@@ -2,8 +2,9 @@
   <NuxtLayout>
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold text-gray-900">Team</h1>
-        <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, email, and company.</p>
+        <h1 class="text-base font-semibold text-gray-900">Customers</h1>
+        <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name and email.
+        </p>
       </div>
     </div>
 
@@ -11,7 +12,7 @@
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
     </div>
 
-    <div v-else-if="error" class="mt-8 rounded-md bg-red-50 p-4">
+    <!-- <div v-else-if="error" class="mt-8 rounded-md bg-red-50 p-4">
       <p class="text-sm text-red-700">{{ error.message }}</p>
     </div>
 
@@ -22,7 +23,8 @@
             <table class="min-w-full divide-y divide-gray-300">
               <thead class="bg-gray-50">
                 <tr>
-                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
+                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name
+                  </th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Company</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Website</th>
@@ -48,16 +50,19 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
+    <CustomersTable />
+
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
 import { TeamService } from '~/api/Team/TeamService';
+import CustomersTable from '~/components/CustomersTable.vue';
 
 const teamService = new TeamService();
 
-const { data: teams, pending, error } = await useAsyncData('teams', () => 
-    teamService.getTeams()
+const { data: teams, pending, error } = await useAsyncData('teams', () =>
+  teamService.getTeams()
 );
 </script>
