@@ -1,12 +1,20 @@
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
-    let config: any = {
+    const token = localStorage.getItem('_token');
+
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const config: any = {
       baseURL: runtimeConfig.public.apiBaseURL,
-      method: method,
-      headers: {
-        Accept: 'application/json',
-      },
+      method,
+      headers,
     };
 
     if (method.toUpperCase() === 'GET') {
