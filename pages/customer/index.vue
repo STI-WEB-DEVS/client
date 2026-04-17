@@ -127,7 +127,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline';
-import { CustomerService } from '~/api/Customer/CustomerService';
+import { CustomerService } from '~/api/customer/CustomerService';
 
 const customerService = new CustomerService();
 
