@@ -115,12 +115,19 @@
           </p>
         </div>
       </div>
+
+      <FeedbackModal
+        :open="isFeedbackModalOpen"
+        :message="feedbackMessage"
+        @close="closeFeedbackModal"
+      />
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   PlusIcon,
   EyeIcon,
@@ -129,9 +136,14 @@ import {
 } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
 
+const router = useRouter();
+
 const customers = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
+
+const isFeedbackModalOpen = ref(false);
+const feedbackMessage = ref('');
 
 onMounted(async () => {
   pending.value = true;
@@ -146,19 +158,29 @@ onMounted(async () => {
   }
 });
 
+const openFeedbackModal = (message: string) => {
+  feedbackMessage.value = message;
+  isFeedbackModalOpen.value = true;
+};
+
+const closeFeedbackModal = () => {
+  isFeedbackModalOpen.value = false;
+  feedbackMessage.value = '';
+};
+
 const handleCreate = () => {
-  alert('Create button clicked');
+  openFeedbackModal('Create button clicked');
 };
 
 const handleView = (customer: any) => {
-  alert(`View customer: ${customer.name}`);
+  router.push(`/customer/${customer.uuid}`);
 };
 
 const handleEdit = (customer: any) => {
-  alert(`Edit customer: ${customer.name}`);
+  openFeedbackModal(`Edit customer: ${customer.name}`);
 };
 
 const handleDelete = (customer: any) => {
-  alert(`Delete customer: ${customer.name}`);
+  openFeedbackModal(`Delete customer: ${customer.name}`);
 };
 </script>
