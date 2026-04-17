@@ -12,9 +12,10 @@
         <button
           type="button"
           @click="handleCreate"
-          class="inline-flex items-center justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+          class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
         >
-          Create Customer
+          <PlusIcon class="h-4 w-4" />
+          <span>Create Customer</span>
         </button>
       </div>
 
@@ -66,25 +67,28 @@
                     <button
                       type="button"
                       @click="handleView(customer)"
-                      class="rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
-                      View
+                      <EyeIcon class="h-4 w-4" />
+                      <span>View</span>
                     </button>
 
                     <button
                       type="button"
                       @click="handleEdit(customer)"
-                      class="rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
-                      Edit
+                      <PencilSquareIcon class="h-4 w-4" />
+                      <span>Edit</span>
                     </button>
 
                     <button
                       type="button"
                       @click="handleDelete(customer)"
-                      class="rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+                      class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
                     >
-                      Delete
+                      <TrashIcon class="h-4 w-4" />
+                      <span>Delete</span>
                     </button>
                   </div>
                 </td>
@@ -117,6 +121,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import {
+  PlusIcon,
+  EyeIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from '@heroicons/vue/24/outline';
 import { CustomerService } from '~/api/Customer/CustomerService';
 
 const customerService = new CustomerService();
