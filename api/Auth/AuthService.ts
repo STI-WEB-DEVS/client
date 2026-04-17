@@ -1,9 +1,13 @@
+export interface LoginResponse {
+  token: string;
+}
+
 export class AuthService {
-  async login(email: string, password: string) {
+  async login(email: string, password: string): Promise<LoginResponse> {
     const runtimeConfig = useRuntimeConfig();
 
     try {
-      return await $fetch('/login', {
+      return await $fetch<LoginResponse>('/login', {
         baseURL: runtimeConfig.public.apiBaseURL,
         method: 'POST',
         headers: {
