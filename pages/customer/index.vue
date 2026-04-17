@@ -127,9 +127,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline';
-import { CustomerService } from '~/api/customer/CustomerService';
-
-const customerService = new CustomerService();
+import { customerService } from '~/api/customer/CustomerService';
 
 const customers = ref<any>(null);
 const pending = ref(true);
@@ -140,7 +138,7 @@ onMounted(async () => {
   error.value = null;
 
   try {
-    customers.value = await customerService.getCustomers();
+    customers.value = await customerService.list();
   } catch (err: any) {
     error.value = err;
   } finally {
