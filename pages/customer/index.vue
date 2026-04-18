@@ -116,15 +116,33 @@
         </div>
       </div>
 
+
+      <CustomerFormModal
+        :open="isFormModalOpen"
+        :loading="isSaving"
+        :customer="selectedCustomer" 
+        @close="closeFormModal"
+        @submit="handleFormSubmit"
+      />
+
+      <DeleteConfirmationModal
+        :open="isDeleteModalOpen"
+        :loading="isSaving"
+        :title="'Delete Customer'"
+        :message="`Are you sure you want to delete ${selectedCustomer?.name}? This action cannot be undone.`"
+        @close="isDeleteModalOpen = false"
+        @confirm="confirmDelete"
+      />
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
         @close="closeFeedbackModal"
       />
     </div>
+
+
   </NuxtLayout>
 </template>
-
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
@@ -135,20 +153,26 @@ import {
   TrashIcon,
 } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
+import CustomerFormModal from '~/components/CustomerFormModal.vue';
+import DeleteConfirmationModal from '~/components/DeleteConfirmationModal.vue';
 
 const router = useRouter();
 
+// --- Data State ---
 const customers = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
+const selectedCustomer = ref<any>(null);
 
-const isFeedbackModalOpen = ref(false);
-const feedbackMessage = ref('');
+// --- UI State ---
+const isFormModalOpen = ref(false);
+const isDeleteModalOpen = ref(false);
+const isSaving = ref(false);
 
-onMounted(async () => {
+// --- Initialization ---
+const fetchCustomers = async () => {
   pending.value = true;
   error.value = null;
-
   try {
     customers.value = await customerService.list();
   } catch (err: any) {
@@ -156,31 +180,67 @@ onMounted(async () => {
   } finally {
     pending.value = false;
   }
-});
-
-const openFeedbackModal = (message: string) => {
-  feedbackMessage.value = message;
-  isFeedbackModalOpen.value = true;
 };
 
-const closeFeedbackModal = () => {
-  isFeedbackModalOpen.value = false;
-  feedbackMessage.value = '';
-};
+onMounted(fetchCustomers);
 
-const handleCreate = () => {
-  openFeedbackModal('Create button clicked');
-};
-
+// --- Navigation ---
 const handleView = (customer: any) => {
   router.push(`/customer/${customer.uuid}`);
 };
 
-const handleEdit = (customer: any) => {
-  openFeedbackModal(`Edit customer: ${customer.name}`);
+// --- Form Logic (Create & Edit) ---
+const openFormModal = () => {
+  isFormModalOpen.value = true;
 };
 
+const closeFormModal = () => {
+  isFormModalOpen.value = false;
+};
+const handleCreate = () => {
+  selectedCustomer.value = null;
+  isFormModalOpen.value = true;
+};
+
+const handleEdit = (customer: any) => {
+  selectedCustomer.value = { ...customer };
+  isFormModalOpen.value = true;
+};
+
+const handleFormSubmit = async (formData: { name: string; email: string }) => {
+  isSaving.value = true;
+  try {
+    if (selectedCustomer.value?.uuid) {
+      await customerService.update(selectedCustomer.value.uuid, formData);
+    } else {
+      await customerService.create(formData);
+    }
+    isFormModalOpen.value = false;
+    await fetchCustomers();
+  } catch (err: any) {
+    alert(err.message || 'Error saving customer');
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+// --- Delete Logic ---
 const handleDelete = (customer: any) => {
-  openFeedbackModal(`Delete customer: ${customer.name}`);
+  selectedCustomer.value = customer;
+  isDeleteModalOpen.value = true;
+};
+
+const confirmDelete = async () => {
+  if (!selectedCustomer.value) return;
+  isSaving.value = true;
+  try {
+    await customerService.delete(selectedCustomer.value.uuid);
+    isDeleteModalOpen.value = false;
+    await fetchCustomers();
+  } catch (err: any) {
+    alert(err.message || 'Error deleting customer');
+  } finally {
+    isSaving.value = false;
+  }
 };
 </script>
