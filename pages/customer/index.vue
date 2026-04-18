@@ -190,17 +190,14 @@ const handleDelete = (customer: any) => {
 
 // Modal Callbacks
 const handleCreated = async () => {
-  alert('Customer created successfully!');
   await fetchCustomers(); // Refresh list
 };
 
 const handleUpdated = async () => {
-  alert('Customer updated successfully!');
   await fetchCustomers(); // Refresh list
 };
 
 const handleDeleted = async () => {
-  alert('Customer deleted successfully!');
   await fetchCustomers(); // Refresh list
 };
 </script>

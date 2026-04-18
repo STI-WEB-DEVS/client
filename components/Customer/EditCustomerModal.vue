@@ -38,39 +38,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { customerService } from '~/api/customer/CustomerService';
+import { ref, watch } from 'vue'
+import { customerService } from '~/api/customer/CustomerService'
 
-const props = defineProps<{
-  open: boolean;
-  uuid: string;
-}>();
+const props = defineProps<{ open: boolean; uuid: string }>()
+const emit = defineEmits<{ (e: 'close'): void; (e: 'updated'): void }>()
 
-const emit = defineEmits<{ (e: 'close'): void; (e: 'updated'): void }>();
+const form = ref({ name: '', email: '' })
+const loading = ref(false)
 
-const form = ref({ name: '', email: '' });
-const loading = ref(false);
+watch(() => props.open, async (val) => {
+  if (!val || !props.uuid) return
 
-onMounted(async () => {
-  if (!props.uuid) return;
-  try {
-    const data = await customerService.show(props.uuid);
-    form.value = { name: data.name || '', email: data.email || '' };
-  } catch (err) {
-    console.error(err);
+  const res = await customerService.show(props.uuid)
+  const data = res.data ?? res
+
+  form.value = {
+    name: data.name || '',
+    email: data.email || '',
   }
-});
+})
 
 const handleSubmit = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    await customerService.update(props.uuid, form.value);
-    emit('updated');
-    emit('close');
-  } catch (err: any) {
-    alert(err.message || 'Failed to update customer');
+    await customerService.update(props.uuid, form.value)
+    emit('updated')
+    emit('close')
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 </script>
