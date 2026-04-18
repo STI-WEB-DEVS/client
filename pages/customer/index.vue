@@ -116,8 +116,23 @@
         </div>
       </div>
 
+      <CreateCustomerModal
+        :open="isCreateModalOpen"
+        :customer="selectedCustomer"
+        @close="() => (isCreateModalOpen.value = false)"
+        @saved="onCustomerSaved"
+      />
+
+      <ConfirmModal
+        :open="isConfirmModalOpen"
+        :title="confirmTitle"
+        :message="confirmMessage"
+        @close="closeConfirmModal"
+        @confirm="deleteCustomer"
+      />
+
       <FeedbackModal
-        :open="isFeedbackModalOpen"
+        :open="Boolean(feedbackMessage)"
         :message="feedbackMessage"
         @close="closeFeedbackModal"
       />
@@ -135,6 +150,8 @@ import {
   TrashIcon,
 } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
+import CreateCustomerModal from '~/components/CreateCustomerModal.vue'
+import ConfirmModal from '~/components/ConfirmModal.vue'
 
 const router = useRouter();
 
@@ -142,10 +159,14 @@ const customers = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 
-const isFeedbackModalOpen = ref(false);
-const feedbackMessage = ref('');
+const isCreateModalOpen = ref(false)
+const selectedCustomer = ref<any>(null)
+const isConfirmModalOpen = ref(false)
+const feedbackMessage = ref('')
+const confirmTitle = ref('')
+const confirmMessage = ref('')
 
-onMounted(async () => {
+const fetchCustomers = async () => {
   pending.value = true;
   error.value = null;
 
@@ -156,31 +177,70 @@ onMounted(async () => {
   } finally {
     pending.value = false;
   }
-});
+}
+
+onMounted(fetchCustomers);
 
 const openFeedbackModal = (message: string) => {
   feedbackMessage.value = message;
-  isFeedbackModalOpen.value = true;
-};
+}
 
-const closeFeedbackModal = () => {
-  isFeedbackModalOpen.value = false;
-  feedbackMessage.value = '';
-};
+const showSuccess = (message: string) => {
+  feedbackMessage.value = message;
+  setTimeout(() => {
+    feedbackMessage.value = '';
+  }, 3000);
+}
 
 const handleCreate = () => {
-  openFeedbackModal('Create button clicked');
-};
+  selectedCustomer.value = null
+  isCreateModalOpen.value = true
+}
 
 const handleView = (customer: any) => {
   router.push(`/customer/${customer.uuid}`);
 };
 
 const handleEdit = (customer: any) => {
-  openFeedbackModal(`Edit customer: ${customer.name}`);
-};
+  selectedCustomer.value = customer
+  isCreateModalOpen.value = true
+}
 
 const handleDelete = (customer: any) => {
-  openFeedbackModal(`Delete customer: ${customer.name}`);
-};
+  selectedCustomer.value = customer
+  confirmTitle.value = 'Delete customer'
+  confirmMessage.value = `Are you sure you want to delete ${customer.name}? This cannot be undone.`
+  isConfirmModalOpen.value = true
+}
+
+const closeConfirmModal = () => {
+  isConfirmModalOpen.value = false
+  selectedCustomer.value = null
+}
+
+const deleteCustomer = async () => {
+  if (!selectedCustomer.value?.uuid) {
+    return
+  }
+
+  isConfirmModalOpen.value = false
+  pending.value = true
+
+  try {
+    await customerService.delete(selectedCustomer.value.uuid)
+    await fetchCustomers()
+    showSuccess('Customer deleted successfully.')
+  } catch (err: any) {
+    error.value = err
+  } finally {
+    pending.value = false
+    selectedCustomer.value = null
+  }
+}
+
+const onCustomerSaved = async () => {
+  isCreateModalOpen.value = false
+  await fetchCustomers()
+  showSuccess(selectedCustomer.value ? 'Customer updated successfully.' : 'Customer created successfully.')
+}
 </script>
