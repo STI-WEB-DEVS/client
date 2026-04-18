@@ -2,30 +2,23 @@ export class BaseService {
   private tokenStorageKey = 'auth_token';
 
   private getApiBaseUrl(): string {
-    try {
-      const runtimeConfig = useRuntimeConfig();
-      if (runtimeConfig?.public?.apiBaseURL) {
-        return runtimeConfig.public.apiBaseURL;
-      }
-    } catch {
-      // fallback below for cases where composables are unavailable
-    }
-
-    if (import.meta.client) {
+    if (typeof window !== 'undefined') {
       const nuxtConfig = (window as any).__NUXT__?.config;
-      return nuxtConfig?.public?.apiBaseURL || '';
+      if (nuxtConfig?.public?.apiBaseURL) {
+        return nuxtConfig.public.apiBaseURL;
+      }
     }
 
-    return '';
+    return 'https://jsonplaceholder.typicode.com';
   }
 
   private readToken(): string {
-    if (!import.meta.client) return '';
+    if (typeof window === 'undefined') return '';
     return localStorage.getItem(this.tokenStorageKey) || '';
   }
 
   private persistTokenFromResponse(response: any) {
-    if (!import.meta.client || !response || typeof response !== 'object') return;
+    if (typeof window === 'undefined' || !response || typeof response !== 'object') return;
 
     const token =
       response.token ||
@@ -43,39 +36,63 @@ export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const token = this.readToken();
 
-    let config: any = {
-      baseURL: this.getApiBaseUrl(),
-      method: method,
-      headers: {
-        Accept: 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
     };
 
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const baseURL = this.getApiBaseUrl();
+    const config: RequestInit = {
+      method,
+      headers,
+    };
+
+    let requestUrl = `${baseURL}${url}`;
     if (method.toUpperCase() === 'GET') {
-      config.params = params;
+      const query = new URLSearchParams(params as Record<string, string>).toString();
+      if (query) {
+        requestUrl += `${url.includes('?') ? '&' : '?'}${query}`;
+      }
     } else {
-      config.body = params;
+      config.body = JSON.stringify(params);
     }
 
     try {
-      const response = await $fetch<T>(url, config);
+      const res = await fetch(requestUrl, config);
+      const response = (await res.json()) as T;
+
+      if (!res.ok) {
+        throw {
+          response: {
+            status: res.status,
+            _data: response,
+          },
+        };
+      }
+
       this.persistTokenFromResponse(response);
       return response;
     } catch (error: any) {
-      const status = error.response?.status;
-      const data = error.response?._data;
+      const status = error?.response?.status;
+      const message =
+        error?.response?._data?.message ||
+        error?.data?.message ||
+        error?.message;
 
       switch (status) {
         case 400:
+        case 401:
         case 404:
         case 422:
         case 429:
-          throw new Error(data?.message || "Validation or Request Error");
+          throw new Error(message || 'Validation or Request Error');
         case 500:
-          throw new Error("Server error. Please try again or contact the administrator.");
+          throw new Error('Server error. Please try again or contact the administrator.');
         default:
-          throw new Error("Something went wrong. Please try again.");
+          throw new Error(message || 'Something went wrong. Please try again.');
       }
     }
   }
