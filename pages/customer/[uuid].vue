@@ -25,5 +25,6 @@ import { computed } from 'vue'
 
 const route = useRoute()
 
+
 const uuid = computed(() => String(route.params.uuid ?? ''))
 </script>

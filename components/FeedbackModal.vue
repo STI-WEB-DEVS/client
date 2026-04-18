@@ -47,15 +47,13 @@
   </teleport>
 </template>
 
-<script setup lang="ts">
-defineProps<{
-  open: boolean
-  message: string
-}>()
+<script setup>
+defineProps({
+  open: Boolean,
+  message: String
+});
 
-defineEmits<{
-  (e: 'close'): void
-}>()
+defineEmits(['close']);
 </script>
 
 <style scoped>
