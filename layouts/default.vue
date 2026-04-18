@@ -148,7 +148,7 @@ import {
   DocumentDuplicateIcon,
   FolderIcon,
   HomeIcon,
-  UsersIcon,
+  UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
@@ -158,11 +158,11 @@ const route = useRoute()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customer', href: '/team', icon: UsersIcon }, // Changed name to 'Customer'
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
+  // { name: 'Projects', href: '#', icon: FolderIcon },
+  // { name: 'Calendar', href: '#', icon: CalendarIcon },
+  // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
+  // { name: 'Reports', href: '#', icon: ChartPieIcon },
 ]
 
 const userNavigation = [
