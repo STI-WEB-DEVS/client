@@ -12,11 +12,23 @@
 
 import { BaseService } from "../BaseService";
 
+interface Customer {
+  id: number;
+  name: string;
+  email: string;
+}
+
+// Laravel Pagination Structure
+interface PaginatedResponse<T> {
+  data: T[];
+  current_page: number;
+  last_page: number;
+  total: number;
+}
+
 export class CustomerService extends BaseService {
   async getCustomers() {
-    return this.request('/customers', 'GET');
-  }
-  async createCustomer(customerData: object) {
-    return this.request('/customers', 'POST', customerData);
+    // We expect a PaginatedResponse containing an array of Customers
+    return this.request<PaginatedResponse<Customer>>('/customers', 'GET');
   }
 }
