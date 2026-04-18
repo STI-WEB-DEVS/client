@@ -1,68 +1,99 @@
 export class BaseService {
-  async request<T>(url: string, method: string, params: object = {}): Promise<T> {
-    const runtimeConfig = useRuntimeConfig();
+  private tokenStorageKey = '_token';
 
-    const isClient = import.meta.client;
+  private isClient(): boolean {
+    return typeof window !== 'undefined';
+  }
 
-    // Retrieve token from localStorage if available
-    const token = isClient ? localStorage.getItem("authToken") : null;
+  private get baseURL(): string {
+    // Safe way to get runtime config
+    if (this.isClient()) {
+      return (window as any).__NUXT__?.config?.public?.apiBaseURL || '';
+    }
+    return '';
+  }
 
-    let config: any = {
-      baseURL: runtimeConfig.public.apiBaseURL,
-      method: method,
-      headers: {
-        Accept: "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}), // inject token if exists
-      },
+  private getToken(): string {
+    if (!this.isClient()) return '';
+    return localStorage.getItem(this.tokenStorageKey) || '';
+  }
+
+  private saveToken(response: any) {
+    if (!this.isClient() || !response) return;
+
+    const token = response.token ||
+                  response.access_token ||
+                  response.accessToken ||
+                  response.data?.token ||
+                  response.data?.access_token ||
+                  response.data?.accessToken;
+
+    if (typeof token === 'string' && token.trim()) {
+      localStorage.setItem(this.tokenStorageKey, token);
+    }
+  }
+
+  async request<T>(
+    url: string,
+    method: string = 'GET',
+    params: object = {}
+  ): Promise<T> {
+    const token = this.getToken();
+
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
     };
 
-    if (method.toUpperCase() === "GET") {
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const config: Record<string, any> = {
+      method: method.toUpperCase(),
+      headers,
+    };
+
+    if (config.method === 'GET') {
       config.params = params;
     } else {
       config.body = params;
     }
 
     try {
-      const response = await $fetch<T>(url, config);
+      const fullUrl = `${this.baseURL}${url}`;
 
-      // Cast response to any to check for token/role fields
-      const anyResponse = response as any;
-
-      if (isClient) {
-        // Save or update token in localStorage (supports common API shapes)
-        const tokenFromResponse =
-          anyResponse?.token ||
-          anyResponse?.access_token ||
-          anyResponse?.accessToken ||
-          anyResponse?.data?.token ||
-          anyResponse?.data?.access_token ||
-          anyResponse?.data?.accessToken;
-
-        if (tokenFromResponse) {
-          localStorage.setItem("authToken", tokenFromResponse);
-        }
-
-        // Normalize role label to "customer" after login/response
-        if (anyResponse?.role || anyResponse?.user?.role || anyResponse?.data?.role) {
-          localStorage.setItem("userRole", "customer");
-        }
+      if (config.method === 'GET') {
+        const query = new URLSearchParams(params as Record<string, string>).toString();
+        const requestUrl = query ? `${fullUrl}?${query}` : fullUrl;
+        const response = await fetch(requestUrl, config);
+        const data = (await response.json()) as T;
+        this.saveToken(data);
+        return data;
       }
 
-      return response;
+      config.body = JSON.stringify(params);
+      const response = await fetch(fullUrl, config);
+      const data = (await response.json()) as T;
+      this.saveToken(data);
+      return data;
     } catch (error: any) {
-      const status = error.response?.status;
-      const data = error.response?._data;
+      const status = error?.response?.status;
+      let message = error?.response?._data?.message ||
+                    error?.data?.message ||
+                    error?.message ||
+                    'Something went wrong. Please try again.';
 
       switch (status) {
         case 400:
+        case 401:
         case 404:
         case 422:
         case 429:
-          throw new Error(data?.message || "Validation or Request Error");
+          throw new Error(message || 'Validation or Request Error');
         case 500:
-          throw new Error("Server error. Please try again or contact the administrator.");
+          throw new Error('Server error. Please try again or contact the administrator.');
         default:
-          throw new Error("Something went wrong. Please try again.");
+          throw new Error(message);
       }
     }
   }
