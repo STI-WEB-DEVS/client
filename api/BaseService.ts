@@ -3,26 +3,20 @@ export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
 
     const runtimeConfig = useRuntimeConfig();
+    const token = localStorage.getItem('_token');
 
-    const token = useCookie("token").value;
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+    };
 
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
 
-
-
-    let config: any = {
-
+    const config: any = {
       baseURL: runtimeConfig.public.apiBaseURL,
-
-      method: method,
-
-      headers: {
-
-        Accept: "application/json",
-
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-
-      },
-
+      method,
+      headers,
     };
 
 
@@ -58,33 +52,28 @@ export class BaseService {
       return response;
 
     } catch (error: any) {
-
-      const status = error.response?.status;
-
-      const data = error.response?._data;
+      const status = error?.response?.status;
+      const message =
+        error?.response?._data?.message ||
+        error?.data?.message ||
+        error?.message;
 
 
 
       switch (status) {
 
         case 400:
-
+        case 401:
         case 404:
 
         case 422:
 
         case 429:
-
-          throw new Error(data?.message || "Validation or Request Error");
-
+          throw new Error(message || 'Validation or Request Error');
         case 500:
-
-          throw new Error("Server error. Please try again or contact the administrator.");
-
+          throw new Error('Server error. Please try again or contact the administrator.');
         default:
-
-          throw new Error("Something went wrong. Please try again.");
-
+          throw new Error(message || 'Something went wrong. Please try again.');
       }
 
     }
