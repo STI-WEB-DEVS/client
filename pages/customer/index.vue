@@ -11,7 +11,7 @@
 
         <button
           type="button"
-          @click="handleCreate"
+          @click="showCreateModal = true"
           class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
         >
           <PlusIcon class="h-4 w-4" />
@@ -32,18 +32,10 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  ID
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Name
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Email
-                </th>
-                <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Actions
-                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Name</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Email</th>
+                <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
             </thead>
 
@@ -53,19 +45,12 @@
                 :key="customer.id"
                 class="transition hover:bg-gray-50"
               >
-                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ customer.id }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                  {{ customer.name }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ customer.email }}
-                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ customer.id }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ customer.name }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ customer.email }}</td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
                     <button
-                      type="button"
                       @click="handleView(customer)"
                       class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
@@ -74,7 +59,6 @@
                     </button>
 
                     <button
-                      type="button"
                       @click="handleEdit(customer)"
                       class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
@@ -83,7 +67,6 @@
                     </button>
 
                     <button
-                      type="button"
                       @click="handleDelete(customer)"
                       class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
                     >
@@ -116,10 +99,26 @@
         </div>
       </div>
 
-      <FeedbackModal
-        :open="isFeedbackModalOpen"
-        :message="feedbackMessage"
-        @close="closeFeedbackModal"
+      <!-- Customer Modals -->
+      <CreateCustomerModal
+        :open="showCreateModal"
+        @close="showCreateModal = false"
+        @created="handleCreated"
+      />
+
+      <EditCustomerModal
+        :open="showEditModal"
+        :uuid="selectedUuid"
+        @close="showEditModal = false"
+        @updated="handleUpdated"
+      />
+
+      <DeleteCustomerModal
+        :open="showDeleteModal"
+        :customer-name="selectedName"
+        :uuid="selectedUuid"
+        @close="showDeleteModal = false"
+        @deleted="handleDeleted"
       />
     </div>
   </NuxtLayout>
@@ -136,19 +135,30 @@ import {
 } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
 
+import CreateCustomerModal from '~/components/customer/CreateCustomerModal.vue';
+import EditCustomerModal from '~/components/customer/EditCustomerModal.vue';
+import DeleteCustomerModal from '~/components/customer/DeleteCustomerModal.vue';
+
 const router = useRouter();
 
 const customers = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 
-const isFeedbackModalOpen = ref(false);
-const feedbackMessage = ref('');
+const showCreateModal = ref(false);
+const showEditModal = ref(false);
+const showDeleteModal = ref(false);
+
+const selectedUuid = ref('');
+const selectedName = ref('');
 
 onMounted(async () => {
+  await fetchCustomers();
+});
+
+const fetchCustomers = async () => {
   pending.value = true;
   error.value = null;
-
   try {
     customers.value = await customerService.list();
   } catch (err: any) {
@@ -156,20 +166,11 @@ onMounted(async () => {
   } finally {
     pending.value = false;
   }
-});
-
-const openFeedbackModal = (message: string) => {
-  feedbackMessage.value = message;
-  isFeedbackModalOpen.value = true;
 };
 
-const closeFeedbackModal = () => {
-  isFeedbackModalOpen.value = false;
-  feedbackMessage.value = '';
-};
-
+// Button Handlers
 const handleCreate = () => {
-  openFeedbackModal('Create button clicked');
+  showCreateModal.value = true;
 };
 
 const handleView = (customer: any) => {
@@ -177,10 +178,29 @@ const handleView = (customer: any) => {
 };
 
 const handleEdit = (customer: any) => {
-  openFeedbackModal(`Edit customer: ${customer.name}`);
+  selectedUuid.value = customer.uuid;
+  showEditModal.value = true;
 };
 
 const handleDelete = (customer: any) => {
-  openFeedbackModal(`Delete customer: ${customer.name}`);
+  selectedUuid.value = customer.uuid;
+  selectedName.value = customer.name;
+  showDeleteModal.value = true;
+};
+
+// Modal Callbacks
+const handleCreated = async () => {
+  alert('Customer created successfully!');
+  await fetchCustomers(); // Refresh list
+};
+
+const handleUpdated = async () => {
+  alert('Customer updated successfully!');
+  await fetchCustomers(); // Refresh list
+};
+
+const handleDeleted = async () => {
+  alert('Customer deleted successfully!');
+  await fetchCustomers(); // Refresh list
 };
 </script>
