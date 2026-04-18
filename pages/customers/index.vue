@@ -2,8 +2,8 @@
   <NuxtLayout>
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold text-gray-900">Team</h1>
-        <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, email, and company.</p>
+        <h1 class="text-base font-semibold text-gray-900">Customers</h1>
+        <p class="mt-2 text-sm text-gray-700">A list of all the customers in your account including their name, email, and company.</p>
       </div>
     </div>
 
@@ -29,19 +29,19 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="user in teams" :key="user.id">
+                <tr v-for="customer in customers" :key="customer.id">
                   <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                    {{ user.name }}
+                    {{ customer.name }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.email }}
+                    {{ customer.email }}
+                  </td>
+                  <!-- <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {{ customer.company?.name || 'N/A' }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.company?.name || 'N/A' }}
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ user.website }}
-                  </td>
+                    {{ customer.website }}
+                  </td> -->
                 </tr>
               </tbody>
             </table>
@@ -53,11 +53,12 @@
 </template>
 
 <script setup lang="ts">
-import { TeamService } from '~/api/Team/TeamService';
+  import { CustomerService, type Customer } from '~/api/Customer/CustomerService'
 
-const teamService = new TeamService();
+  const customerService = new CustomerService()
 
-const { data: teams, pending, error } = await useAsyncData('teams', () => 
-    teamService.getTeams()
-);
+  const { data: customers, pending, error } = await useAsyncData<Customer[]>(
+    'customers',
+    () => customerService.getCustomers()
+  )
 </script>
