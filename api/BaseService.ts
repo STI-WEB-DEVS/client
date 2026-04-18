@@ -3,13 +3,13 @@ export class BaseService {
 
   private getApiBaseUrl(): string {
     if (typeof window !== 'undefined') {
-      const nuxtConfig = (window as any).__NUXT__?.config;
-      if (nuxtConfig?.public?.apiBaseURL) {
-        return nuxtConfig.public.apiBaseURL;
+      const config = (window as any).__NUXT__?.config?.public;
+      if (config?.apiBaseURL) {
+        return config.apiBaseURL;
       }
     }
-
-    return 'https://jsonplaceholder.typicode.com';
+    
+    return 'http://127.0.0.1:8000/api';
   }
 
   private readToken(): string {
