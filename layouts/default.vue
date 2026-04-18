@@ -132,7 +132,7 @@
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
                   <a :href="item.href"
                     :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{
-                    item.name }}</a>
+                      item.name }}</a>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -171,7 +171,7 @@ import {
   DocumentDuplicateIcon,
   FolderIcon,
   HomeIcon,
-  UsersIcon,
+  UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
@@ -181,11 +181,11 @@ const route = useRoute()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customer', href: '/customer', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
+  // { name: 'Projects', href: '#', icon: FolderIcon },
+  // { name: 'Calendar', href: '#', icon: CalendarIcon },
+  // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
+  // { name: 'Reports', href: '#', icon: ChartPieIcon },
 ]
 
 const userNavigation = [
