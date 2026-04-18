@@ -36,6 +36,7 @@ export class BaseService {
         case 400:
         case 401:
         case 404:
+          throw new Error(message || 'API endpoint not found. Please verify your API_BASE_URL.');
         case 422:
         case 429:
           throw new Error(message || 'Validation or Request Error');

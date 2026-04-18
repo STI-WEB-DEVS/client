@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss'],
   runtimeConfig: {
     public: {
-      apiBaseURL: process.env.API_BASE_URL || 'https://jsonplaceholder.typicode.com'
+      apiBaseURL: process.env.NUXT_PUBLIC_API_BASE || '/api'
     }
   }
 })
