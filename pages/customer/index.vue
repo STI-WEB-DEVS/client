@@ -32,18 +32,10 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  ID
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Name
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Email
-                </th>
-                <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Actions
-                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Name</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Email</th>
+                <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
             </thead>
 
@@ -65,7 +57,6 @@
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
                     <button
-                      type="button"
                       @click="handleView(customer)"
                       class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
@@ -74,7 +65,6 @@
                     </button>
 
                     <button
-                      type="button"
                       @click="handleEdit(customer)"
                       class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
@@ -83,7 +73,6 @@
                     </button>
 
                     <button
-                      type="button"
                       @click="handleDelete(customer)"
                       class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
                     >
@@ -116,7 +105,6 @@
         </div>
       </div>
 
-
       <CustomerFormModal
         :open="isFormModalOpen"
         :loading="isSaving"
@@ -133,16 +121,16 @@
         @close="isDeleteModalOpen = false"
         @confirm="confirmDelete"
       />
+
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
         @close="closeFeedbackModal"
       />
     </div>
-
-
   </NuxtLayout>
 </template>
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
@@ -155,6 +143,7 @@ import {
 import { customerService } from '~/api/customer/CustomerService';
 import CustomerFormModal from '~/components/CustomerFormModal.vue';
 import DeleteConfirmationModal from '~/components/DeleteConfirmationModal.vue';
+import FeedbackModal from '~/components/FeedbackModal.vue';
 
 const router = useRouter();
 
@@ -169,7 +158,11 @@ const isFormModalOpen = ref(false);
 const isDeleteModalOpen = ref(false);
 const isSaving = ref(false);
 
-// --- Initialization ---
+// --- Feedback State ---
+const isFeedbackModalOpen = ref(false);
+const feedbackMessage = ref('');
+
+// --- Actions ---
 const fetchCustomers = async () => {
   pending.value = true;
   error.value = null;
@@ -184,19 +177,25 @@ const fetchCustomers = async () => {
 
 onMounted(fetchCustomers);
 
+const showFeedback = (msg: string) => {
+  feedbackMessage.value = msg;
+  isFeedbackModalOpen.value = true;
+};
+
+const closeFeedbackModal = () => {
+  isFeedbackModalOpen.value = false;
+};
+
 // --- Navigation ---
 const handleView = (customer: any) => {
   router.push(`/customer/${customer.uuid}`);
 };
 
-// --- Form Logic (Create & Edit) ---
-const openFormModal = () => {
-  isFormModalOpen.value = true;
-};
-
+// --- Form Logic ---
 const closeFormModal = () => {
   isFormModalOpen.value = false;
 };
+
 const handleCreate = () => {
   selectedCustomer.value = null;
   isFormModalOpen.value = true;
@@ -212,13 +211,15 @@ const handleFormSubmit = async (formData: { name: string; email: string }) => {
   try {
     if (selectedCustomer.value?.uuid) {
       await customerService.update(selectedCustomer.value.uuid, formData);
+      showFeedback('Customer updated successfully!');
     } else {
       await customerService.create(formData);
+      showFeedback('Customer created successfully!');
     }
     isFormModalOpen.value = false;
     await fetchCustomers();
   } catch (err: any) {
-    alert(err.message || 'Error saving customer');
+    showFeedback(err.message || 'Error saving customer');
   } finally {
     isSaving.value = false;
   }
@@ -237,8 +238,9 @@ const confirmDelete = async () => {
     await customerService.delete(selectedCustomer.value.uuid);
     isDeleteModalOpen.value = false;
     await fetchCustomers();
+    showFeedback('Customer deleted successfully!');
   } catch (err: any) {
-    alert(err.message || 'Error deleting customer');
+    showFeedback(err.message || 'Error deleting customer');
   } finally {
     isSaving.value = false;
   }
