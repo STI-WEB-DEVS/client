@@ -1,44 +1,40 @@
 export class BaseService {
-  private tokenStorageKey = '_token';
+  private tokenStorageKey = 'auth_token';
 
-  private isClient(): boolean {
-    return typeof window !== 'undefined';
-  }
-
-  private get baseURL(): string {
-    // Safe way to get runtime config
-    if (this.isClient()) {
-      return (window as any).__NUXT__?.config?.public?.apiBaseURL || '';
+  private getApiBaseUrl(): string {
+    if (typeof window !== 'undefined') {
+      const config = (window as any).__NUXT__?.config?.public;
+      if (config?.apiBaseURL) {
+        return config.apiBaseURL;
+      }
     }
-    return '';
+    
+    return 'http://127.0.0.1:8000/api';
   }
 
-  private getToken(): string {
-    if (!this.isClient()) return '';
+  private readToken(): string {
+    if (typeof window === 'undefined') return '';
     return localStorage.getItem(this.tokenStorageKey) || '';
   }
 
-  private saveToken(response: any) {
-    if (!this.isClient() || !response) return;
+  private persistTokenFromResponse(response: any) {
+    if (typeof window === 'undefined' || !response || typeof response !== 'object') return;
 
-    const token = response.token ||
-                  response.access_token ||
-                  response.accessToken ||
-                  response.data?.token ||
-                  response.data?.access_token ||
-                  response.data?.accessToken;
+    const token =
+      response.token ||
+      response.access_token ||
+      response.accessToken ||
+      response.data?.token ||
+      response.data?.access_token ||
+      response.data?.accessToken;
 
     if (typeof token === 'string' && token.trim()) {
       localStorage.setItem(this.tokenStorageKey, token);
     }
   }
 
-  async request<T>(
-    url: string,
-    method: string = 'GET',
-    params: object = {}
-  ): Promise<T> {
-    const token = this.getToken();
+  async request<T>(url: string, method: string, params: object = {}): Promise<T> {
+    const token = this.readToken();
 
     const headers: Record<string, string> = {
       Accept: 'application/json',
@@ -48,40 +44,43 @@ export class BaseService {
       headers.Authorization = `Bearer ${token}`;
     }
 
-    const config: Record<string, any> = {
-      method: method.toUpperCase(),
+    const baseURL = this.getApiBaseUrl();
+    const config: RequestInit = {
+      method,
       headers,
     };
 
-    if (config.method === 'GET') {
-      config.params = params;
+    let requestUrl = `${baseURL}${url}`;
+    if (method.toUpperCase() === 'GET') {
+      const query = new URLSearchParams(params as Record<string, string>).toString();
+      if (query) {
+        requestUrl += `${url.includes('?') ? '&' : '?'}${query}`;
+      }
     } else {
-      config.body = params;
+      config.body = JSON.stringify(params);
     }
 
     try {
-      const fullUrl = `${this.baseURL}${url}`;
+      const res = await fetch(requestUrl, config);
+      const response = (await res.json()) as T;
 
-      if (config.method === 'GET') {
-        const query = new URLSearchParams(params as Record<string, string>).toString();
-        const requestUrl = query ? `${fullUrl}?${query}` : fullUrl;
-        const response = await fetch(requestUrl, config);
-        const data = (await response.json()) as T;
-        this.saveToken(data);
-        return data;
+      if (!res.ok) {
+        throw {
+          response: {
+            status: res.status,
+            _data: response,
+          },
+        };
       }
 
-      config.body = JSON.stringify(params);
-      const response = await fetch(fullUrl, config);
-      const data = (await response.json()) as T;
-      this.saveToken(data);
-      return data;
+      this.persistTokenFromResponse(response);
+      return response;
     } catch (error: any) {
       const status = error?.response?.status;
-      let message = error?.response?._data?.message ||
-                    error?.data?.message ||
-                    error?.message ||
-                    'Something went wrong. Please try again.';
+      const message =
+        error?.response?._data?.message ||
+        error?.data?.message ||
+        error?.message;
 
       switch (status) {
         case 400:
@@ -93,7 +92,7 @@ export class BaseService {
         case 500:
           throw new Error('Server error. Please try again or contact the administrator.');
         default:
-          throw new Error(message);
+          throw new Error(message || 'Something went wrong. Please try again.');
       }
     }
   }
