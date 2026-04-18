@@ -116,6 +116,8 @@
         </div>
       </div>
 
+      <CustomerForm @submitted="refreshCustomers" />
+
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
@@ -134,7 +136,9 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline';
-import { customerService } from '~/api/Customer/CustomerService';
+import { customerService } from '~/api/customer/CustomerService';
+import CustomerForm from '~/components/forms/CustomerForm.vue'
+
 
 const router = useRouter();
 
@@ -169,8 +173,8 @@ const closeFeedbackModal = () => {
 };
 
 const handleCreate = () => {
-  openFeedbackModal('Create button clicked');
-};
+  isFeedbackModalOpen.value = true
+}
 
 const handleView = (customer: any) => {
   router.push(`/customer/${customer.uuid}`);
@@ -183,4 +187,8 @@ const handleEdit = (customer: any) => {
 const handleDelete = (customer: any) => {
   openFeedbackModal(`Delete customer: ${customer.name}`);
 };
+const refreshCustomers = async () => {
+  customers.value = await customerService.list()
+}
+
 </script>
