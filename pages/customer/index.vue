@@ -78,16 +78,55 @@
       </Table>
 
       <FeedbackModal
-        :open="isFeedbackModalOpen"
-        :message="feedbackMessage"
-        @close="closeFeedbackModal"
-      />
+        :open="isModalOpen"
+        :title="modalTitle"
+        :confirm-text="confirmText"
+        :cancel-text="modalMode !== 'view' ? 'Cancel' : undefined"
+        :variant="modalMode === 'delete' ? 'danger' : 'info'"
+        :loading="submitting"
+        @close="closeModal"
+        @confirm="handleModalConfirm"
+      >
+        <div v-if="modalMode === 'delete'">
+          <p>
+            Are you sure you want to delete
+            <span class="font-semibold text-gray-900">{{
+              selectedCustomer?.name
+            }}</span>? This action cannot be undone.
+          </p>
+        </div>
+
+        <div v-else-if="modalMode === 'edit' || modalMode === 'create'">
+          <CustomerForm v-model="form" :disabled="submitting" />
+        </div>
+
+        <div v-else-if="modalMode === 'view'" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</p>
+              <p class="mt-1 text-sm text-gray-900 font-medium">{{ selectedCustomer?.id }}</p>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">UUID</p>
+              <p class="mt-1 text-xs text-gray-600 truncate">{{ selectedCustomer?.uuid }}</p>
+            </div>
+            <div class="col-span-2">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</p>
+              <p class="mt-1 text-sm text-gray-900">{{ selectedCustomer?.name }}</p>
+            </div>
+            <div class="col-span-2">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</p>
+              <p class="mt-1 text-sm text-gray-900">{{ selectedCustomer?.email }}</p>
+            </div>
+          </div>
+        </div>
+      </FeedbackModal>
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import {
   EyeIcon,
@@ -108,14 +147,49 @@ const tableColumns = [
 const customers = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
+const submitting = ref(false);
 
-const isFeedbackModalOpen = ref(false);
-const feedbackMessage = ref("");
+const isModalOpen = ref(false);
+const modalMode = ref<"create" | "edit" | "delete" | "view">("view");
+const selectedCustomer = ref<any>(null);
+const form = ref({
+  name: "",
+  email: "",
+});
 
-onMounted(async () => {
+const modalTitle = computed(() => {
+  switch (modalMode.value) {
+    case "create":
+      return "Create Customer";
+    case "edit":
+      return "Edit Customer";
+    case "delete":
+      return "Delete Customer";
+    case "view":
+      return "Customer Details";
+    default:
+      return "Notification";
+  }
+});
+
+const confirmText = computed(() => {
+  switch (modalMode.value) {
+    case "create":
+      return "Create";
+    case "edit":
+      return "Save Changes";
+    case "delete":
+      return "Delete";
+    case "view":
+      return "Close";
+    default:
+      return "Okay";
+  }
+});
+
+const loadCustomers = async () => {
   pending.value = true;
   error.value = null;
-
   try {
     customers.value = await customerService.list();
   } catch (err: any) {
@@ -123,20 +197,44 @@ onMounted(async () => {
   } finally {
     pending.value = false;
   }
-});
-
-const openFeedbackModal = (message: string) => {
-  feedbackMessage.value = message;
-  isFeedbackModalOpen.value = true;
 };
 
-const closeFeedbackModal = () => {
-  isFeedbackModalOpen.value = false;
-  feedbackMessage.value = "";
+onMounted(loadCustomers);
+
+const closeModal = () => {
+  isModalOpen.value = false;
+  selectedCustomer.value = null;
+  submitting.value = false;
+};
+
+const handleModalConfirm = async () => {
+  if (modalMode.value === "view") {
+    closeModal();
+    return;
+  }
+
+  submitting.value = true;
+  try {
+    if (modalMode.value === "delete") {
+      await customerService.delete(selectedCustomer.value.uuid);
+    } else if (modalMode.value === "edit") {
+      await customerService.update(selectedCustomer.value.uuid, form.value);
+    } else if (modalMode.value === "create") {
+      await customerService.create(form.value);
+    }
+    await loadCustomers();
+    closeModal();
+  } catch (err: any) {
+    alert(err.message || "An error occurred");
+  } finally {
+    submitting.value = false;
+  }
 };
 
 const handleCreate = () => {
-  openFeedbackModal("Create button clicked");
+  modalMode.value = "create";
+  form.value = { name: "", email: "" };
+  isModalOpen.value = true;
 };
 
 const handleView = (customer: any) => {
@@ -144,10 +242,15 @@ const handleView = (customer: any) => {
 };
 
 const handleEdit = (customer: any) => {
-  openFeedbackModal(`Edit customer: ${customer.name}`);
+  modalMode.value = "edit";
+  selectedCustomer.value = customer;
+  form.value = { name: customer.name, email: customer.email };
+  isModalOpen.value = true;
 };
 
 const handleDelete = (customer: any) => {
-  openFeedbackModal(`Delete customer: ${customer.name}`);
+  modalMode.value = "delete";
+  selectedCustomer.value = customer;
+  isModalOpen.value = true;
 };
 </script>
