@@ -1,29 +1,22 @@
 <template>
   <NuxtLayout>
-    <div class="space-y-6">
-      <div>
-        <h1 class="text-xl font-semibold tracking-tight text-gray-900">
-          View Customer
-        </h1>
-        <p class="mt-1 text-sm text-gray-500">
-          Dedicated customer page using the UUID from the route.
-        </p>
-      </div>
-
-      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <p class="text-sm text-gray-500">Customer UUID</p>
-        <p class="mt-2 break-all text-base font-medium text-gray-900">
-          {{ uuid }}
-        </p>
-      </div>
+    <div v-if="customer" class="space-y-4">
+      <h1 class="text-xl font-semibold">{{ customer.name }}</h1>
+      <p class="text-gray-600">{{ customer.email }}</p>
     </div>
+    <div v-else class="text-gray-500">Loading...</div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { customerService } from '~/api/customer/CustomerService'
 
 const route = useRoute()
+const customer = ref<any>(null)
 
-const uuid = computed(() => String(route.params.uuid ?? ''))
+onMounted(async () => {
+  customer.value = await customerService.show(route.params.uuid as string)
+})
 </script>

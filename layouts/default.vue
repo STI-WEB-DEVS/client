@@ -25,15 +25,24 @@
                 <nav class="relative flex flex-1 flex-col">
                   <ul role="list" class="flex flex-1 flex-col gap-y-7">
                     <li>
-                      <ul role="list" class="-mx-2 space-y-1">
-                        <li v-for="item in navigation" :key="item.name">
-                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
-                            <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
-                            {{ item.name }}
-                          </NuxtLink>
-                        </li>
-                      </ul>
-                    </li>
+  <ul role="list" class="-mx-2 space-y-1">
+    <li>
+      <NuxtLink to="/dashboard" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+        Dashboard
+      </NuxtLink>
+    </li>
+    <li>
+      <NuxtLink to="/customer" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+        Customers
+      </NuxtLink>
+    </li>
+    <li>
+      <NuxtLink to="/product" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+        Products
+      </NuxtLink>
+    </li>
+  </ul>
+</li>
                     <li class="mt-auto">
                       <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                         <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
@@ -158,6 +167,7 @@ const route = useRoute()
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/customer', icon: UserGroupIcon },
+  { name: 'Products', href: '/product', icon: FolderIcon }, // new link
   // { name: 'Projects', href: '#', icon: FolderIcon },
   // { name: 'Calendar', href: '#', icon: CalendarIcon },
   // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
