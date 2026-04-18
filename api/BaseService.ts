@@ -1,48 +1,48 @@
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
+    const token = localStorage.getItem('_token');
 
-    // Read token from localStorage
-    const token = process.client ? localStorage.getItem("token") : null;
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
 
     const config: any = {
       baseURL: runtimeConfig.public.apiBaseURL,
-      method: method.toUpperCase(),
-      headers: {
-        Accept: "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },  
+      method,
+      headers,
     };
 
-    if (config.method === "GET") {
+    if (method.toUpperCase() === 'GET') {
       config.params = params;
     } else {
       config.body = params;
     }
 
     try {
-      const response = await $fetch<T>(url, config);
-
-      // If the response contains a new token, save it
-      if (process.client && (response as any)?.token) {
-        localStorage.setItem("token", (response as any).token);
-      }
-
-      return response;
+      return await $fetch<T>(url, config);
     } catch (error: any) {
-      const status = error.response?.status;
-      const data = error.response?._data;
+      const status = error?.response?.status;
+      const message =
+        error?.response?._data?.message ||
+        error?.data?.message ||
+        error?.message;
 
       switch (status) {
         case 400:
+        case 401:
         case 404:
         case 422:
         case 429:
-          throw new Error(data?.message || "Validation or Request Error");
+          throw new Error(message || 'Validation or Request Error');
         case 500:
-          throw new Error("Server error. Please try again or contact the administrator.");
+          throw new Error('Server error. Please try again or contact the administrator.');
         default:
-          throw new Error("Something went wrong. Please try again.");
+          throw new Error(message || 'Something went wrong. Please try again.');
       }
     }
   }
