@@ -1,0 +1,224 @@
+<template>
+  <NuxtLayout>
+    <div class="space-y-6">
+
+      <!-- HEADER (UNCHANGED) -->
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-xl font-semibold tracking-tight text-gray-900">Customers</h1>
+          <p class="mt-1 text-sm text-gray-500">
+            Displaying customer records from your API.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          @click="openCreate"
+          class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+        >
+          <PlusIcon class="h-4 w-4" />
+          <span>Create Customer</span>
+        </button>
+      </div>
+
+      <!-- LOADING -->
+      <div v-if="pending" class="flex justify-center py-16">
+        <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
+      </div>
+
+      <!-- ERROR -->
+      <div v-else-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4">
+        <p class="text-sm text-red-700">{{ error.message }}</p>
+      </div>
+
+      <!-- TABLE (UNCHANGED DESIGN) -->
+      <div v-else class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Name</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Email</th>
+                <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-100 bg-white">
+
+              <tr
+                v-for="customer in customers?.data"
+                :key="customer.id"
+                class="transition hover:bg-gray-50"
+              >
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                  {{ customer.id }}
+                </td>
+
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
+                  {{ customer.name }}
+                </td>
+
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  {{ customer.email }}
+                </td>
+
+                <td class="whitespace-nowrap px-6 py-4">
+                  <div class="flex items-center justify-end gap-2">
+
+                    <button
+                      type="button"
+                      @click="handleView(customer)"
+                      class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      <EyeIcon class="h-4 w-4" />
+                      <span>View</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      @click="openEdit(customer)"
+                      class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      <PencilSquareIcon class="h-4 w-4" />
+                      <span>Edit</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      @click="openDelete(customer)"
+                      class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+                    >
+                      <TrashIcon class="h-4 w-4" />
+                      <span>Delete</span>
+                    </button>
+
+                  </div>
+                </td>
+              </tr>
+
+              <tr v-if="!customers?.data?.length">
+                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
+                  No customers found.
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CREATE / EDIT MODAL (UNCHANGED DESIGN) -->
+      <CustomerFormModal
+        :open="isFormOpen"
+        :mode="mode"
+        :customer="selectedCustomer"
+        @close="isFormOpen = false"
+        @create="handleCreate"
+        @update="handleUpdate"
+      />
+
+      <!-- DELETE MODAL (UNCHANGED DESIGN) -->
+      <CustomerDeleteModal
+        :open="isDeleteOpen"
+        :customer="selectedCustomer"
+        @close="isDeleteOpen = false"
+        @confirm="handleDelete"
+      />
+
+    </div>
+  </NuxtLayout>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import {
+  PlusIcon,
+  EyeIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from '@heroicons/vue/24/outline'
+import { customerService } from '~/api/customer/CustomerService'
+
+const router = useRouter()
+
+const customers = ref<any>(null)
+const pending = ref(true)
+const error = ref<any>(null)
+
+/* MODALS */
+const isFormOpen = ref(false)
+const isDeleteOpen = ref(false)
+
+const mode = ref<'create' | 'edit'>('create')
+const selectedCustomer = ref<any>(null)
+
+/* LOAD */
+onMounted(async () => {
+  try {
+    customers.value = await customerService.list()
+  } finally {
+    pending.value = false
+  }
+})
+
+/* OPEN CREATE */
+const openCreate = () => {
+  mode.value = 'create'
+  selectedCustomer.value = null
+  isFormOpen.value = true
+}
+
+/* OPEN EDIT */
+const openEdit = (customer: any) => {
+  mode.value = 'edit'
+  selectedCustomer.value = customer
+  isFormOpen.value = true
+}
+
+/* OPEN DELETE */
+const openDelete = (customer: any) => {
+  selectedCustomer.value = customer
+  isDeleteOpen.value = true
+}
+
+/* VIEW */
+const handleView = (customer: any) => {
+  router.push(`/customer/${customer.uuid}`)
+}
+
+/* CREATE */
+const handleCreate = async (payload: any) => {
+  const res = await customerService.create(payload)
+  customers.value.data.unshift(res?.data ?? res)
+  isFormOpen.value = false
+}
+
+/* UPDATE */
+const handleUpdate = async (payload: any) => {
+  const res = await customerService.update(selectedCustomer.value.uuid, payload)
+
+  const index = customers.value.data.findIndex(
+    (c: any) => c.uuid === selectedCustomer.value.uuid
+  )
+
+  if (index !== -1) {
+    customers.value.data[index] = res?.data ?? res
+  }
+
+  isFormOpen.value = false
+}
+
+/* DELETE */
+const handleDelete = async () => {
+  await customerService.delete(selectedCustomer.value.uuid)
+
+  customers.value.data = customers.value.data.filter(
+    (c: any) => c.uuid !== selectedCustomer.value.uuid
+  )
+
+  isDeleteOpen.value = false
+}
+</script>
