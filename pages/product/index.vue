@@ -1,11 +1,157 @@
 <template>
   <NuxtLayout>
-    <h2>products</h2>
+    <div class="space-y-6">
+      <Heading
+        title="Products"
+        description="Displaying product records from your API."
+        button-text="Create Product"
+        @click="handleCreate"
+      />
+
+      <div v-if="pending" class="flex justify-center py-16">
+        <div
+          class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"
+        ></div>
+      </div>
+
+      <div
+        v-else-if="error"
+        class="rounded-xl border border-red-200 bg-red-50 p-4"
+      >
+        <p class="text-sm text-red-700">{{ error.message }}</p>
+      </div>
+
+      <Table
+        v-else
+        :columns="tableColumns"
+        :rows="products?.data || []"
+        empty-message="No products found."
+      >
+        <template #cell(price)="{ value }">
+          <span class="font-medium text-gray-900">${{ value }}</span>
+        </template>
+
+        <template #cell(actions)="{ row: product }">
+          <div class="flex items-center justify-end gap-2">
+            <button
+              type="button"
+              @click="handleView(product)"
+              class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              <EyeIcon class="h-4 w-4" />
+              <span>View</span>
+            </button>
+
+            <button
+              type="button"
+              @click="handleEdit(product)"
+              class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              <PencilSquareIcon class="h-4 w-4" />
+              <span>Edit</span>
+            </button>
+
+            <button
+              type="button"
+              @click="handleDelete(product)"
+              class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+            >
+              <TrashIcon class="h-4 w-4" />
+              <span>Delete</span>
+            </button>
+          </div>
+        </template>
+
+        <template #footer>
+          <p class="text-sm text-gray-500">
+            Showing
+            <span class="font-medium text-gray-900">{{
+              products?.meta?.from ?? 0
+            }}</span>
+            to
+            <span class="font-medium text-gray-900">{{
+              products?.meta?.to ?? 0
+            }}</span>
+            of
+            <span class="font-medium text-gray-900">{{
+              products?.meta?.total ?? 0
+            }}</span>
+            products
+          </p>
+        </template>
+      </Table>
+
+      <FeedbackModal
+        :open="isFeedbackModalOpen"
+        :message="feedbackMessage"
+        @close="closeFeedbackModal"
+      />
+    </div>
   </NuxtLayout>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import {
+  EyeIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from "@heroicons/vue/24/outline";
+import { productService } from "~/api/product/ProductService";
 
-const feature = ref();
+const router = useRouter();
+
+const tableColumns = [
+  { key: "id", label: "ID" },
+  { key: "name", label: "Name" },
+  { key: "price", label: "Price" },
+  { key: "actions", label: "Actions", align: "right" as const },
+];
+
+const products = ref<any>(null);
+const pending = ref(true);
+const error = ref<any>(null);
+
+const isFeedbackModalOpen = ref(false);
+const feedbackMessage = ref("");
+
+onMounted(async () => {
+  pending.value = true;
+  error.value = null;
+
+  try {
+    products.value = await productService.list();
+  } catch (err: any) {
+    error.value = err;
+  } finally {
+    pending.value = false;
+  }
+});
+
+const openFeedbackModal = (message: string) => {
+  feedbackMessage.value = message;
+  isFeedbackModalOpen.value = true;
+};
+
+const closeFeedbackModal = () => {
+  isFeedbackModalOpen.value = false;
+  feedbackMessage.value = "";
+};
+
+const handleCreate = () => {
+  openFeedbackModal("Create product button clicked");
+};
+
+const handleView = (product: any) => {
+  openFeedbackModal(`View product: ${product.name}`);
+};
+
+const handleEdit = (product: any) => {
+  openFeedbackModal(`Edit product: ${product.name}`);
+};
+
+const handleDelete = (product: any) => {
+  openFeedbackModal(`Delete product: ${product.name}`);
+};
 </script>
