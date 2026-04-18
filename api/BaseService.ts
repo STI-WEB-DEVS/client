@@ -1,84 +1,51 @@
-
 export class BaseService {
-
-  async request<T>(url: string, method: string, data: object = {}): Promise<T> {
-
+  async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
+    const token = localStorage.getItem('_token');
 
-    const token = useCookie('auth_token'); // Nuxt helper: works on SSR and Client
-
-
-
-    const options: any = {
-
-      baseURL: runtimeConfig.public.apiBaseURL,
-
-      method,
-
-      headers: {
-
-        Accept: 'application/json',
-
-        ...(token.value && { Authorization: `Bearer ${token.value}` }),
-
-      },
-
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
     };
 
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
 
+    const config: any = {
+      baseURL: runtimeConfig.public.apiBaseURL,
+      method,
+      headers,
+    };
 
     if (method.toUpperCase() === 'GET') {
-
-      options.params = data;
-
+      config.params = params;
     } else {
-
-      options.body = data;
-
+      config.body = params;
     }
-
-
 
     try {
-
-      const response = await $fetch<T>(url, options);
-
-
-
-      // Handle token storage for Auth calls
-
-      if ((url.includes('login') || url.includes('register')) && (response as any).token) {
-
-        token.value = (response as any).token;
-
-      }
-
-
-
-      return response;
-
+      return await $fetch<T>(url, config);
     } catch (error: any) {
+      const status = error?.response?.status;
+      const message =
+        error?.response?._data?.message ||
+        error?.data?.message ||
+        error?.message;
 
-      const status = error.response?.status;
-
-      
-
-      if (status === 401) {
-
-        token.value = null; // Clear cookie
-
-        throw new Error("Session expired.");
-
+      switch (status) {
+        case 400:
+        case 401:
+        case 404:
+        case 422:
+        case 429:
+          throw new Error(message || 'Validation or Request Error');
+        case 500:
+          throw new Error('Server error. Please try again or contact the administrator.');
+        default:
+          throw new Error(message || 'Something went wrong. Please try again.');
       }
-
-      
-
-      // ... rest of your error handling
-
-      throw error;
-
     }
-
   }
-
 }
+
+export default BaseService;
