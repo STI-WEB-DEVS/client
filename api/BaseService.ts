@@ -1,26 +1,20 @@
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
-    // 1. Cast to any to avoid the 'Property public does not exist' error
-    const runtimeConfig = useRuntimeConfig() as any;
-    const token = useCookie('auth_token');
-    
-    // 2. Default headers
+    const runtimeConfig = useRuntimeConfig();
+    const token = localStorage.getItem('_token');
+
     const headers: Record<string, string> = {
-      'Accept': 'application/json',
+      Accept: 'application/json',
     };
 
-    // 3. Only access localStorage if we are running in the browser
-    if (process.client) {
-      const token = localStorage.getItem('auth_token');
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
     }
 
-    let config: any = {
+    const config: any = {
       baseURL: runtimeConfig.public.apiBaseURL,
-      method: method,
-      headers: headers,
+      method,
+      headers,
     };
 
     if (method.toUpperCase() === 'GET') {
@@ -32,22 +26,23 @@ export class BaseService {
     try {
       return await $fetch<T>(url, config);
     } catch (error: any) {
-      const status = error.response?.status;
-      const data = error.response?._data;
+      const status = error?.response?.status;
+      const message =
+        error?.response?._data?.message ||
+        error?.data?.message ||
+        error?.message;
 
       switch (status) {
         case 400:
+        case 401:
         case 404:
         case 422:
         case 429:
-          throw new Error(data?.message || "Validation or Request Error");
-        case 401:
-          // Optional: handle unauthorized (e.g., clear storage and redirect to login)
-          throw new Error("Unauthorized. Please login again.");
+          throw new Error(message || 'Validation or Request Error');
         case 500:
-          throw new Error("Server error. Please try again or contact the administrator.");
+          throw new Error('Server error. Please try again or contact the administrator.');
         default:
-          throw new Error("Something went wrong. Please try again.");
+          throw new Error(message || 'Something went wrong. Please try again.');
       }
     }
   }
