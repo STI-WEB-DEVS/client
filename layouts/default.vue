@@ -266,7 +266,7 @@ import {
   ChartPieIcon,
   Cog6ToothIcon,
   DocumentDuplicateIcon,
-  FolderIcon,
+  GiftIcon,
   HomeIcon,
   UserGroupIcon,
   XMarkIcon,
@@ -279,7 +279,7 @@ const route = useRoute();
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
   { name: "Customers", href: "/customer", icon: UserGroupIcon },
-  // { name: 'Projects', href: '#', icon: FolderIcon },
+  { name: "Products", href: "/product", icon: GiftIcon },
   // { name: 'Calendar', href: '#', icon: CalendarIcon },
   // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
   // { name: 'Reports', href: '#', icon: ChartPieIcon },
