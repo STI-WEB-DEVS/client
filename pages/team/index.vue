@@ -1,70 +1,134 @@
 <template>
-  <NuxtLayout>
-    <div class="p-8">
-      <div class="sm:flex sm:items-center">
-        <div class="sm:flex-auto">
-          <h1 class="text-base font-semibold text-gray-900">Team Members</h1>
-          <p class="mt-2 text-sm text-gray-700">A list of names and emails from your account.</p>
-        </div>
-      </div>
-
-      <div v-if="pending" class="mt-8 flex justify-center">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-
-      <div v-else-if="error" class="mt-8 rounded-md bg-red-50 p-4">
-        <p class="text-sm text-red-700">Error: {{ error.message }}</p>
-      </div>
-
-      <div v-else class="mt-8 flow-root">
-        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-          <table class="min-w-full divide-y divide-gray-300">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">Name</th>
-                <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
-                <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">UUID</th>
-                <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">CreatedAt</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-              <tr v-for="user in (teams || [])" :key="user.id">
-                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
-                  {{ user.name || user.full_name || user.username || 'No name provided' }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {{ user.email }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {{ user.uuid }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {{ user.created_at }}
-                </td>
-              </tr>
-              <tr v-if="teams && teams.length === 0">
-                <td colspan="2" class="py-10 text-center text-gray-500">No members found.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <main class="flex h-screen flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+      <h2 class="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+        Sign in to your account
+      </h2>
     </div>
-  </NuxtLayout>
+
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
+      <div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
+        <form class="space-y-6" method="POST" @submit.prevent="handleSubmit">
+          <div>
+            <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
+            <div class="mt-2">
+              <input
+                v-model="email"
+                type="email"
+                name="email"
+                id="email"
+                autocomplete="email"
+                required
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
+            <div class="mt-2">
+              <input
+                v-model="password"
+                type="password"
+                name="password"
+                id="password"
+                autocomplete="current-password"
+                required
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex gap-3">
+              <div class="flex h-6 shrink-0 items-center">
+                <div class="group grid size-4 grid-cols-1">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    class="col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                  />
+                  <svg
+                    class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                  >
+                    <path
+                      class="opacity-0 group-has-[:checked]:opacity-100"
+                      d="M3 8L6 11L11 3.5"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      class="opacity-0 group-has-[:indeterminate]:opacity-100"
+                      d="M3 7H11"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <label for="remember-me" class="block text-sm/6 text-gray-900">Remember me</label>
+            </div>
+
+            <div class="text-sm/6">
+              <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+            </div>
+          </div>
+
+          <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+
+          <div>
+            <button
+              type="submit"
+              :disabled="isLoading"
+              class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ isLoading ? 'Signing in...' : 'Sign in' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <p class="mt-10 text-center text-sm/6 text-gray-500">
+        Not a member?
+        {{ ' ' }}
+        <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Register here</a>
+      </p>
+    </div>
+  </main>
 </template>
 
 <script setup lang="ts">
-import { TeamService } from '~/api/Team/TeamService';
+import { ref } from 'vue';
+import { AuthService } from '~/api/auth/AuthService';
 
-const teamService = new TeamService();
+const email = ref('');
+const password = ref('');
+const error = ref('');
+const isLoading = ref(false);
 
-const { data: teams, pending, error } = await useAsyncData('teams', async () => {
-    const response = await teamService.getTeams();
-    
-    // Most APIs wrap data in a 'data' object. 
-    // This line handles both raw arrays and wrapped objects.
-    return Array.isArray(response) ? response : (response.data || response.customers || []);
-}, { 
-    server: false // Keeps the request on the client to access your LocalStorage token
-});
+const authService = new AuthService();
+
+const handleSubmit = async () => {
+  error.value = '';
+  isLoading.value = true;
+
+  try {
+    const response = await authService.login(email.value, password.value);
+
+    if (response?.token) {
+      localStorage.setItem('_token', response.token);
+    }
+
+    await navigateTo('/dashboard');
+  } catch (err: any) {
+    error.value = err?.message || '';
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>

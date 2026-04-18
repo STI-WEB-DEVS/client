@@ -144,10 +144,11 @@ import {
   CalendarIcon,
   ChartPieIcon,
   Cog6ToothIcon,
+  CubeIcon,
   DocumentDuplicateIcon,
   FolderIcon,
   HomeIcon,
-  UsersIcon,
+  UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
@@ -157,11 +158,12 @@ const route = useRoute()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '#', icon: FolderIcon },
-  { name: 'Calendar', href: '#', icon: CalendarIcon },
-  { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
+  { name: 'Products', href: '/product', icon: CubeIcon },
+  // { name: 'Projects', href: '#', icon: FolderIcon },
+  // { name: 'Calendar', href: '#', icon: CalendarIcon },
+  // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
+  // { name: 'Reports', href: '#', icon: ChartPieIcon },
 ]
 
 const userNavigation = [
