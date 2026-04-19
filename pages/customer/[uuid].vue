@@ -47,19 +47,21 @@
             {{ customer.email }}
           </p>
         </div>
-      </div>
-        <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <p class="text-sm text-gray-500">Created at</p>
+                <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <p class="text-sm text-gray-500">Customer Name</p>
           <p class="mt-2 text-base font-medium text-gray-900">
             {{ customer.created_at }}
           </p>
         </div>
+
         <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <p class="text-sm text-gray-500">Updated at</p>
+          <p class="text-sm text-gray-500">Customer Email</p>
           <p class="mt-2 text-base font-medium text-gray-900">
             {{ customer.updated_at }}
           </p>
         </div>
+      </div>
+
       
     </div>
   </NuxtLayout>
@@ -68,7 +70,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { customerService } from '~/api/Customer/CustomerService';
+import { customerService } from '~/api/customer/CustomerService';
 
 const route = useRoute();
 const uuid = String(route.params.uuid ?? '');
