@@ -1,34 +1,40 @@
-// import { BaseService } from "../BaseService"; 
+import BaseService from '~/api/BaseService';
 
-// export class TeamService extends BaseService {
-//   async getTeams() {
-//     return this.request('/customers', 'GET');
-//   }
+class CustomerService extends BaseService {
+    private static instance: CustomerService;
 
-//   async createTeam(teamData: object) {
-//     return this.request('/teams', 'POST', teamData);
-//   }
-// }
+    public static getInstance(): CustomerService {
+        if (!CustomerService.instance) {
+            CustomerService.instance = new CustomerService();
+        }
+        return CustomerService.instance;
+    }
 
-import { BaseService } from "../BaseService";
+    private resource = '/customers';
 
-interface Customer {
-  id: number;
-  name: string;
-  email: string;
+    async list(params: object = {}): Promise<any> {
+        return await this.request(this.resource, 'GET', params);
+    }
+
+    async create(payload: object): Promise<any> {
+        return await this.request(this.resource, 'POST', payload);
+    }
+
+    async show(uuid: string): Promise<any> {
+        return await this.request(`${this.resource}/${uuid}`, 'GET');
+    }
+
+    async update(uuid: string, payload: object): Promise<any> {
+        return await this.request(`${this.resource}/${uuid}`, 'PUT', payload);
+    }
+
+    async delete(uuid: string): Promise<any> {
+        return await this.request(`${this.resource}/${uuid}`, 'DELETE');
+    }
+
+    async restore(uuid: string): Promise<any> {
+        return await this.request(`${this.resource}/${uuid}/restore`, 'POST');
+    }
 }
 
-// Laravel Pagination Structure
-interface PaginatedResponse<T> {
-  data: T[];
-  current_page: number;
-  last_page: number;
-  total: number;
-}
-
-export class CustomerService extends BaseService {
-  async getCustomers() {
-    // We expect a PaginatedResponse containing an array of Customers
-    return this.request<PaginatedResponse<Customer>>('/customers', 'GET');
-  }
-}
+export const customerService = CustomerService.getInstance();
