@@ -56,7 +56,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { customerService } from '~/api/customer/CustomerService';
+import { customerService } from '~/api/Customer/CustomerService';
 
 const route = useRoute();
 const uuid = String(route.params.uuid ?? '');

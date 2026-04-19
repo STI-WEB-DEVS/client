@@ -140,7 +140,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline';
-import { customerService } from '~/api/customer/CustomerService';
+import { customerService } from '~/api/Customer/CustomerService';
 import CustomerFormModal from '~/components/CustomerFormModal.vue';
 import DeleteConfirmationModal from '~/components/DeleteConfirmationModal.vue';
 import FeedbackModal from '~/components/FeedbackModal.vue';
