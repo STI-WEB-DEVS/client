@@ -133,6 +133,21 @@ const isFormModalOpen = ref(false);
 const isDeleteModalOpen = ref(false);
 const isSaving = ref(false);
 
+// --- Feedback State ---
+const isFeedbackModalOpen = ref(false);
+const feedbackMessage = ref('');
+
+const showFeedback = (msg: string) => {
+  feedbackMessage.value = msg;
+  isFeedbackModalOpen.value = true;
+};
+
+const closeFeedbackModal = () => {
+  isFeedbackModalOpen.value = false;
+};
+
+
+
 // Actions
 const fetchProducts = async () => {
   pending.value = true;
@@ -167,13 +182,16 @@ const handleFormSubmit = async (formData: any) => {
   try {
     if (selectedProduct.value?.uuid) {
       await productService.update(selectedProduct.value.uuid, formData);
+      showFeedback('Product updated successfully!');
     } else {
       await productService.create(formData);
+      showFeedback('Product created successfully!');
     }
     isFormModalOpen.value = false;
     await fetchProducts();
   } catch (err: any) {
     alert(err.message || 'Error saving product');
+    showFeedback('Error saving product');
   } finally {
     isSaving.value = false;
   }
@@ -190,6 +208,7 @@ const confirmDelete = async () => {
   try {
     await productService.delete(selectedProduct.value.uuid);
     isDeleteModalOpen.value = false;
+    showFeedback('Product deleted successfully!');
     await fetchProducts();
   } catch (err: any) {
     alert('Error deleting product');
