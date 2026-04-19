@@ -75,7 +75,7 @@
 
                     <button
                       type="button"
-                      @click="handleEdit(customer)"
+                      @click="handleEditClick(customer)"
                       class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                       <PencilSquareIcon class="h-4 w-4" />
@@ -84,7 +84,7 @@
 
                     <button
                       type="button"
-                      @click="handleDelete(customer)"
+                      @click="handleDeleteClick(customer)"
                       class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
                     >
                       <TrashIcon class="h-4 w-4" />
@@ -116,71 +116,100 @@
         </div>
       </div>
 
-      <FeedbackModal
+        <CreateModal 
+        :open="isCreateOpen" 
+        entityType="Customer" 
+        :service="customerService"
+        @close="isCreateOpen = false"
+        @success="handleActionSuccess" 
+      />
+
+      <EditModal 
+        :open="isEditOpen" 
+        entityType="Customer" 
+        :entityData="selectedCustomer"
+        :service="customerService"
+        @close="isEditOpen = false"
+        @success="handleActionSuccess" 
+      />
+
+      <DeleteModal 
+        :open="isDeleteOpen" 
+        :entityName="selectedCustomer?.name"
+        :uuid="selectedCustomer?.uuid"
+        :service="customerService"
+        @close="isDeleteOpen = false"
+        @success="handleActionSuccess" 
+      />
+
+      <!-- <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
-        @close="closeFeedbackModal"
+        @close="closeFeedbackModal" -->
       />
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import {
-  PlusIcon,
-  EyeIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from '@heroicons/vue/24/outline';
-import { customerService } from '~/api/customer/CustomerService';
+  import { ref } from 'vue';
+  import { customerService } from '~/api/customer/CustomerService';
 
-const router = useRouter();
+  
 
-const customers = ref<any>(null);
-const pending = ref(true);
-const error = ref<any>(null);
+  // 1. Control Visibility for all modals
+  const isCreateOpen = ref(false);
+  const isEditOpen = ref(false);
+  const isDeleteOpen = ref(false);
+  const isFeedbackOpen = ref(false);
 
-const isFeedbackModalOpen = ref(false);
-const feedbackMessage = ref('');
+  // 2. Data State
+  const selectedCustomer = ref<any>(null);
+  const feedbackMessage = ref('');
 
-onMounted(async () => {
-  pending.value = true;
-  error.value = null;
+  const refreshData = async () => {
+    pending.value = true;
+    error.value = null;
 
-  try {
-    customers.value = await customerService.list();
-  } catch (err: any) {
-    error.value = err;
-  } finally {
-    pending.value = false;
-  }
-});
+    try {
+      // This fetches the fresh list from your API
+      customers.value = await customerService.list();
+    } catch (err: any) {
+      error.value = err;
+    } finally {
+      pending.value = false;
+    }
+  };
 
-const openFeedbackModal = (message: string) => {
-  feedbackMessage.value = message;
-  isFeedbackModalOpen.value = true;
-};
+  // 2. Call it when the page first opens
+  onMounted(() => {
+    refreshData();
+  });
 
-const closeFeedbackModal = () => {
-  isFeedbackModalOpen.value = false;
-  feedbackMessage.value = '';
-};
+  // 3. The Unified "Success" Connection
+  // This is the only function that talks to the Feedback Modal now
+  const handleActionSuccess = (message: string) => {
+    // Close all action modals
+    isCreateOpen.value = false;
+    isEditOpen.value = false;
+    isDeleteOpen.value = false;
 
-const handleCreate = () => {
-  openFeedbackModal('Create button clicked');
-};
+    // Trigger the feedback light
+    feedbackMessage.value = message;
+    isFeedbackOpen.value = true;
 
-const handleView = (customer: any) => {
-  router.push(`/customer/${customer.uuid}`);
-};
+    // Refresh your table data to show the changes
+    refreshData(); 
+  };
 
-const handleEdit = (customer: any) => {
-  openFeedbackModal(`Edit customer: ${customer.name}`);
-};
+  // 4. Button Handlers (Table Actions)
+  const handleEditClick = (customer: any) => {
+    selectedCustomer.value = customer;
+    isEditOpen.value = true;
+  };
 
-const handleDelete = (customer: any) => {
-  openFeedbackModal(`Delete customer: ${customer.name}`);
-};
+  const handleDeleteClick = (customer: any) => {
+    selectedCustomer.value = customer;
+    isDeleteOpen.value = true;
+  };
 </script>
