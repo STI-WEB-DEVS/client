@@ -1,40 +1,13 @@
-import BaseService from '~/api/BaseService';
+import { BaseService } from "../BaseService";
 
-class CustomerService extends BaseService {
-    private static instance: CustomerService;
+// api/Customer/CustomerService.ts
 
-    public static getInstance(): CustomerService {
-        if (!CustomerService.instance) {
-            CustomerService.instance = new CustomerService();
-        }
-        return CustomerService.instance;
+export class CustomerService extends BaseService {
+    async getCustomers(): Promise<any[]> {
+      const response = await this.request<any>('/customers', 'GET');
+      
+      // Laravel API Resources wrap the array in a 'data' key
+      // We return response.data so the frontend gets the actual array
+      return response.data || []; 
     }
-
-    private resource = '/customers';
-
-    async list(params: object = {}): Promise<any> {
-        return await this.request(this.resource, 'GET', params);
-    }
-
-    async create(payload: object): Promise<any> {
-        return await this.request(this.resource, 'POST', payload);
-    }
-
-    async show(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'GET');
-    }
-
-    async update(uuid: string, payload: object): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'PUT', payload);
-    }
-
-    async delete(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'DELETE');
-    }
-
-    async restore(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}/restore`, 'POST');
-    }
-}
-
-export const customerService = CustomerService.getInstance();
+  }
