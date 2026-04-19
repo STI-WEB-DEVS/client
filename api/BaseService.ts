@@ -17,6 +17,12 @@ export class BaseService {
     return localStorage.getItem(this.tokenStorageKey) || '';
   }
 
+  logout(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(this.tokenStorageKey);
+    }
+  }
+
   private persistTokenFromResponse(response: any) {
     if (typeof window === 'undefined' || !response || typeof response !== 'object') return;
 
@@ -57,6 +63,7 @@ export class BaseService {
         requestUrl += `${url.includes('?') ? '&' : '?'}${query}`;
       }
     } else {
+      headers['Content-Type'] = 'application/json';
       config.body = JSON.stringify(params);
     }
 

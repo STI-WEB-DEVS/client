@@ -49,12 +49,12 @@
 
             <tbody class="divide-y divide-gray-100 bg-white">
               <tr
-                v-for="customer in customers?.data"
-                :key="customer.id"
+                v-for="(customer, index) in customers?.data"
+                :key="customer.uuid"
                 class="transition hover:bg-gray-50"
               >
                 <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ customer.id }}
+                  {{ index + 1 }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   {{ customer.name }}
@@ -116,6 +116,16 @@
         </div>
       </div>
 
+      <div v-if="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50" @click="isModalOpen = false">
+        <div @click.stop class="bg-white p-6 rounded-lg max-w-xl w-full mx-4 max-h-[90vh] overflow-y-auto relative">
+          <button @click="isModalOpen = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+            <XMarkIcon class="h-6 w-6" />
+          </button>
+          <h2 class="text-lg font-medium mb-4">{{ mode === 'create' ? 'Create Customer' : 'Update Customer' }}</h2>
+          <CustomerForm :mode="mode" :customer="selectedCustomer" @submitted="handleSubmitted" @cancel="isModalOpen = false" />
+        </div>
+      </div>
+
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
@@ -133,8 +143,10 @@ import {
   EyeIcon,
   PencilSquareIcon,
   TrashIcon,
+  XMarkIcon,
 } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
+import CustomerForm from '~/components/CustomerForm.vue';
 
 const router = useRouter();
 
@@ -145,18 +157,28 @@ const error = ref<any>(null);
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
 
-onMounted(async () => {
+const selectedCustomer = ref<any>(null);
+const mode = ref<'create' | 'update'>('create');
+const isModalOpen = ref(false);
+const isLoading = ref(false);
+
+const fetchCustomers = async () => {
   pending.value = true;
   error.value = null;
 
   try {
     customers.value = await customerService.list();
+    if (customers.value?.data) {
+      customers.value.data.reverse();
+    }
   } catch (err: any) {
     error.value = err;
   } finally {
     pending.value = false;
   }
-});
+};
+
+onMounted(fetchCustomers);
 
 const openFeedbackModal = (message: string) => {
   feedbackMessage.value = message;
@@ -169,7 +191,9 @@ const closeFeedbackModal = () => {
 };
 
 const handleCreate = () => {
-  openFeedbackModal('Create button clicked');
+  mode.value = 'create';
+  selectedCustomer.value = null;
+  isModalOpen.value = true;
 };
 
 const handleView = (customer: any) => {
@@ -177,10 +201,53 @@ const handleView = (customer: any) => {
 };
 
 const handleEdit = (customer: any) => {
-  openFeedbackModal(`Edit customer: ${customer.name}`);
+  mode.value = 'update';
+  // Always get fresh data from the current array state
+  const currentCustomer = customers.value.data.find(c => c.uuid === customer.uuid);
+  selectedCustomer.value = currentCustomer || customer;
+  isModalOpen.value = true;
 };
 
-const handleDelete = (customer: any) => {
-  openFeedbackModal(`Delete customer: ${customer.name}`);
+const handleDelete = async (customer: any) => {
+  if (!confirm(`Are you sure you want to delete "${customer.name}"?`)) return;
+
+  const index = customers.value.data.findIndex(c => c.uuid === customer.uuid);
+  if (index > -1) customers.value.data.splice(index, 1);
+
+  try {
+    await customerService.delete(customer.uuid);
+    openFeedbackModal(`Customer "${customer.name}" deleted successfully.`);
+  } catch (err: any) {
+    // Revert if error
+    if (index > -1) customers.value.data.splice(index, 0, customer);
+    if (customers.value.meta) {
+      customers.value.meta.total += 1;
+      customers.value.meta.to += 1;
+    }
+    openFeedbackModal(`Failed to delete customer: ${err.message}`);
+  }
+};
+
+const handleSubmitted = (data: {success: boolean, message: string, item?: any, action: string}) => {
+  openFeedbackModal(data.message);
+  if (data.success) {
+    if (data.action === 'create' && data.item) {
+      customers.value.data.push(data.item);
+      if (customers.value.meta) {
+        customers.value.meta.total += 1;
+        customers.value.meta.to += 1;
+      }
+    } else if (data.action === 'update' && data.item) {
+      const index = customers.value.data.findIndex(c => c.uuid === data.item.uuid);
+      if (index > -1) {
+        customers.value.data[index] = data.item;
+        // Update selectedCustomer reference if it's the same item being edited
+        if (selectedCustomer.value && selectedCustomer.value.uuid === data.item.uuid) {
+          selectedCustomer.value = data.item;
+        }
+      }
+    }
+  }
+  isModalOpen.value = false;
 };
 </script>

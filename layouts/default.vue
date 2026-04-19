@@ -7,7 +7,7 @@
         </TransitionChild>
 
         <div class="fixed inset-0 flex">
-          <TransitionChild as="template" enter="transition ease-in-out duration-300 transform" enter-from="-translate-x-full" enter-to="translate-x-0" leave="transition ease-in-out duration-300 transform" leave-from="translate-x-0" leave-to="-translate-x-full">
+          <TransitionChild as="template" enter="ease-in-out duration-300 transform" enter-from="-translate-x-full" enter-to="translate-x-0" leave="transition ease-in-out duration-300 transform" leave-from="translate-x-0" leave-to="-translate-x-full">
             <DialogPanel class="relative mr-16 flex w-full max-w-xs flex-1">
               <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0" enter-to="" leave="ease-in-out duration-300" leave-from="" leave-to="opacity-0">
                 <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
@@ -87,7 +87,8 @@
         <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
 
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <div class="flex flex-1"></div> <div class="flex items-center gap-x-4 lg:gap-x-6">
+          <div class="flex flex-1"></div>
+          <div class="flex items-center gap-x-4 lg:gap-x-6">
             <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
               <span class="sr-only">View notifications</span>
               <BellIcon class="size-6" aria-hidden="true" />
@@ -141,17 +142,13 @@ import {
 import {
   Bars3Icon,
   BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
   Cog6ToothIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
   HomeIcon,
   ShoppingBagIcon,
   UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
+import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -159,11 +156,7 @@ const route = useRoute()
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/product', icon: ShoppingBagIcon},
-  //{ name: 'Projects', href: '#', icon: FolderIcon },
-  // { name: 'Calendar', href: '#', icon: CalendarIcon },
-  // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  // { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Products', href: '/product', icon: ShoppingBagIcon },
 ]
 
 const userNavigation = [

@@ -39,9 +39,6 @@
                   Name
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Description
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Price
                 </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -52,21 +49,18 @@
 
             <tbody class="divide-y divide-gray-100 bg-white">
               <tr
-                v-for="product in products?.data"
-                :key="product.id"
+                v-for="(product, index) in products?.data"
+                :key="product.uuid"
                 class="transition hover:bg-gray-50"
               >
                 <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ product.id }}
+                  {{ index + 1 }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   {{ product.name }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ product.description }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ product.price }}
+                  {{ parseFloat(product.price).toFixed(2) }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
@@ -101,7 +95,7 @@
               </tr>
 
               <tr v-if="!products?.data?.length">
-                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
+                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
                   No products found.
                 </td>
               </tr>
@@ -122,6 +116,16 @@
         </div>
       </div>
 
+      <div v-if="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50" @click="isModalOpen = false">
+        <div @click.stop class="bg-white p-6 rounded-lg max-w-xl w-full mx-4 max-h-[90vh] overflow-y-auto relative">
+          <button @click="isModalOpen = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+            <XMarkIcon class="h-6 w-6" />
+          </button>
+          <h2 class="text-lg font-medium mb-4">{{ mode === 'create' ? 'Create Product' : 'Update Product' }}</h2>
+          <ProductForm :mode="mode" :product="selectedProduct" @submitted="handleSubmitted" @cancel="isModalOpen = false" />
+        </div>
+      </div>
+
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
@@ -139,8 +143,10 @@ import {
   EyeIcon,
   PencilSquareIcon,
   TrashIcon,
+  XMarkIcon,
 } from '@heroicons/vue/24/outline';
 import { productService } from '~/api/product/ProductService';
+import ProductForm from '~/components/ProductForm.vue';
 
 const router = useRouter();
 
@@ -151,18 +157,28 @@ const error = ref<any>(null);
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
 
-onMounted(async () => {
+const selectedProduct = ref<any>(null);
+const mode = ref<'create' | 'update'>('create');
+const isModalOpen = ref(false);
+const isLoading = ref(false);
+
+const fetchProducts = async () => {
   pending.value = true;
   error.value = null;
 
   try {
     products.value = await productService.list();
+    if (products.value?.data) {
+      products.value.data.reverse();
+    }
   } catch (err: any) {
     error.value = err;
   } finally {
     pending.value = false;
   }
-});
+};
+
+onMounted(fetchProducts);
 
 const openFeedbackModal = (message: string) => {
   feedbackMessage.value = message;
@@ -175,7 +191,9 @@ const closeFeedbackModal = () => {
 };
 
 const handleCreate = () => {
-  openFeedbackModal('Create button clicked');
+  mode.value = 'create';
+  selectedProduct.value = null;
+  isModalOpen.value = true;
 };
 
 const handleView = (product: any) => {
@@ -183,19 +201,49 @@ const handleView = (product: any) => {
 };
 
 const handleEdit = (product: any) => {
-  openFeedbackModal(`Edit product: ${product.name}`);
+  mode.value = 'update';
+  // Always get fresh data from the current array state
+  const currentProduct = products.value.data.find(p => p.uuid === product.uuid);
+  selectedProduct.value = currentProduct || product;
+  isModalOpen.value = true;
 };
 
 const handleDelete = async (product: any) => {
   if (!confirm(`Are you sure you want to delete "${product.name}"?`)) return;
-  
+
+  const index = products.value.data.findIndex(p => p.uuid === product.uuid);
+  if (index > -1) products.value.data.splice(index, 1);
+
   try {
     await productService.delete(product.uuid);
     openFeedbackModal(`Product "${product.name}" deleted successfully.`);
-    const updated = await productService.list();
-    products.value = updated;
   } catch (err: any) {
+    // Revert if error
+    if (index > -1) products.value.data.splice(index, 0, product);
+    if (products.value.meta) {
+      products.value.meta.total += 1;
+      products.value.meta.to += 1;
+    }
     openFeedbackModal(`Failed to delete product: ${err.message}`);
   }
+};
+
+const handleSubmitted = (data: {success: boolean, message: string, item?: any, action: string}) => {
+  openFeedbackModal(data.message);
+  if (data.success) {
+    if (data.action === 'create' && data.item) {
+      products.value.data.push(data.item);
+    } else if (data.action === 'update' && data.item) {
+      const index = products.value.data.findIndex(p => p.uuid === data.item.uuid);
+      if (index > -1) {
+        products.value.data[index] = data.item;
+        // Update selectedProduct reference if it's the same item being edited
+        if (selectedProduct.value && selectedProduct.value.uuid === data.item.uuid) {
+          selectedProduct.value = data.item;
+        }
+      }
+    }
+  }
+  isModalOpen.value = false;
 };
 </script>
