@@ -119,6 +119,7 @@
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
+        :type="feedbackType"
         @close="closeFeedbackModal"
       />
     </div>
@@ -135,6 +136,7 @@ import {
   TrashIcon,
 } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
+import FeedbackModal from '~/components/FeedbackModal.vue';
 
 const router = useRouter();
 
@@ -144,6 +146,7 @@ const error = ref<any>(null);
 
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
+const feedbackType = ref<'success' | 'error' | 'info'>('info');
 
 const fetchCustomers = async () => {
   pending.value = true;
@@ -159,8 +162,9 @@ const fetchCustomers = async () => {
 
 onMounted(fetchCustomers);
 
-const openFeedbackModal = (message: string) => {
+const openFeedbackModal = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
   feedbackMessage.value = message;
+  feedbackType.value = type;
   isFeedbackModalOpen.value = true;
 };
 
@@ -174,7 +178,7 @@ const handleCreate = () => {
 };
 
 const handleView = (customer: any) => {
-  router.push(`/customer/${customer.uuid}`);
+  router.push(`/customer/${customer.uuid}?mode=view`);
 };
 
 const handleEdit = (customer: any) => {
@@ -185,10 +189,10 @@ const handleDelete = async (customer: any) => {
   if (confirm(`Are you sure you want to delete ${customer.name}?`)) {
     try {
       await customerService.delete(customer.uuid);
-      openFeedbackModal('Customer deleted successfully!');
+      openFeedbackModal('Customer deleted successfully!', 'success');
       fetchCustomers();
     } catch (err: any) {
-      openFeedbackModal(err.message || 'Failed to delete customer');
+      openFeedbackModal(err.message || 'Failed to delete customer', 'error');
     }
   }
 };

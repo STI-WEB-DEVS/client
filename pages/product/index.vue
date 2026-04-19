@@ -69,6 +69,15 @@
 
                     <button
                       type="button"
+                      @click="handleEdit(product)"
+                      class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      <PencilSquareIcon class="h-4 w-4" />
+                      <span>Edit</span>
+                    </button>
+
+                    <button
+                      type="button"
                       @click="handleDelete(product)"
                       class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
                     >
@@ -87,11 +96,24 @@
             </tbody>
           </table>
         </div>
+
+        <div class="border-t border-gray-200 bg-gray-50 px-6 py-4">
+          <p class="text-sm text-gray-500">
+            Showing
+            <span class="font-medium text-gray-900">{{ products?.meta?.from ?? 0 }}</span>
+            to
+            <span class="font-medium text-gray-900">{{ products?.meta?.to ?? 0 }}</span>
+            of
+            <span class="font-medium text-gray-900">{{ products?.meta?.total ?? 0 }}</span>
+            products
+          </p>
+        </div>
       </div>
 
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
+        :type="feedbackType"
         @close="closeFeedbackModal"
       />
     </div>
@@ -104,6 +126,7 @@ import { useRouter } from 'vue-router';
 import {
   PlusIcon,
   EyeIcon,
+  PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline';
 import { productService } from '~/api/product/ProductService';
@@ -117,6 +140,7 @@ const error = ref<any>(null);
 
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
+const feedbackType = ref<'success' | 'error' | 'info'>('info');
 
 const fetchProducts = async () => {
   pending.value = true;
@@ -132,8 +156,9 @@ const fetchProducts = async () => {
 
 onMounted(fetchProducts);
 
-const openFeedbackModal = (message: string) => {
+const openFeedbackModal = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
   feedbackMessage.value = message;
+  feedbackType.value = type;
   isFeedbackModalOpen.value = true;
 };
 
@@ -147,6 +172,10 @@ const handleCreate = () => {
 };
 
 const handleView = (product: any) => {
+  router.push(`/product/${product.uuid}?mode=view`);
+};
+
+const handleEdit = (product: any) => {
   router.push(`/product/${product.uuid}`);
 };
 
@@ -154,10 +183,10 @@ const handleDelete = async (product: any) => {
   if (confirm(`Are you sure you want to delete ${product.name}?`)) {
     try {
       await productService.delete(product.uuid);
-      openFeedbackModal('Product deleted successfully!');
+      openFeedbackModal('Product deleted successfully!', 'success');
       fetchProducts();
     } catch (err: any) {
-      openFeedbackModal(err.message || 'Failed to delete product');
+      openFeedbackModal(err.message || 'Failed to delete product', 'error');
     }
   }
 };

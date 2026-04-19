@@ -1,5 +1,5 @@
 // ~/api/BaseService.ts
-export class BaseService {
+export default class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
     const token = localStorage.getItem('_token');

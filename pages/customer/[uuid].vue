@@ -10,10 +10,10 @@
         </button>
         <div>
           <h1 class="text-xl font-semibold tracking-tight text-gray-900">
-            {{ isCreate ? 'Create Customer' : 'Customer Details' }}
+            {{ pageTitle }}
           </h1>
           <p class="mt-1 text-sm text-gray-500">
-            {{ isCreate ? 'Fill in the information below to add a new customer.' : `Managing customer: ${uuid}` }}
+            {{ pageSubtitle }}
           </p>
         </div>
       </div>
@@ -22,9 +22,16 @@
         <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
       </div>
 
+      <!-- Read-only view mode -->
+      <div v-else-if="isViewMode && customer" class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-gray-500">UUID</p>
+        <p class="mt-1 text-sm text-gray-900 font-mono bg-gray-50 rounded-lg px-4 py-2">{{ customer.uuid }}</p>
+      </div>
+
+      <!-- Create / Edit form mode -->
       <EntityForm
-        v-else
-        entityName="Customer"
+        v-else-if="!isViewMode"
+        :entityName="'Customer'"
         :fields="fields"
         :service="customerService"
         :initialData="customer"
@@ -49,6 +56,19 @@ const router = useRouter();
 // UUID extraction pattern as per instruction 7
 const uuid = computed(() => String(route.params.uuid ?? ''));
 const isCreate = computed(() => uuid.value === 'create');
+const isViewMode = computed(() => route.query.mode === 'view');
+
+const pageTitle = computed(() => {
+  if (isCreate.value) return 'Create Customer';
+  if (isViewMode.value) return 'Customer Details';
+  return 'Edit Customer';
+});
+
+const pageSubtitle = computed(() => {
+  if (isCreate.value) return 'Fill in the information below to add a new customer.';
+  if (isViewMode.value) return `Viewing customer: ${uuid.value}`;
+  return `Editing customer: ${uuid.value}`;
+});
 
 const customer = ref<any>(null);
 const loading = ref(false);
