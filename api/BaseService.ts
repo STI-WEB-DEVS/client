@@ -17,6 +17,11 @@ export class BaseService {
       headers,
     };
 
+    // Attach Authorization header if token exists
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     if (method.toUpperCase() === 'GET') {
       config.params = params;
     } else {
