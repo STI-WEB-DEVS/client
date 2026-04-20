@@ -1,5 +1,5 @@
-export class BaseService {
-
+// ~/api/BaseService.ts
+export default class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
 
     const runtimeConfig = useRuntimeConfig();
@@ -79,9 +79,4 @@ export class BaseService {
     }
 
   }
-
 }
-
-
-
-export default BaseService;

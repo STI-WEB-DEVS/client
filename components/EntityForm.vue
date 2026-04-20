@@ -1,92 +1,115 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-6">
-    <div v-for="field in fields" :key="field.name">
-      <label :for="field.name" class="block text-sm font-medium text-gray-900">
-        {{ field.label }}
-      </label>
-      <div class="mt-2">
-        <input
-          v-if="field.type !== 'textarea'"
-          v-model="form[field.name]"
-          :type="field.type"
-          :id="field.name"
-          :name="field.name"
-          required
-          class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        />
-        <textarea
-          v-else
-          v-model="form[field.name]"
-          :id="field.name"
-          :name="field.name"
-          required
-          class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        ></textarea>
-      </div>
+  <div class="space-y-6">
+    <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <form @submit.prevent="handleSubmit" class="space-y-4">
+        <div v-for="field in fields" :key="field.name" class="space-y-1">
+          <label :for="field.name" class="text-sm font-medium text-gray-700">
+            {{ field.label }}
+          </label>
+          <input
+            v-model="formData[field.name]"
+            :id="field.name"
+            :type="field.type || 'text'"
+            :required="field.required"
+            class="block w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-500"
+            :placeholder="field.placeholder"
+          />
+        </div>
+
+        <div class="pt-4">
+          <button
+            type="submit"
+            :disabled="loading"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:opacity-50"
+          >
+            <span v-if="loading" class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+            <span>{{ isEdit ? 'Update' : 'Create' }} {{ entityName }}</span>
+          </button>
+        </div>
+      </form>
     </div>
 
-    <Feedback v-if="feedbackMessage" :message="feedbackMessage" />
-
-    <div>
-      <button
-        type="submit"
-        :disabled="isLoading"
-        class="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50"
-      >
-        {{ isLoading ? 'Saving...' : submitLabel }}
-      </button>
-    </div>
-  </form>
+    <FeedbackModal
+      :open="isFeedbackModalOpen"
+      :message="feedbackMessage"
+      :type="feedbackType"
+      @close="closeFeedbackModal"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import Feedback from '~/components/Feedback.vue'
+import { ref, onMounted, watch } from 'vue';
+import FeedbackModal from '~/components/FeedbackModal.vue';
+
+interface Field {
+  name: string;
+  label: string;
+  type?: string;
+  placeholder?: string;
+  required?: boolean;
+}
 
 const props = defineProps<{
-  fields: { name: string; type: string; label: string }[]
-  service: any
-  entityName: string
-  uuid?: string
-}>()
+  entityName: string;
+  fields: Field[];
+  service: any;
+  initialData?: any;
+  isEdit?: boolean;
+  uuid?: string;
+}>();
 
-const emit = defineEmits(['success', 'error'])
+const emit = defineEmits(['success', 'error']);
 
-const form = ref<Record<string, any>>({})
-const feedbackMessage = ref('')
-const isLoading = ref(false)
+const formData = ref<any>({});
+const loading = ref(false);
 
-const submitLabel = props.uuid ? `Update ${props.entityName}` : `Create ${props.entityName}`
+const isFeedbackModalOpen = ref(false);
+const feedbackMessage = ref('');
+const feedbackType = ref<'success' | 'error' | 'info'>('info');
 
-onMounted(async () => {
-  if (props.uuid) {
-    try {
-      const data = await props.service.show(props.uuid)
-      form.value = { ...data }
-    } catch (err: any) {
-      feedbackMessage.value = `Error loading ${props.entityName}.`
-    }
-  }
-})
+// Initialize form data
+const initForm = () => {
+  props.fields.forEach(field => {
+    formData.value[field.name] = props.initialData?.[field.name] || '';
+  });
+};
+
+onMounted(initForm);
+watch(() => props.initialData, initForm, { deep: true });
+
+const openFeedbackModal = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  feedbackMessage.value = message;
+  feedbackType.value = type;
+  isFeedbackModalOpen.value = true;
+};
+
+const closeFeedbackModal = () => {
+  isFeedbackModalOpen.value = false;
+};
 
 const handleSubmit = async () => {
-  feedbackMessage.value = ''
-  isLoading.value = true
+  loading.value = true;
   try {
-    if (props.uuid) {
-      await props.service.update(props.uuid, form.value)
-      feedbackMessage.value = `${props.entityName} updated successfully!`
-      emit('success')
+    let response;
+    if (props.isEdit && props.uuid) {
+      response = await props.service.update(props.uuid, formData.value);
+      openFeedbackModal(`${props.entityName} updated successfully!`, 'success');
     } else {
-      await props.service.create(form.value)
-      feedbackMessage.value = `${props.entityName} created successfully!`
-      emit('success')
+      response = await props.service.create(formData.value);
+      openFeedbackModal(`${props.entityName} created successfully!`, 'success');
+      if (!props.isEdit) {
+        // Clear form on success for new records
+        initForm();
+      }
     }
+    emit('success', response);
   } catch (err: any) {
-    feedbackMessage.value = `Error saving ${props.entityName}.`
-    emit('error')
+    console.error(err);
+    openFeedbackModal(err.message || `Failed to save ${props.entityName}`, 'error');
+    emit('error', err);
   } finally {
-    isLoading.value = false
+    loading.value = false;
   }
-}
+};
 </script>

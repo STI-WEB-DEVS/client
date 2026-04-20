@@ -123,6 +123,7 @@
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
+        :type="feedbackType"
         @close="closeFeedbackModal"
       />
     </div>
@@ -137,8 +138,9 @@ import {
   EyeIcon,
   PencilSquareIcon,
   TrashIcon,
-} from '@heroicons/vue/24/outline'
-import { customerService } from '~/api/customer/CustomerService'
+} from '@heroicons/vue/24/outline';
+import { customerService } from '~/api/customer/CustomerService';
+import FeedbackModal from '~/components/FeedbackModal.vue';
 
 const router = useRouter()
 
@@ -146,16 +148,13 @@ const customers = ref<any>(null)
 const pending = ref(true)
 const error = ref<any>(null)
 
-const isFeedbackModalOpen = ref(false)
-const feedbackMessage = ref('')
-
-onMounted(async () => {
-  await fetchCustomers()
-})
+const isFeedbackModalOpen = ref(false);
+const feedbackMessage = ref('');
+const feedbackType = ref<'success' | 'error' | 'info'>('info');
 
 const fetchCustomers = async () => {
-  pending.value = true
-  error.value = null
+  pending.value = true;
+  error.value = null;
   try {
     customers.value = await customerService.list()
   } catch (err: any) {
@@ -163,12 +162,15 @@ const fetchCustomers = async () => {
   } finally {
     pending.value = false
   }
-}
+};
 
-const openFeedbackModal = (message: string) => {
-  feedbackMessage.value = message
-  isFeedbackModalOpen.value = true
-}
+onMounted(fetchCustomers);
+
+const openFeedbackModal = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  feedbackMessage.value = message;
+  feedbackType.value = type;
+  isFeedbackModalOpen.value = true;
+};
 
 const closeFeedbackModal = () => {
   isFeedbackModalOpen.value = false
@@ -176,24 +178,26 @@ const closeFeedbackModal = () => {
 }
 
 const handleCreate = () => {
-  router.push('/customer/create')
-}
+  router.push('/customer/create');
+};
 
 const handleView = (customer: any) => {
-  router.push(`/customer/${customer.uuid}`)
-}
+  router.push(`/customer/${customer.uuid}?mode=view`);
+};
 
 const handleEdit = (customer: any) => {
-  router.push(`/customer/${customer.uuid}/edit`)
-}
+  router.push(`/customer/${customer.uuid}`);
+};
 
 const handleDelete = async (customer: any) => {
-  try {
-    await customerService.delete(customer.uuid)
-    openFeedbackModal(`Deleted customer: ${customer.name}`)
-    await fetchCustomers() // refresh list
-  } catch (err: any) {
-    openFeedbackModal(`Failed to delete: ${err.message}`)
+  if (confirm(`Are you sure you want to delete ${customer.name}?`)) {
+    try {
+      await customerService.delete(customer.uuid);
+      openFeedbackModal('Customer deleted successfully!', 'success');
+      fetchCustomers();
+    } catch (err: any) {
+      openFeedbackModal(err.message || 'Failed to delete customer', 'error');
+    }
   }
-}
+};
 </script>
