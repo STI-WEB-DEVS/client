@@ -1,40 +1,40 @@
 import BaseService from '~/api/BaseService';
 
 class CustomerService extends BaseService {
-    private static instance: CustomerService;
+  private static instance: CustomerService;
 
-    public static getInstance(): CustomerService {
-        if (!CustomerService.instance) {
-            CustomerService.instance = new CustomerService();
-        }
-        return CustomerService.instance;
+  public static getInstance(): CustomerService {
+    if (!CustomerService.instance) {
+      CustomerService.instance = new CustomerService();
     }
+    return CustomerService.instance;
+  }
 
-    private resource = '/customers';
+  private resource = '/customers';
 
-    async list(params: object = {}): Promise<any> {
-        return await this.request(this.resource, 'GET', params);
-    }
+  async list(params: object = {}): Promise<any> {
+    return await this.request(this.resource, 'GET', params);
+  }
 
-    async create(payload: object): Promise<any> {
-        return await this.request(this.resource, 'POST', payload);
-    }
+  async create(payload: object): Promise<any> {
+    return await this.request(this.resource, 'POST', payload);
+  }
 
-    async show(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'GET');
-    }
+  async show(uuid: string): Promise<any> {
+    return await this.request(`${this.resource}/${uuid}`, 'GET');
+  }
 
-    async update(uuid: string, payload: object): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'PUT', payload);
-    }
+  async update(uuid: string, payload: object): Promise<any> {
+    return await this.request(`${this.resource}/${uuid}`, 'PUT', payload);
+  }
 
-    async delete(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'DELETE');
-    }
+  async delete(uuid: string): Promise<any> {
+    return await this.request(`${this.resource}/${uuid}`, 'DELETE');
+  }
 
-    async restore(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}/restore`, 'POST');
-    }
+  async restore(uuid: string): Promise<any> {
+    return await this.request(`${this.resource}/${uuid}/restore`, 'POST');
+  }
 }
 
 export const customerService = CustomerService.getInstance();
