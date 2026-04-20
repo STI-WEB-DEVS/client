@@ -87,7 +87,8 @@
         <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
 
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <div class="flex flex-1"></div> <div class="flex items-center gap-x-4 lg:gap-x-6">
+          <div class="flex flex-1"></div> 
+          <div class="flex items-center gap-x-4 lg:gap-x-6">
             <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
               <span class="sr-only">View notifications</span>
               <BellIcon class="size-6" aria-hidden="true" />
@@ -108,7 +109,12 @@
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
+                    <button 
+                      @click="handleNavigation(item)"
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full text-left px-3 py-1 text-sm/6 text-gray-900']"
+                    >
+                      {{ item.name }}
+                    </button>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -141,35 +147,52 @@ import {
 import {
   Bars3Icon,
   BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
   Cog6ToothIcon,
-  DocumentDuplicateIcon,
   FolderIcon,
   HomeIcon,
   UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
-import { useRoute } from 'vue-router'
+import { ChevronDownIcon } from '@heroicons/vue/20/solid'
+import { useRoute, useRouter } from 'vue-router'
+import { AuthService } from '~/api/auth/AuthService' // Adjusted path to your AuthService file
 
 const route = useRoute()
+const router = useRouter()
+const authService = new AuthService()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/customer', icon: UserGroupIcon },
-{ name: 'Products', href: '/product', icon: FolderIcon },
-
-  // { name: 'Projects', href: '#', icon: FolderIcon },
-  // { name: 'Calendar', href: '#', icon: CalendarIcon },
-  // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  // { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Products', href: '/product', icon: FolderIcon },
 ]
 
 const userNavigation = [
   { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Sign out', href: '/' },
 ]
 
 const sidebarOpen = ref(false)
+
+/**
+ * Handles navigation from the user menu.
+ * Specifically checks if the item is 'Sign out' to trigger AuthService.
+ */
+const handleNavigation = async (item) => {
+  if (item.name === 'Sign out') {
+    const success = await authService.logout()
+    
+    // Only redirect if the backend returned a success status 
+    // and the token was cleared from localStorage (per your AuthService logic)
+    if (success) {
+      router.push(item.href)
+    } else {
+      console.error('Logout failed to synchronize with backend.')
+      // Optional: Force redirect if you want to allow logout even on network failure
+      // router.push('/login') 
+    }
+  } else {
+    router.push(item.href)
+  }
+}
 </script>
