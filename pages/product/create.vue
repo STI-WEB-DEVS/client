@@ -1,28 +1,53 @@
 <template>
-  <div>
-    <h1 class="text-xl font-bold mb-4">Create Product</h1>
-    <EntityForm
-      :fields="fields"
-      :service="productService"
-      entityName="Product"
-      @success="feedbackMessage = 'Product created successfully!'"
-      @error="feedbackMessage = 'Error creating product.'"
-    />
-    <Feedback v-if="feedbackMessage" :message="feedbackMessage" />
-  </div>
+  <NuxtLayout>
+    <div class="max-w-lg mx-auto space-y-6">
+      <h1 class="text-xl font-semibold">Create Product</h1>
+      <form @submit.prevent="handleSubmit" class="space-y-4">
+        <input
+          v-model="name"
+          type="text"
+          placeholder="Product Name"
+          class="w-full border rounded p-2"
+        />
+        <input
+          v-model="price"
+          type="number"
+          placeholder="Price"
+          class="w-full border rounded p-2"
+        />
+        <textarea
+          v-model="description"
+          placeholder="Description"
+          class="w-full border rounded p-2"
+        ></textarea>
+        <button
+          type="submit"
+          class="bg-indigo-600 text-white px-4 py-2 rounded"
+        >
+          Save
+        </button>
+      </form>
+    </div>
+  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { productService } from '~/api/product/ProductService'
-import EntityForm from '~/components/EntityForm.vue'
-import Feedback from '~/components/Feedback.vue'
 
-const feedbackMessage = ref('')
+const router = useRouter()
 
-const fields = [
-  { name: 'name', type: 'text', label: 'Product Name' },
-  { name: 'price', type: 'number', label: 'Price' },
-  { name: 'description', type: 'textarea', label: 'Description' },
-]
+const name = ref('')
+const price = ref<number | null>(null)
+const description = ref('')
+
+const handleSubmit = async () => {
+  await productService.create({
+    name: name.value,
+    price: price.value,
+    description: description.value,
+  })
+  router.push('/product') // back to product list
+}
 </script>

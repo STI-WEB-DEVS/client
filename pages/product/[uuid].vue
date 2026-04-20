@@ -1,6 +1,7 @@
 <template>
   <NuxtLayout>
     <div class="mx-auto max-w-2xl space-y-6">
+      <!-- Header -->
       <div class="flex items-center gap-4">
         <button
           @click="router.back()"
@@ -18,6 +19,7 @@
         </div>
       </div>
 
+      <!-- Loading spinner -->
       <div v-if="loading && !isCreate" class="flex justify-center py-16">
         <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
       </div>
@@ -26,6 +28,15 @@
       <div v-else-if="isViewMode && product" class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <p class="text-sm font-medium text-gray-500">UUID</p>
         <p class="mt-1 text-sm text-gray-900 font-mono bg-gray-50 rounded-lg px-4 py-2">{{ product.uuid }}</p>
+
+        <p class="text-sm font-medium text-gray-500 mt-4">Name</p>
+        <p class="mt-1 text-sm text-gray-900">{{ product.name }}</p>
+
+        <p class="text-sm font-medium text-gray-500 mt-4">Price</p>
+        <p class="mt-1 text-sm text-gray-900">{{ product.price }}</p>
+
+        <p class="text-sm font-medium text-gray-500 mt-4">Description</p>
+        <p class="mt-1 text-sm text-gray-900">{{ product.description }}</p>
       </div>
 
       <!-- Create / Edit form mode -->
@@ -38,7 +49,11 @@
         :isEdit="!isCreate"
         :uuid="uuid"
         @success="handleSuccess"
+        @error="handleError"
       />
+
+      <!-- Feedback banner -->
+      <Feedback v-if="feedbackMessage" :message="feedbackMessage" :type="feedbackType" />
     </div>
   </NuxtLayout>
 </template>
@@ -49,11 +64,11 @@ import { useRoute, useRouter } from 'vue-router';
 import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
 import { productService } from '~/api/product/ProductService';
 import EntityForm from '~/components/EntityForm.vue';
+import Feedback from '~/components/Feedback.vue';
 
 const route = useRoute();
 const router = useRouter();
 
-// UUID extraction pattern as per instruction 7
 const uuid = computed(() => String(route.params.uuid ?? ''));
 const isCreate = computed(() => uuid.value === 'create');
 const isViewMode = computed(() => route.query.mode === 'view');
@@ -76,7 +91,11 @@ const loading = ref(false);
 const fields = [
   { name: 'name', label: 'Product Name', placeholder: 'e.g. Premium Widget', required: true },
   { name: 'price', label: 'Price', type: 'number', placeholder: '0.00', required: true },
+  { name: 'description', label: 'Description', type: 'textarea', placeholder: 'Enter description' },
 ];
+
+const feedbackMessage = ref('');
+const feedbackType = ref<'success' | 'error'>('success');
 
 onMounted(async () => {
   if (!isCreate.value) {
@@ -85,7 +104,8 @@ onMounted(async () => {
       const response = await productService.show(uuid.value);
       product.value = response.data || response;
     } catch (err) {
-      console.error('Failed to fetch product', err);
+      feedbackMessage.value = 'Failed to fetch product';
+      feedbackType.value = 'error';
     } finally {
       loading.value = false;
     }
@@ -93,8 +113,15 @@ onMounted(async () => {
 });
 
 const handleSuccess = () => {
-  if (isCreate.value) {
-    router.push('/product');
-  }
+  feedbackMessage.value = isCreate.value
+    ? 'Product created successfully!'
+    : 'Product updated successfully!';
+  feedbackType.value = 'success';
+  setTimeout(() => router.push('/product'), 1500); // redirect after showing feedback
+};
+
+const handleError = (err: any) => {
+  feedbackMessage.value = err?.message || 'Error saving product.';
+  feedbackType.value = 'error';
 };
 </script>

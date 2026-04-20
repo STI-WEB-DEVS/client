@@ -54,7 +54,7 @@
                   {{ product.name }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                  ${{ product.price }}
+                  {{ product.price }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
