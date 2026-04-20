@@ -181,9 +181,10 @@ import {
 } from '@heroicons/vue/24/outline'
 
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
-
-import FeedbackModal from '~/components/FeedbackModal.vue'
 import ConfirmModal from '~/components/ConfirmModal.vue'
+import { AuthService } from '~/api/auth/AuthService'
+
+const authService = new AuthService()
 
 /* ----------------------------------------
  * ROUTER
@@ -209,26 +210,16 @@ const logout = () => {
 }
 
 const confirmLogout = async () => {
+  isSaving.value = true
   try {
-    isSaving.value = true
-    const runtimeConfig = useRuntimeConfig()
-    const token = localStorage.getItem('_token')
-
-    await $fetch('/logout', {
-      baseURL: runtimeConfig.public.apiBaseURL,
-      method: 'DELETE',
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    await authService.logout()         // DELETE /logout — throws if not 2xx
+    localStorage.removeItem('_token') // only reached on success
+    router.push('/')
   } catch (error) {
     console.error('Logout failed:', error)
   } finally {
-    localStorage.removeItem('_token')
     isSaving.value = false
     isDeleteModalOpen.value = false
-    router.push('/')
   }
 }
 

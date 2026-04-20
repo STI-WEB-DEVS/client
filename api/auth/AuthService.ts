@@ -2,41 +2,60 @@ export interface LoginResponse {
   token: string;
 }
 
+export interface LogoutResponse {
+  message: string;
+}
+
+const getBaseURL = () => useRuntimeConfig().public.apiBaseURL;
+
+const handleError = (error: any): never => {
+  const status = error?.response?.status;
+  const message =
+    error?.response?._data?.message ||
+    error?.data?.message ||
+    error?.message;
+
+  switch (status) {
+    case 400:
+    case 401:
+    case 422:
+    case 429:
+      throw new Error(message || 'Validation or Request Error');
+    case 500:
+      throw new Error('Server error. Please try again or contact the administrator.');
+    default:
+      throw new Error(message || 'Something went wrong. Please try again.');
+  }
+};
+
 export class AuthService {
   async login(email: string, password: string): Promise<LoginResponse> {
-    const runtimeConfig = useRuntimeConfig();
-
     try {
       return await $fetch<LoginResponse>('/login', {
-        baseURL: runtimeConfig.public.apiBaseURL,
+        baseURL: getBaseURL(),
         method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: { email, password },
+      });
+    } catch (error: any) {
+      return handleError(error);
+    }
+  }
+
+  async logout(): Promise<LogoutResponse> {
+    const token = import.meta.client ? localStorage.getItem('_token') : null;
+
+    try {
+      return await $fetch<LogoutResponse>('/logout', {
+        baseURL: getBaseURL(),
+        method: 'DELETE',
         headers: {
           Accept: 'application/json',
-        },
-        body: {
-          email,
-          password,
+          Authorization: `Bearer ${token}`,
         },
       });
     } catch (error: any) {
-      const status = error?.response?.status;
-      const message =
-        error?.response?._data?.message ||
-        error?.data?.message ||
-        error?.message;
-
-      switch (status) {
-        case 400:
-        case 401:
-        case 404:
-        case 422:
-        case 429:
-          throw new Error(message || 'Validation or Request Error');
-        case 500:
-          throw new Error('Server error. Please try again or contact the administrator.');
-        default:
-          throw new Error(message || 'Something went wrong. Please try again.');
-      }
+      return handleError(error);
     }
   }
 }
