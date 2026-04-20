@@ -130,8 +130,8 @@
                 <MenuItems
                   class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                  <a :href="item.href"
-                    :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{
+                  <a :href="item.href" @click.prevent="item.name === 'Sign out' ? handleLogout() : null"
+                    :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900 cursor-pointer']">{{
                       item.name }}</a>
                   </MenuItem>
                 </MenuItems>
@@ -147,10 +147,24 @@
         </div>
       </main>
     </div>
+
+    <!-- Logout Confirmation Modal -->
+    <FeedbackModal
+      :open="isLogoutModalOpen"
+      title="Confirm Logout"
+      message="Are you sure you want to log out of your account?"
+      show-cancel
+      confirm-text="Logout"
+      @close="isLogoutModalOpen = false"
+      @confirm="confirmLogout"
+    />
   </div>
 </template>
 
 <script setup>
+import AuthService from '~/api/auth/AuthService'
+import FeedbackModal from '~/components/FeedbackModal.vue'
+import { useRouter, useRoute } from 'vue-router'
 import { ref } from 'vue'
 import {
   Dialog,
@@ -174,8 +188,10 @@ import {
   UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
+import { ChevronDownIcon } from '@heroicons/vue/20/solid'
+
 const route = useRoute()
+const router = useRouter()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
@@ -192,4 +208,21 @@ const userNavigation = [
 ]
 
 const sidebarOpen = ref(false)
+const isLogoutModalOpen = ref(false)
+
+const handleLogout = () => {
+  isLogoutModalOpen.value = true
+}
+
+const confirmLogout = async () => {
+  isLogoutModalOpen.value = false
+  try {
+    const success = await AuthService.logout()
+    if (success) {
+      router.push('/')
+    }
+  } catch (error) {
+    console.error("Logout error:", error)
+  }
+}
 </script>

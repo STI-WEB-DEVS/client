@@ -47,8 +47,9 @@
               :class="{ 'bg-red-600 hover:bg-red-700': showCancel }"
               @click="showCancel ? $emit('confirm') : $emit('close')"
             >
-              {{ showCancel ? 'Delete' : 'Okay' }}
+              {{ confirmText || (showCancel ? 'Delete' : 'Okay') }}
             </button>
+
           </div>
         </div>
       </div>
@@ -62,6 +63,7 @@ defineProps<{
   message: string
   title?: string
   showCancel?: boolean
+  confirmText?: string
 }>()
 
 defineEmits<{

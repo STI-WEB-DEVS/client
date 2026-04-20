@@ -26,24 +26,6 @@
             </div>
           </div>
 
-          <div class="relative">
-            <div class="absolute inset-0 flex items-center" aria-hidden="true">
-              <div class="w-full border-t border-gray-200"></div>
-            </div>
-            <div class="relative flex justify-center text-sm/6 font-medium">
-              <span class="bg-white px-6 text-gray-900">Or use token</span>
-            </div>
-          </div>
-
-          <div>
-            <label for="token" class="block text-sm/6 font-medium text-gray-900">Access Token</label>
-            <div class="mt-2">
-              <input v-model="token" type="text" name="token" id="token"
-                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                placeholder="Paste your token here" />
-            </div>
-          </div>
-
           <div class="flex items-center justify-between">
             <div class="flex gap-3">
               <div class="flex h-6 shrink-0 items-center">
@@ -105,13 +87,13 @@ const handleSubmit = async () => {
 
   try {
     if (token.value) {
-        localStorage.setItem('_token', token.value);
+      localStorage.setItem('_token', token.value);
     } else {
-        const authService = new AuthService();
-        const response = await authService.login(email.value, password.value);
-        if (response?.token) {
-            localStorage.setItem('_token', response.token);
-        }
+      const authService = new AuthService();
+      const response = await authService.login(email.value, password.value);
+      if (response?.token) {
+        localStorage.setItem('_token', response.token);
+      }
     }
 
     await navigateTo('/dashboard');
