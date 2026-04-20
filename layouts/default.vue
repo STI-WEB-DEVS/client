@@ -222,14 +222,17 @@
                     :key="item.name"
                     v-slot="{ active }"
                   >
-                    <a
-                      :href="item.href"
+                    <component
+                      :is="item.onClick ? 'button' : 'NuxtLink'"
+                      :to="item.onClick ? undefined : item.href"
+                      @click="item.onClick ? item.onClick() : null"
                       :class="[
                         active ? 'bg-gray-50 outline-none' : '',
-                        'block px-3 py-1 text-sm/6 text-gray-900',
+                        'block w-full text-left px-3 py-1 text-sm/6 text-gray-900',
                       ]"
-                      >{{ item.name }}</a
                     >
+                      {{ item.name }}
+                    </component>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -273,8 +276,21 @@ import {
 } from "@heroicons/vue/24/outline";
 import { ChevronDownIcon, MagnifyingGlassIcon } from "@heroicons/vue/20/solid";
 import { useRoute } from "vue-router";
+import { AuthService } from "~/api/auth/AuthService";
+const authService = new AuthService();
 
 const route = useRoute();
+
+const logout = async () => {
+  try {
+    await authService.logout();
+    localStorage.removeItem("_token");
+    await navigateTo("/");
+  } catch (error) {
+    console.error("Logout failed:", error);
+    // Optionally show an error message to the user
+  }
+};
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
@@ -287,7 +303,7 @@ const navigation = [
 
 const userNavigation = [
   { name: "Your profile", href: "#" },
-  { name: "Sign out", href: "#" },
+  { name: "Sign out", href: "#", onClick: logout },
 ];
 
 const sidebarOpen = ref(false);

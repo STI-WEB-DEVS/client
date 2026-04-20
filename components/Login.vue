@@ -122,7 +122,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { AuthService } from "~/api/Auth/AuthService";
+import { AuthService } from "~/api/auth/AuthService";
 
 const email = ref("");
 const password = ref("");
@@ -141,7 +141,7 @@ const handleSubmit = async () => {
 
     const authToken = response.token;
 
-    localStorage.setItem("token", authToken);
+    localStorage.setItem("_token", authToken);
 
     await navigateTo("/dashboard");
   } catch (err: any) {

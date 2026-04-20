@@ -1,17 +1,19 @@
+import { BaseService } from "../BaseService";
+
 export interface LoginResponse {
   token: string;
 }
 
-export class AuthService {
+export class AuthService extends BaseService {
   async login(email: string, password: string): Promise<LoginResponse> {
     const runtimeConfig = useRuntimeConfig();
 
     try {
-      return await $fetch<LoginResponse>('/login', {
+      return await $fetch<LoginResponse>("/login", {
         baseURL: runtimeConfig.public.apiBaseURL,
-        method: 'POST',
+        method: "POST",
         headers: {
-          Accept: 'application/json',
+          Accept: "application/json",
         },
         body: {
           email,
@@ -31,12 +33,17 @@ export class AuthService {
         case 404:
         case 422:
         case 429:
-          throw new Error(message || 'Validation or Request Error');
+          throw new Error(message || "Validation or Request Error");
         case 500:
-          throw new Error('Server error. Please try again or contact the administrator.');
+          throw new Error(
+            "Server error. Please try again or contact the administrator.",
+          );
         default:
-          throw new Error(message || 'Something went wrong. Please try again.');
+          throw new Error(message || "Something went wrong. Please try again.");
       }
     }
+  }
+  async logout(): Promise<void> {
+    await this.request<void>("/logout", "DELETE");
   }
 }
