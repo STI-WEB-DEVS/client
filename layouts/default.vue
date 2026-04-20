@@ -172,7 +172,7 @@ const navigation = [
 
 const userNavigation = [
   { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Sign out', href: '/logout' },
 ]
 
 const sidebarOpen = ref(false)

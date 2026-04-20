@@ -1,15 +1,43 @@
 <template>
   <NuxtLayout>
-    <div class="mx-auto max-w-2xl space-y-6">
-      <!-- Header -->
-      <div class="flex items-center gap-4">
+    <main class="flex-1 p-6">
+      <!-- View mode stays inline -->
+      <div v-if="isViewMode && product" class="mx-auto max-w-2xl space-y-6">
+        <h1 class="text-xl font-semibold text-gray-900">Product Details</h1>
+        <p class="text-sm text-gray-500">Viewing product: {{ uuid }}</p>
+
+        <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <p class="text-sm font-medium text-gray-500">UUID</p>
+          <p class="mt-1 text-sm text-gray-900 font-mono bg-gray-50 rounded-lg px-4 py-2">{{ product.uuid }}</p>
+
+          <p class="text-sm font-medium text-gray-500 mt-4">Name</p>
+          <p class="mt-1 text-sm text-gray-900">{{ product.name }}</p>
+
+          <p class="text-sm font-medium text-gray-500 mt-4">Price</p>
+          <p class="mt-1 text-sm text-gray-900">{{ product.price }}</p>
+
+          <p class="text-sm font-medium text-gray-500 mt-4">Description</p>
+          <p class="mt-1 text-sm text-gray-900">{{ product.description }}</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal for create & edit -->
+    <div
+      v-if="(isCreate || !isViewMode) && showModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="w-full max-w-2xl rounded-2xl bg-white shadow-lg p-6 relative">
+        <!-- Close button -->
         <button
-          @click="router.back()"
-          class="rounded-lg border border-gray-200 p-2 transition hover:bg-gray-50"
+          @click="closeModal"
+          class="absolute top-4 right-4 rounded-lg border border-gray-200 p-2 transition hover:bg-gray-50"
         >
           <ArrowLeftIcon class="h-5 w-5 text-gray-500" />
         </button>
-        <div>
+
+        <!-- Header -->
+        <div class="mb-6">
           <h1 class="text-xl font-semibold tracking-tight text-gray-900">
             {{ pageTitle }}
           </h1>
@@ -17,43 +45,28 @@
             {{ pageSubtitle }}
           </p>
         </div>
+
+        <!-- Loading spinner (only for edit mode) -->
+        <div v-if="loading && !isCreate" class="flex justify-center py-16">
+          <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
+        </div>
+
+        <!-- Create / Edit form -->
+        <EntityForm
+          v-else
+          :entityName="'Product'"
+          :fields="fields"
+          :service="productService"
+          :initialData="product"
+          :isEdit="!isCreate"
+          :uuid="uuid"
+          @success="handleSuccess"
+          @error="handleError"
+        />
+
+        <!-- Feedback banner -->
+        <Feedback v-if="feedbackMessage" :message="feedbackMessage" :type="feedbackType" />
       </div>
-
-      <!-- Loading spinner -->
-      <div v-if="loading && !isCreate" class="flex justify-center py-16">
-        <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
-      </div>
-
-      <!-- Read-only view mode -->
-      <div v-else-if="isViewMode && product" class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <p class="text-sm font-medium text-gray-500">UUID</p>
-        <p class="mt-1 text-sm text-gray-900 font-mono bg-gray-50 rounded-lg px-4 py-2">{{ product.uuid }}</p>
-
-        <p class="text-sm font-medium text-gray-500 mt-4">Name</p>
-        <p class="mt-1 text-sm text-gray-900">{{ product.name }}</p>
-
-        <p class="text-sm font-medium text-gray-500 mt-4">Price</p>
-        <p class="mt-1 text-sm text-gray-900">{{ product.price }}</p>
-
-        <p class="text-sm font-medium text-gray-500 mt-4">Description</p>
-        <p class="mt-1 text-sm text-gray-900">{{ product.description }}</p>
-      </div>
-
-      <!-- Create / Edit form mode -->
-      <EntityForm
-        v-else-if="!isViewMode"
-        :entityName="'Product'"
-        :fields="fields"
-        :service="productService"
-        :initialData="product"
-        :isEdit="!isCreate"
-        :uuid="uuid"
-        @success="handleSuccess"
-        @error="handleError"
-      />
-
-      <!-- Feedback banner -->
-      <Feedback v-if="feedbackMessage" :message="feedbackMessage" :type="feedbackType" />
     </div>
   </NuxtLayout>
 </template>
@@ -97,6 +110,13 @@ const fields = [
 const feedbackMessage = ref('');
 const feedbackType = ref<'success' | 'error'>('success');
 
+// Modal state
+const showModal = ref(true);
+const closeModal = () => {
+  showModal.value = false;
+  router.push('/product'); // navigate away when closing
+};
+
 onMounted(async () => {
   if (!isCreate.value) {
     loading.value = true;
@@ -117,7 +137,7 @@ const handleSuccess = () => {
     ? 'Product created successfully!'
     : 'Product updated successfully!';
   feedbackType.value = 'success';
-  setTimeout(() => router.push('/product'), 1500); // redirect after showing feedback
+  setTimeout(() => closeModal(), 1500);
 };
 
 const handleError = (err: any) => {

@@ -26,8 +26,10 @@
       <div v-else-if="isViewMode && customer" class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <p class="text-sm font-medium text-gray-500">UUID</p>
         <p class="mt-1 text-sm text-gray-900 font-mono bg-gray-50 rounded-lg px-4 py-2">{{ customer.uuid }}</p>
+
         <p class="text-sm font-medium text-gray-500 mt-4">Name</p>
         <p class="mt-1 text-sm text-gray-900">{{ customer.name }}</p>
+
         <p class="text-sm font-medium text-gray-500 mt-4">Email</p>
         <p class="mt-1 text-sm text-gray-900">{{ customer.email }}</p>
       </div>
@@ -42,10 +44,16 @@
         :isEdit="!isCreate"
         :uuid="uuid"
         @success="handleSuccess"
+        @error="handleError"
       />
 
-      <!-- Feedback -->
-      <Feedback v-if="feedbackMessage" :message="feedbackMessage" :type="feedbackType" />
+      <!-- Feedback modal -->
+      <FeedbackModal
+        :open="!!feedbackMessage"
+        :message="feedbackMessage"
+        :type="feedbackType"
+        @close="feedbackMessage = ''"
+      />
     </div>
   </NuxtLayout>
 </template>
@@ -56,7 +64,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeftIcon } from '@heroicons/vue/24/outline'
 import { customerService } from '~/api/customer/CustomerService'
 import EntityForm from '~/components/EntityForm.vue'
-import Feedback from '~/components/Feedback.vue'
+import FeedbackModal from '~/components/FeedbackModal.vue' // modal version
 
 const route = useRoute()
 const router = useRouter()
@@ -108,6 +116,14 @@ const handleSuccess = () => {
     ? 'Customer created successfully!'
     : 'Customer updated successfully!'
   feedbackType.value = 'success'
-  setTimeout(() => router.push('/customer'), 1500) // redirect after showing feedback
+  setTimeout(() => {
+    feedbackMessage.value = '' // auto-close modal
+    router.push('/customer')
+  }, 1500)
+}
+
+const handleError = (err: any) => {
+  feedbackMessage.value = err?.message || 'Error saving customer.'
+  feedbackType.value = 'error'
 }
 </script>
