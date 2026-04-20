@@ -3,9 +3,9 @@
     <div class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-xl font-semibold tracking-tight text-gray-900">Customers</h1>
+          <h1 class="text-xl font-semibold tracking-tight text-gray-900">Products</h1>
           <p class="mt-1 text-sm text-gray-500">
-            Displaying customer records from your API.
+            Displaying product records from your API.
           </p>
         </div>
 
@@ -15,7 +15,7 @@
           class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
         >
           <PlusIcon class="h-4 w-4" />
-          <span>Create Customer</span>
+          <span>Create Product</span>
         </button>
       </div>
 
@@ -36,7 +36,7 @@
                   Name
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Email
+                  Price
                 </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
@@ -46,21 +46,21 @@
 
             <tbody class="divide-y divide-gray-100 bg-white">
               <tr
-                v-for="customer in customers?.data"
-                :key="customer.id"
+                v-for="product in products?.data"
+                :key="product.id"
                 class="transition hover:bg-gray-50"
               >
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                  {{ customer.name }}
+                  {{ product.name }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ customer.email }}
+                  {{ formatPrice(product.price) }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
                     <button
                       type="button"
-                      @click="handleView(customer)"
+                      @click="handleView(product)"
                       class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                       <EyeIcon class="h-4 w-4" />
@@ -69,7 +69,7 @@
 
                     <button
                       type="button"
-                      @click="handleEdit(customer)"
+                      @click="handleEdit(product)"
                       class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                       <PencilSquareIcon class="h-4 w-4" />
@@ -78,7 +78,7 @@
 
                     <button
                       type="button"
-                      @click="handleDelete(customer)"
+                      @click="handleDelete(product)"
                       class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
                     >
                       <TrashIcon class="h-4 w-4" />
@@ -88,15 +88,14 @@
                 </td>
               </tr>
 
-              <tr v-if="!customers?.data?.length">
+              <tr v-if="!products?.data?.length">
                 <td colspan="3" class="px-6 py-10 text-center text-sm text-gray-500">
-                  No customers found.
+                  No products found.
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-
       </div>
 
       <FeedbackModal
@@ -122,12 +121,12 @@
               <div class="flex items-start justify-between gap-4">
                 <div>
                   <h2 class="text-lg font-semibold text-gray-900">
-                    {{ formMode === 'create' ? 'Create customer' : 'Edit customer' }}
+                    {{ formMode === 'create' ? 'Create product' : 'Edit product' }}
                   </h2>
                   <p class="mt-1 text-sm text-gray-500">
                     {{ formMode === 'create'
-                      ? 'Add a new customer to the database.'
-                      : 'Update the selected customer record in the database.' }}
+                      ? 'Add a new product to the database.'
+                      : 'Update the selected product record in the database.' }}
                   </p>
                 </div>
 
@@ -140,11 +139,11 @@
                 </button>
               </div>
 
-              <form class="mt-6 space-y-4" @submit.prevent="submitCustomerForm">
+              <form class="mt-6 space-y-4" @submit.prevent="submitProductForm">
                 <div>
-                  <label for="customer-name" class="block text-sm font-medium text-gray-900">Name</label>
+                  <label for="product-name" class="block text-sm font-medium text-gray-900">Name</label>
                   <input
-                    id="customer-name"
+                    id="product-name"
                     v-model="form.name"
                     type="text"
                     required
@@ -153,11 +152,13 @@
                 </div>
 
                 <div>
-                  <label for="customer-email" class="block text-sm font-medium text-gray-900">Email</label>
+                  <label for="product-price" class="block text-sm font-medium text-gray-900">Price</label>
                   <input
-                    id="customer-email"
-                    v-model="form.email"
-                    type="email"
+                    id="product-price"
+                    v-model="form.price"
+                    type="number"
+                    min="0"
+                    step="0.01"
                     required
                     class="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-gray-900"
                   />
@@ -178,7 +179,7 @@
                     :disabled="isSubmitting"
                     class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {{ isSubmitting ? 'Saving...' : formMode === 'create' ? 'Create customer' : 'Save changes' }}
+                    {{ isSubmitting ? 'Saving...' : formMode === 'create' ? 'Create product' : 'Save changes' }}
                   </button>
                 </div>
               </form>
@@ -199,28 +200,28 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline';
-import { customerService } from '~/api/customer/CustomerService';
+import { productService } from '~/api/product/ProductService';
 
 const router = useRouter();
 
-type Customer = {
+type Product = {
   id: number;
   uuid: string;
   name: string;
-  email: string;
+  price: number | string;
 };
 
-const customers = ref<any>(null);
+const products = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 const isSubmitting = ref(false);
 const isFormModalOpen = ref(false);
 const formMode = ref<'create' | 'edit'>('create');
-const selectedCustomerUuid = ref('');
+const selectedProductUuid = ref('');
 const formError = ref('');
 const form = ref({
   name: '',
-  email: '',
+  price: '0.00',
 });
 
 const isFeedbackModalOpen = ref(false);
@@ -228,12 +229,12 @@ const feedbackTitle = ref('Feedback');
 const feedbackMessage = ref('');
 const feedbackTone = ref<'neutral' | 'success' | 'error'>('neutral');
 
-const fetchCustomers = async () => {
+const fetchProducts = async () => {
   pending.value = true;
   error.value = null;
 
   try {
-    customers.value = await customerService.list();
+    products.value = await productService.list();
   } catch (err: any) {
     error.value = err;
   } finally {
@@ -241,7 +242,15 @@ const fetchCustomers = async () => {
   }
 };
 
-onMounted(fetchCustomers);
+onMounted(fetchProducts);
+
+const formatPrice = (value: number | string) => {
+  const amount = Number(value ?? 0);
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(amount);
+};
 
 const openFeedbackModal = (
   title: string,
@@ -263,18 +272,18 @@ const closeFeedbackModal = () => {
 
 const openCreateModal = () => {
   formMode.value = 'create';
-  selectedCustomerUuid.value = '';
-  form.value = { name: '', email: '' };
+  selectedProductUuid.value = '';
+  form.value = { name: '', price: '0.00' };
   formError.value = '';
   isFormModalOpen.value = true;
 };
 
-const openEditModal = (customer: Customer) => {
+const openEditModal = (product: Product) => {
   formMode.value = 'edit';
-  selectedCustomerUuid.value = customer.uuid;
+  selectedProductUuid.value = product.uuid;
   form.value = {
-    name: customer.name,
-    email: customer.email,
+    name: product.name,
+    price: Number(product.price).toFixed(2),
   };
   formError.value = '';
   isFormModalOpen.value = true;
@@ -285,23 +294,28 @@ const closeFormModal = () => {
   formError.value = '';
 };
 
-const submitCustomerForm = async () => {
+const submitProductForm = async () => {
   isSubmitting.value = true;
   formError.value = '';
 
   try {
+    const payload = {
+      name: form.value.name,
+      price: Number(form.value.price),
+    };
+
     if (formMode.value === 'create') {
-      await customerService.create(form.value);
-      openFeedbackModal('Success', 'Customer created successfully.', 'success');
+      await productService.create(payload);
+      openFeedbackModal('Success', 'Product created successfully.', 'success');
     } else {
-      await customerService.update(selectedCustomerUuid.value, form.value);
-      openFeedbackModal('Success', 'Customer updated successfully.', 'success');
+      await productService.update(selectedProductUuid.value, payload);
+      openFeedbackModal('Success', 'Product updated successfully.', 'success');
     }
 
     closeFormModal();
-    await fetchCustomers();
+    await fetchProducts();
   } catch (err: any) {
-    formError.value = err?.message || 'Unable to save customer.';
+    formError.value = err?.message || 'Unable to save product.';
   } finally {
     isSubmitting.value = false;
   }
@@ -311,27 +325,27 @@ const handleCreate = () => {
   openCreateModal();
 };
 
-const handleView = (customer: Customer) => {
-  router.push(`/customer/${customer.uuid}`);
+const handleView = (product: Product) => {
+  router.push(`/product/${product.uuid}`);
 };
 
-const handleEdit = (customer: Customer) => {
-  openEditModal(customer);
+const handleEdit = (product: Product) => {
+  openEditModal(product);
 };
 
-const handleDelete = async (customer: Customer) => {
-  const confirmed = window.confirm(`Delete customer "${customer.name}"?`);
+const handleDelete = async (product: Product) => {
+  const confirmed = window.confirm(`Delete product "${product.name}"?`);
 
   if (!confirmed) {
     return;
   }
 
   try {
-    await customerService.delete(customer.uuid);
-    openFeedbackModal('Success', 'Customer deleted successfully.', 'success');
-    await fetchCustomers();
+    await productService.delete(product.uuid);
+    openFeedbackModal('Success', 'Product deleted successfully.', 'success');
+    await fetchProducts();
   } catch (err: any) {
-    openFeedbackModal('Delete failed', err?.message || 'Unable to delete customer.', 'error');
+    openFeedbackModal('Delete failed', err?.message || 'Unable to delete product.', 'error');
   }
 };
 </script>

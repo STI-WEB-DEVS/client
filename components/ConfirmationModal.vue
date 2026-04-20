@@ -9,16 +9,13 @@
       >
         <div
           class="absolute inset-0 bg-black/30 backdrop-blur-sm"
-          @click="$emit('close')"
+          @click="$emit('cancel')"
         />
 
         <div class="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
           <div class="flex items-start justify-between gap-4">
             <div>
-              <p
-                class="text-xs font-semibold uppercase tracking-[0.2em]"
-                :class="toneClasses.eyebrow"
-              >
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-900">
                 {{ title }}
               </p>
               <p class="mt-2 text-sm text-gray-600">
@@ -29,20 +26,29 @@
             <button
               type="button"
               class="rounded-md p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
-              @click="$emit('close')"
+              @click="$emit('cancel')"
             >
               x
             </button>
           </div>
 
-          <div class="mt-6 flex justify-end">
+          <div class="mt-6 flex justify-end gap-3">
             <button
               type="button"
-              class="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white transition"
-              :class="toneClasses.button"
-              @click="$emit('close')"
+              class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              @click="$emit('cancel')"
             >
-              {{ buttonLabel }}
+              {{ cancelLabel }}
+            </button>
+            <button
+              type="button"
+              class="rounded-lg px-4 py-2 text-sm font-medium text-white transition"
+              :class="confirmTone === 'danger'
+                ? 'bg-red-600 hover:bg-red-500'
+                : 'bg-gray-900 hover:bg-gray-800'"
+              @click="$emit('confirm')"
+            >
+              {{ confirmLabel }}
             </button>
           </div>
         </div>
@@ -52,43 +58,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   open: boolean
   title?: string
   message: string
-  tone?: 'neutral' | 'success' | 'error'
-  buttonLabel?: string
+  confirmLabel?: string
+  cancelLabel?: string
+  confirmTone?: 'default' | 'danger'
 }>(), {
-  title: 'Feedback',
-  tone: 'neutral',
-  buttonLabel: 'Okay',
-})
-
-const toneClasses = computed(() => {
-  if (props.tone === 'success') {
-    return {
-      eyebrow: 'text-emerald-600',
-      button: 'bg-emerald-600 hover:bg-emerald-500',
-    }
-  }
-
-  if (props.tone === 'error') {
-    return {
-      eyebrow: 'text-red-600',
-      button: 'bg-red-600 hover:bg-red-500',
-    }
-  }
-
-  return {
-    eyebrow: 'text-gray-900',
-    button: 'bg-gray-900 hover:bg-gray-800',
-  }
+  title: 'Please confirm',
+  confirmLabel: 'Continue',
+  cancelLabel: 'Cancel',
+  confirmTone: 'default',
 })
 
 defineEmits<{
-  (e: 'close'): void
+  (e: 'cancel'): void
+  (e: 'confirm'): void
 }>()
 </script>
 

@@ -108,7 +108,13 @@
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
+                    <button
+                      type="button"
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full px-3 py-1 text-left text-sm/6 text-gray-900']"
+                      @click="handleUserAction(item.action)"
+                    >
+                      {{ item.name }}
+                    </button>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -123,6 +129,25 @@
         </div>
       </main>
     </div>
+
+    <ConfirmationModal
+      :open="isLogoutModalOpen"
+      title="Confirm logout"
+      message="Are you sure you want to log out? You will need to sign in again to continue."
+      confirm-label="Log out"
+      cancel-label="Stay signed in"
+      confirm-tone="danger"
+      @cancel="closeLogoutModal"
+      @confirm="confirmLogout"
+    />
+
+    <FeedbackModal
+      :open="isFeedbackModalOpen"
+      :title="feedbackTitle"
+      :message="feedbackMessage"
+      :tone="feedbackTone"
+      @close="closeFeedbackModal"
+    />
   </div>
 </template>
 
@@ -147,17 +172,22 @@ import {
   DocumentDuplicateIcon,
   FolderIcon,
   HomeIcon,
+  ShoppingBagIcon,
   UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import { useRoute } from 'vue-router'
+import { AuthService } from '~/api/auth/AuthService'
 
 const route = useRoute()
+const router = useRouter()
+const authService = new AuthService()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/customer', icon: UserGroupIcon },
+  { name: 'Products', href: '/product', icon: ShoppingBagIcon },
   // { name: 'Projects', href: '#', icon: FolderIcon },
   // { name: 'Calendar', href: '#', icon: CalendarIcon },
   // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
@@ -165,9 +195,55 @@ const navigation = [
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your profile', action: 'profile' },
+  { name: 'Sign out', action: 'logout' },
 ]
 
 const sidebarOpen = ref(false)
+const isLogoutModalOpen = ref(false)
+const isFeedbackModalOpen = ref(false)
+const feedbackTitle = ref('Feedback')
+const feedbackMessage = ref('')
+const feedbackTone = ref('neutral')
+
+const openFeedbackModal = (title, message, tone = 'neutral') => {
+  feedbackTitle.value = title
+  feedbackMessage.value = message
+  feedbackTone.value = tone
+  isFeedbackModalOpen.value = true
+}
+
+const closeFeedbackModal = () => {
+  isFeedbackModalOpen.value = false
+  feedbackTitle.value = 'Feedback'
+  feedbackMessage.value = ''
+  feedbackTone.value = 'neutral'
+}
+
+const openLogoutModal = () => {
+  isLogoutModalOpen.value = true
+}
+
+const closeLogoutModal = () => {
+  isLogoutModalOpen.value = false
+}
+
+const handleUserAction = (action) => {
+  if (action === 'logout') {
+    openLogoutModal()
+  }
+}
+
+const confirmLogout = async () => {
+  try {
+    await authService.logout()
+  } catch (error) {
+    openFeedbackModal('Logout failed', error?.message || 'Unable to log out right now.', 'error')
+    return
+  }
+
+  localStorage.removeItem('_token')
+  closeLogoutModal()
+  await router.push('/')
+}
 </script>
