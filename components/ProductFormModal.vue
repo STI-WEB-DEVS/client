@@ -30,17 +30,6 @@
             </div>
 
             <div>
-              <label for="product-description" class="block text-sm font-medium text-gray-700">Description</label>
-              <textarea
-                id="product-description"
-                v-model="form.description"
-                rows="3"
-                class="mt-2 block w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-                placeholder="Product description"
-              ></textarea>
-            </div>
-
-            <div>
               <label for="product-price" class="block text-sm font-medium text-gray-700">Price</label>
               <input
                 id="product-price"

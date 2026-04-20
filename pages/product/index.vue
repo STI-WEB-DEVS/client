@@ -33,16 +33,13 @@
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  UUID
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Name
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Description
+                  Price
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Price
+                  Created_At
                 </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
@@ -56,17 +53,14 @@
                 :key="product.uuid"
                 class="transition hover:bg-gray-50"
               >
-                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ product.uuid }}
-                </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   {{ product.name }}
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-500">
-                  {{ product.description }}
-                </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                   ${{ product.price }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  {{ formatDate(product.created_at) }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
@@ -179,12 +173,25 @@ const isFormModalOpen = ref(false);
 const isConfirmModalOpen = ref(false);
 const modalMode = ref<'create' | 'edit'>('create');
 const selectedProduct = ref<any>(null);
-const formData = reactive({ name: '', description: '', price: 0 });
+const formData = reactive({ name: '', price: 0 });
 const formError = ref('');
 const confirmMessage = ref('');
 
 const modalTitle = computed(() => (modalMode.value === 'create' ? 'Create product' : 'Edit product'));
 const submitLabel = computed(() => (modalMode.value === 'create' ? 'Create product' : 'Save changes'));
+
+const formatDate = (value: string | null | undefined) => {
+  if (!value) return '—';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
 
 const loadProducts = async () => {
   pending.value = true;
@@ -216,7 +223,6 @@ const openCreateModal = () => {
   selectedProduct.value = null;
   formError.value = '';
   formData.name = '';
-  formData.description = '';
   formData.price = 0;
   isFormModalOpen.value = true;
 };
@@ -226,7 +232,6 @@ const openEditModal = (product: any) => {
   selectedProduct.value = product;
   formError.value = '';
   formData.name = product.name ?? '';
-  formData.description = product.description ?? '';
   formData.price = product.price ?? 0;
   isFormModalOpen.value = true;
 };
@@ -248,8 +253,8 @@ const closeConfirmModal = () => {
 };
 
 const handleSubmitProduct = async (payload: { name: string; description: string; price: number }) => {
-  if (!payload.name || !payload.description || payload.price < 0) {
-    formError.value = 'Name, description, and valid price are required.';
+  if (!payload.name || payload.price < 0) {
+    formError.value = 'Name valid price are required.';
     return;
   }
 

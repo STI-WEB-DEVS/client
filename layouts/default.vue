@@ -108,8 +108,22 @@
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
-                  </MenuItem>
+                  <button
+                    v-if="item.action"
+                    type="button"
+                    @click="item.action()"
+                    :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full px-3 py-1 text-left text-sm/6 text-gray-900']"
+                  >
+                    {{ item.name }}
+                  </button>
+                  <a
+                    v-else
+                    :href="item.href"
+                    :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']"
+                  >
+                    {{ item.name }}
+                  </a>
+                </MenuItem>
                 </MenuItems>
               </transition>
             </Menu>
@@ -126,7 +140,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import {
   Dialog,
@@ -151,23 +165,35 @@ import {
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { AuthService } from '~/api/auth/AuthService'
 
 const route = useRoute()
+const router = useRouter()
+const authService = new AuthService()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/customer', icon: UserGroupIcon },
   { name: 'Products', href: '/product', icon: FolderIcon },
-  // { name: 'Projects', href: '#', icon: FolderIcon },
-  // { name: 'Calendar', href: '#', icon: CalendarIcon },
-  // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  // { name: 'Reports', href: '#', icon: ChartPieIcon },
 ]
+
+const handleSignOut = async () => {
+  try {
+    await authService.logout()
+  } catch (error: any) {
+    console.warn('Logout error:', error?.message || error)
+  } finally {
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('_token')
+    }
+    router.push('/')
+  }
+}
 
 const userNavigation = [
   { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Sign out', action: handleSignOut },
 ]
 
 const sidebarOpen = ref(false)
