@@ -107,11 +107,25 @@
                 </span>
               </MenuButton>
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
-                <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
-                  <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
-                  </MenuItem>
-                </MenuItems>
+                  <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
+                    <MenuItem v-slot="{ active }">
+                      <a
+                        href="#"
+                        :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']"
+                      >
+                        Your profile
+                      </a>
+                    </MenuItem>
+                    <MenuItem v-slot="{ active }">
+                      <button
+                        type="button"
+                        :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full px-3 py-1 text-left text-sm/6 text-gray-900']"
+                        @click="handleSignOut"
+                      >
+                        Sign out
+                      </button>
+                    </MenuItem>
+                  </MenuItems>
               </transition>
             </Menu>
           </div>
@@ -124,10 +138,41 @@
         </div>
       </main>
     </div>
+
+    <div
+      v-if="isLogoutConfirmOpen"
+      class="fixed inset-0 z-[120] flex items-center justify-center bg-black/50 px-4"
+      @click="isLogoutConfirmOpen = false"
+    >
+      <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl" @click.stop>
+        <h3 class="text-lg font-semibold text-gray-900">Confirm Sign Out</h3>
+        <p class="mt-2 text-sm text-gray-600">
+          Are you sure you want to sign out from your account?
+        </p>
+
+        <div class="mt-6 flex justify-end gap-3">
+          <button
+            type="button"
+            class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            @click="isLogoutConfirmOpen = false"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-60"
+            :disabled="isLoggingOut"
+            @click="confirmSignOut"
+          >
+            {{ isLoggingOut ? 'Signing out...' : 'Sign out' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import {
   Dialog,
@@ -150,6 +195,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 import { useRoute } from 'vue-router'
+import { authService } from '~/api/auth/AuthService'
 
 const route = useRoute()
 
@@ -159,10 +205,26 @@ const navigation = [
   { name: 'Products', href: '/product', icon: ShoppingBagIcon },
 ]
 
-const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
-]
-
 const sidebarOpen = ref(false)
+const isLogoutConfirmOpen = ref(false)
+const isLoggingOut = ref(false)
+
+const handleSignOut = async () => {
+  isLogoutConfirmOpen.value = true
+}
+
+const confirmSignOut = async () => {
+  isLoggingOut.value = true
+
+  try {
+    await authService.logout()
+    isLogoutConfirmOpen.value = false
+    await navigateTo('/')
+  } catch (error) {
+    // Keep token intact if logout endpoint fails.
+    console.error(error)
+  } finally {
+    isLoggingOut.value = false
+  }
+}
 </script>

@@ -162,6 +162,15 @@ const mode = ref<'create' | 'update'>('create');
 const isModalOpen = ref(false);
 const isLoading = ref(false);
 
+const syncProductMetaWithTable = () => {
+  if (!products.value?.meta || !products.value?.data) return;
+
+  const currentCount = products.value.data.length;
+  products.value.meta.total = currentCount;
+  products.value.meta.to = currentCount;
+  products.value.meta.from = currentCount > 0 ? 1 : 0;
+};
+
 const fetchProducts = async () => {
   pending.value = true;
   error.value = null;
@@ -216,14 +225,12 @@ const handleDelete = async (product: any) => {
 
   try {
     await productService.delete(product.uuid);
+    syncProductMetaWithTable();
     openFeedbackModal(`Product "${product.name}" deleted successfully.`);
   } catch (err: any) {
     // Revert if error
     if (index > -1) products.value.data.splice(index, 0, product);
-    if (products.value.meta) {
-      products.value.meta.total += 1;
-      products.value.meta.to += 1;
-    }
+    syncProductMetaWithTable();
     openFeedbackModal(`Failed to delete product: ${err.message}`);
   }
 };
@@ -233,6 +240,7 @@ const handleSubmitted = (data: {success: boolean, message: string, item?: any, a
   if (data.success) {
     if (data.action === 'create' && data.item) {
       products.value.data.push(data.item);
+      syncProductMetaWithTable();
     } else if (data.action === 'update' && data.item) {
       const index = products.value.data.findIndex(p => p.uuid === data.item.uuid);
       if (index > -1) {

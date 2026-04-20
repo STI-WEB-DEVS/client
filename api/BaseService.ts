@@ -1,5 +1,5 @@
 export class BaseService {
-  private tokenStorageKey = 'auth_token';
+  protected tokenStorageKey = '_token';
 
   private getApiBaseUrl(): string {
     if (typeof window !== 'undefined') {
@@ -17,7 +17,7 @@ export class BaseService {
     return localStorage.getItem(this.tokenStorageKey) || '';
   }
 
-  logout(): void {
+  protected clearToken(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(this.tokenStorageKey);
     }

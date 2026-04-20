@@ -1,42 +1,37 @@
+import BaseService from '~/api/BaseService';
+
 export interface LoginResponse {
   token: string;
 }
 
-export class AuthService {
-  async login(email: string, password: string): Promise<LoginResponse> {
-    const runtimeConfig = useRuntimeConfig();
+export interface LogoutResponse {
+  message: string;
+}
 
-    try {
-      return await $fetch<LoginResponse>('/login', {
-        baseURL: runtimeConfig.public.apiBaseURL,
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-        },
-        body: {
-          email,
-          password,
-        },
-      });
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const message =
-        error?.response?._data?.message ||
-        error?.data?.message ||
-        error?.message;
+class AuthService extends BaseService {
+  private static instance: AuthService;
+  private resource = '';
 
-      switch (status) {
-        case 400:
-        case 401:
-        case 404:
-        case 422:
-        case 429:
-          throw new Error(message || 'Validation or Request Error');
-        case 500:
-          throw new Error('Server error. Please try again or contact the administrator.');
-        default:
-          throw new Error(message || 'Something went wrong. Please try again.');
-      }
+  public static getInstance(): AuthService {
+    if (!AuthService.instance) {
+      AuthService.instance = new AuthService();
     }
+
+    return AuthService.instance;
+  }
+
+  async login(email: string, password: string): Promise<LoginResponse> {
+    return await this.request<LoginResponse>(`${this.resource}/login`, 'POST', {
+      email,
+      password,
+    });
+  }
+
+  async logout(): Promise<LogoutResponse> {
+    const response = await this.request<LogoutResponse>(`${this.resource}/logout`, 'POST');
+    this.clearToken();
+    return response;
   }
 }
+
+export const authService = AuthService.getInstance();

@@ -162,6 +162,15 @@ const mode = ref<'create' | 'update'>('create');
 const isModalOpen = ref(false);
 const isLoading = ref(false);
 
+const syncCustomerMetaWithTable = () => {
+  if (!customers.value?.meta || !customers.value?.data) return;
+
+  const currentCount = customers.value.data.length;
+  customers.value.meta.total = currentCount;
+  customers.value.meta.to = currentCount;
+  customers.value.meta.from = currentCount > 0 ? 1 : 0;
+};
+
 const fetchCustomers = async () => {
   pending.value = true;
   error.value = null;
@@ -216,14 +225,12 @@ const handleDelete = async (customer: any) => {
 
   try {
     await customerService.delete(customer.uuid);
+    syncCustomerMetaWithTable();
     openFeedbackModal(`Customer "${customer.name}" deleted successfully.`);
   } catch (err: any) {
     // Revert if error
     if (index > -1) customers.value.data.splice(index, 0, customer);
-    if (customers.value.meta) {
-      customers.value.meta.total += 1;
-      customers.value.meta.to += 1;
-    }
+    syncCustomerMetaWithTable();
     openFeedbackModal(`Failed to delete customer: ${err.message}`);
   }
 };
@@ -233,10 +240,7 @@ const handleSubmitted = (data: {success: boolean, message: string, item?: any, a
   if (data.success) {
     if (data.action === 'create' && data.item) {
       customers.value.data.push(data.item);
-      if (customers.value.meta) {
-        customers.value.meta.total += 1;
-        customers.value.meta.to += 1;
-      }
+      syncCustomerMetaWithTable();
     } else if (data.action === 'update' && data.item) {
       const index = customers.value.data.findIndex(c => c.uuid === data.item.uuid);
       if (index > -1) {
