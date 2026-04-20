@@ -1,5 +1,5 @@
 export class BaseService {
-  private tokenStorageKey = 'auth_token';
+  private tokenStorageKey = '_token';
 
   private getApiBaseUrl(): string {
     if (typeof window !== 'undefined') {
@@ -39,6 +39,10 @@ export class BaseService {
     const headers: Record<string, string> = {
       Accept: 'application/json',
     };
+
+    if (method.toUpperCase() !== 'GET') {
+      headers['Content-Type'] = 'application/json';
+    }
 
     if (token) {
       headers.Authorization = `Bearer ${token}`;

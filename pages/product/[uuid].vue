@@ -3,10 +3,10 @@
     <div class="space-y-6">
       <div>
         <h1 class="text-xl font-semibold tracking-tight text-gray-900">
-          View Customer
+          View Product
         </h1>
         <p class="mt-1 text-sm text-gray-500">
-          Dedicated customer page using the UUID from the route.
+          Dedicated product page using the UUID from the route.
         </p>
       </div>
 
@@ -19,7 +19,7 @@
       </div>
 
       <div v-else class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <p class="text-sm text-gray-500">Customer UUID</p>
+        <p class="text-sm text-gray-500">Product UUID</p>
         <p class="mt-2 break-all text-base font-medium text-gray-900">
           {{ uuid }}
         </p>
@@ -27,11 +27,11 @@
         <div class="mt-6 grid gap-4 sm:grid-cols-2">
           <div>
             <p class="text-sm text-gray-500">Name</p>
-            <p class="mt-1 text-gray-900">{{ customer?.name ?? '-' }}</p>
+            <p class="mt-1 text-gray-900">{{ product?.name ?? '-' }}</p>
           </div>
           <div>
-            <p class="text-sm text-gray-500">Email</p>
-            <p class="mt-1 text-gray-900">{{ customer?.email ?? '-' }}</p>
+            <p class="text-sm text-gray-500">Price</p>
+            <p class="mt-1 text-gray-900">{{ product?.price ?? '-' }}</p>
           </div>
         </div>
       </div>
@@ -42,13 +42,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { customerService } from '~/api/customer/CustomerService';
+import { productService } from '~/api/product/ProductService';
 
 const route = useRoute();
 
 const uuid = computed(() => String(route.params.uuid ?? ''));
 
-const customer = ref<any>(null);
+const product = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 
@@ -57,8 +57,8 @@ onMounted(async () => {
   error.value = null;
 
   try {
-    customer.value = await customerService.show(uuid.value);
-    customer.value = customer.value?.data ?? customer.value;
+    product.value = await productService.show(uuid.value);
+    product.value = product.value?.data ?? product.value;
   } catch (err: any) {
     error.value = err;
   } finally {

@@ -1,5 +1,34 @@
 <template>
   <div>
+    <div
+      v-if="showLogoutConfirm"
+      class="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 p-4"
+    >
+      <div class="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl">
+        <h3 class="text-lg font-semibold text-gray-900">Confirm logout</h3>
+        <p class="mt-2 text-sm text-gray-600">
+          Are you sure you want to sign out?
+        </p>
+        <div class="mt-6 flex justify-end gap-2">
+          <button
+            type="button"
+            class="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            @click="showLogoutConfirm = false"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            :disabled="isLoggingOut"
+            class="rounded-md bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+            @click="confirmLogout"
+          >
+            {{ isLoggingOut ? 'Signing out...' : 'Sign out' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
         <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="" leave="transition-opacity ease-linear duration-300" leave-from="" leave-to="opacity-0">
@@ -108,7 +137,21 @@
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
+                    <button
+                      v-if="item.action === 'logout'"
+                      type="button"
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full px-3 py-1 text-left text-sm/6 text-gray-900']"
+                      @click="showLogoutConfirm = true"
+                    >
+                      {{ item.name }}
+                    </button>
+                    <NuxtLink
+                      v-else
+                      :to="item.href"
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']"
+                    >
+                      {{ item.name }}
+                    </NuxtLink>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -126,7 +169,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import {
   Dialog,
@@ -152,9 +195,11 @@ import {
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { AuthService } from '~/api/auth/AuthService'
 
 const route = useRoute()
+const router = useRouter()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
@@ -166,9 +211,41 @@ const navigation = [
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your profile', href: '/dashboard', action: 'link' },
+  { name: 'Sign out', href: '#', action: 'logout' },
 ]
 
 const sidebarOpen = ref(false)
+const showLogoutConfirm = ref(false)
+const isLoggingOut = ref(false)
+const authService = new AuthService()
+
+const confirmLogout = async () => {
+  isLoggingOut.value = true
+
+  try {
+    const response = await Promise.race([
+      authService.logout(),
+      new Promise<{ success: false; status: number; message: string }>((resolve) => {
+        setTimeout(() => {
+          resolve({
+            success: false,
+            status: 408,
+            message: 'Logout request timeout',
+          })
+        }, 5000)
+      }),
+    ])
+
+    if (response.success) {
+      localStorage.removeItem('_token')
+      await router.replace('/')
+    }
+  } catch (error) {
+    console.error('Logout failed', error)
+  } finally {
+    showLogoutConfirm.value = false
+    isLoggingOut.value = false
+  }
+}
 </script>

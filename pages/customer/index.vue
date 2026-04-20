@@ -49,12 +49,12 @@
 
             <tbody class="divide-y divide-gray-100 bg-white">
               <tr
-                v-for="customer in customers?.data"
-                :key="customer.id"
+                v-for="(customer, index) in customers?.data"
+                :key="customer.uuid"
                 class="transition hover:bg-gray-50"
               >
                 <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ customer.id }}
+                  {{ index + 1 }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   {{ customer.name }}
@@ -116,6 +116,32 @@
         </div>
       </div>
 
+      <div
+        v-if="isModalOpen"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50"
+        @click="isModalOpen = false"
+      >
+        <div
+          @click.stop
+          class="relative mx-4 max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-lg bg-white p-6"
+        >
+          <button
+            class="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+            @click="isModalOpen = false"
+          >
+            ✕
+          </button>
+          <h2 class="mb-4 text-lg font-medium">{{ mode === 'create' ? 'Create Customer' : 'Update Customer' }}</h2>
+          <EntityForm
+            entity="customer"
+            :mode="mode"
+            :item="selectedCustomer"
+            @submitted="handleSubmitted"
+            @cancel="isModalOpen = false"
+          />
+        </div>
+      </div>
+
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
@@ -135,6 +161,7 @@ import {
   TrashIcon,
 } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
+import EntityForm from '~/components/EntityForm.vue';
 
 const router = useRouter();
 
@@ -144,8 +171,11 @@ const error = ref<any>(null);
 
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
+const selectedCustomer = ref<any>(null);
+const mode = ref<'create' | 'update'>('create');
+const isModalOpen = ref(false);
 
-onMounted(async () => {
+const fetchCustomers = async () => {
   pending.value = true;
   error.value = null;
 
@@ -156,7 +186,9 @@ onMounted(async () => {
   } finally {
     pending.value = false;
   }
-});
+};
+
+onMounted(fetchCustomers);
 
 const openFeedbackModal = (message: string) => {
   feedbackMessage.value = message;
@@ -169,7 +201,9 @@ const closeFeedbackModal = () => {
 };
 
 const handleCreate = () => {
-  openFeedbackModal('Create button clicked');
+  mode.value = 'create';
+  selectedCustomer.value = null;
+  isModalOpen.value = true;
 };
 
 const handleView = (customer: any) => {
@@ -177,10 +211,30 @@ const handleView = (customer: any) => {
 };
 
 const handleEdit = (customer: any) => {
-  openFeedbackModal(`Edit customer: ${customer.name}`);
+  mode.value = 'update';
+  selectedCustomer.value = customer;
+  isModalOpen.value = true;
 };
 
-const handleDelete = (customer: any) => {
-  openFeedbackModal(`Delete customer: ${customer.name}`);
+const handleDelete = async (customer: any) => {
+  if (!confirm(`Are you sure you want to delete "${customer.name}"?`)) return;
+
+  try {
+    await customerService.delete(customer.uuid);
+    openFeedbackModal(`Customer "${customer.name}" deleted successfully.`);
+    await fetchCustomers();
+  } catch (err: any) {
+    openFeedbackModal(`Failed to delete customer: ${err.message}`);
+  }
+};
+
+const handleSubmitted = async (data: { success: boolean; message: string; item?: any; action: string }) => {
+  openFeedbackModal(data.message);
+
+  if (data.success) {
+    await fetchCustomers();
+  }
+
+  isModalOpen.value = false;
 };
 </script>
