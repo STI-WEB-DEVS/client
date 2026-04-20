@@ -24,6 +24,10 @@ class ProductService extends BaseService {
         return await this.request(`${this.resource}/${uuid}`, 'GET');
     }
 
+    async getById(uuid: string): Promise<any> {
+        return await this.show(uuid);
+    }
+
     async update(uuid: string, payload: object): Promise<any> {
         return await this.request(`${this.resource}/${uuid}`, 'PUT', payload);
     }

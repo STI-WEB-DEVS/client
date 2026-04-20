@@ -39,4 +39,23 @@ export class AuthService {
       }
     }
   }
+
+  async logout(): Promise<void> {
+    const runtimeConfig = useRuntimeConfig();
+    const token = localStorage.getItem('_token');
+
+    try {
+      await $fetch('/logout', {
+        baseURL: runtimeConfig.public.apiBaseURL,
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error: any) {
+      // Even if the server request fails, we still want to clear local storage
+      console.error('Logout server request failed:', error);
+    }
+  }
 }

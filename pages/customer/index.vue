@@ -49,12 +49,12 @@
 
             <tbody class="divide-y divide-gray-100 bg-white">
               <tr
-                v-for="customer in customers?.data"
+                v-for="(customer, index) in [...(customers?.data || [])].reverse()"
                 :key="customer.id"
                 class="transition hover:bg-gray-50"
               >
                 <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ customer.id }}
+                  {{ index + 1 }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   {{ customer.name }}
@@ -116,9 +116,59 @@
         </div>
       </div>
 
+      <!-- Create Customer Modal -->
+      <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Create Customer</h2>
+            <button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600">
+              <XMarkIcon class="h-5 w-5" />
+            </button>
+          </div>
+          <form @submit.prevent="submitCreate">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Name</label>
+              <input 
+                v-model="createForm.name" 
+                type="text" 
+                required 
+                class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-gray-500 focus:ring-gray-500" 
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Email</label>
+              <input 
+                v-model="createForm.email" 
+                type="email" 
+                required 
+                class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-gray-500 focus:ring-gray-500" 
+              />
+            </div>
+
+            <div class="flex justify-end gap-3">
+              <button
+                type="button"
+                @click="showCreateModal = false"
+                class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                :disabled="isSubmitting"
+                class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+              >
+                {{ isSubmitting ? 'Creating...' : 'Create' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
+        :type="feedbackType"
         @close="closeFeedbackModal"
       />
     </div>
@@ -133,6 +183,7 @@ import {
   EyeIcon,
   PencilSquareIcon,
   TrashIcon,
+  XMarkIcon,
 } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
 
@@ -144,6 +195,22 @@ const error = ref<any>(null);
 
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
+const feedbackType = ref<'success' | 'error' | 'info'>('info');
+
+const showCreateModal = ref(false);
+const createForm = ref({
+  name: '',
+  email: ''
+});
+const isSubmitting = ref(false);
+
+const refreshCustomers = async () => {
+  try {
+    customers.value = await customerService.list();
+  } catch (err: any) {
+    console.error('Failed to refresh customers', err);
+  }
+};
 
 onMounted(async () => {
   pending.value = true;
@@ -158,8 +225,9 @@ onMounted(async () => {
   }
 });
 
-const openFeedbackModal = (message: string) => {
+const openFeedbackModal = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
   feedbackMessage.value = message;
+  feedbackType.value = type;
   isFeedbackModalOpen.value = true;
 };
 
@@ -169,7 +237,25 @@ const closeFeedbackModal = () => {
 };
 
 const handleCreate = () => {
-  openFeedbackModal('Create button clicked');
+  createForm.value = {
+    name: '',
+    email: ''
+  };
+  showCreateModal.value = true;
+};
+
+const submitCreate = async () => {
+  isSubmitting.value = true;
+  try {
+    await customerService.create(createForm.value);
+    showCreateModal.value = false;
+    openFeedbackModal('Customer created successfully!', 'success');
+    await refreshCustomers();
+  } catch (err: any) {
+    openFeedbackModal(err.message || 'Failed to create customer', 'error');
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 
 const handleView = (customer: any) => {
@@ -177,10 +263,18 @@ const handleView = (customer: any) => {
 };
 
 const handleEdit = (customer: any) => {
-  openFeedbackModal(`Edit customer: ${customer.name}`);
+  router.push(`/customer/${customer.uuid}?mode=edit`);
 };
 
-const handleDelete = (customer: any) => {
-  openFeedbackModal(`Delete customer: ${customer.name}`);
+const handleDelete = async (customer: any) => {
+  if (confirm(`Are you sure you want to delete "${customer.name}"?`)) {
+    try {
+      await customerService.delete(customer.uuid);
+      openFeedbackModal('Customer deleted successfully!', 'success');
+      await refreshCustomers();
+    } catch (err: any) {
+      openFeedbackModal(err.message || 'Failed to delete customer', 'error');
+    }
+  }
 };
 </script>
