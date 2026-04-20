@@ -17,21 +17,14 @@ export class BaseService {
       headers,
     };
 
-    if (method.toUpperCase() === "GET") {
+    if (method.toUpperCase() === 'GET') {
       config.params = params;
     } else {
       config.body = params;
     }
 
     try {
-      const response = await $fetch<T>(url, config);
-
-      // Only save token on client
-      if (process.client && (response as any)?.token) {
-        localStorage.setItem("token", (response as any).token);
-      }
-
-      return response;
+      return await $fetch<T>(url, config);
     } catch (error: any) {
       const status = error?.response?.status;
       const message =

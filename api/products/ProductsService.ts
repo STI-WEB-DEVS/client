@@ -1,13 +1,13 @@
 import BaseService from '~/api/BaseService';
 
-class ProductService extends BaseService {
-    private static instance: ProductService;
+class ProductsService extends BaseService {
+    private static instance: ProductsService;
 
-    public static getInstance(): ProductService {
-        if (!ProductService.instance) {
-            ProductService.instance = new ProductService();
+    public static getInstance(): ProductsService {
+        if (!ProductsService.instance) {
+            ProductsService.instance = new ProductsService();
         }
-        return ProductService.instance;
+        return ProductsService.instance;
     }
 
     private resource = '/products';
@@ -37,4 +37,4 @@ class ProductService extends BaseService {
     }
 }
 
-export const productService = ProductService.getInstance();
+export const productsService = ProductsService.getInstance();
