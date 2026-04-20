@@ -17,7 +17,7 @@
         >
           <div class="flex items-start justify-between gap-4">
             <div>
-              <h2 class="text-lg font-semibold text-gray-900">Feedback</h2>
+              <h2 class="text-lg font-semibold text-gray-900">Confirmation</h2>
               <p class="mt-2 text-sm text-gray-600">
                 {{ message }}
               </p>
@@ -32,13 +32,21 @@
             </button>
           </div>
 
-          <div class="mt-6 flex justify-end">
+          <div class="mt-6 flex justify-end gap-3">
             <button
               type="button"
-              class="inline-flex items-center justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+              class="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
               @click="$emit('close')"
             >
-              Okay
+              Cancel
+            </button>
+            
+            <button
+              type="button"
+              class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+              @click="$emit('confirm')"
+            >
+              Log Out
             </button>
           </div>
         </div>
@@ -55,6 +63,7 @@ defineProps<{
 
 defineEmits<{
   (e: 'close'): void
+  (e: 'confirm'): void
 }>()
 </script>
 
