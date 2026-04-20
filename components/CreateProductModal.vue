@@ -10,8 +10,8 @@
             <input v-model="name" type="text" class="mt-1 w-full rounded border px-3 py-2" required />
           </div>
           <div class="mt-4">
-            <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input v-model="email" type="email" class="mt-1 w-full rounded border px-3 py-2" required />
+            <label class="block text-sm font-medium text-gray-700">Price</label>
+            <input v-model="price" type="number" step="0.01" class="mt-1 w-full rounded border px-3 py-2" required />
           </div>
           <div class="mt-6 flex justify-end gap-2">
             <button type="button" @click="onClose" class="px-4 py-2 text-sm text-gray-600">Cancel</button>
@@ -26,27 +26,27 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue'
-import { customerService } from '~/api/customer/CustomerService'
+import { productService } from '~/api/product/ProductService'
 
-const props = defineProps<{ open: boolean; customer?: { uuid: string; name: string; email: string } | null }>()
+const props = defineProps<{ open: boolean; product?: { uuid: string; name: string; price: string } | null }>()
 const emit = defineEmits(['close', 'saved'])
 
 const name = ref('')
-const email = ref('')
+const price = ref('')
 
-const title = computed(() => (props.customer ? 'Edit Customer' : 'Create Customer'))
-const submitLabel = computed(() => (props.customer ? 'Update' : 'Save'))
+const title = computed(() => (props.product ? 'Edit Product' : 'Create Product'))
+const submitLabel = computed(() => (props.product ? 'Update' : 'Save'))
 
 watch(
   () => props.open,
   (open) => {
-    if (open && props.customer) {
-      name.value = props.customer.name ?? ''
-      email.value = props.customer.email ?? ''
+    if (open && props.product) {
+      name.value = props.product.name ?? ''
+      price.value = props.product.price ?? ''
     }
     if (!open) {
       name.value = ''
-      email.value = ''
+      price.value = ''
     }
   },
   { immediate: true }
@@ -56,24 +56,19 @@ const onClose = () => emit('close')
 
 const submit = async () => {
   try {
-    if (props.customer?.uuid) {
-      // Build payload only with changed fields
+    if (props.product?.uuid) {
+      // Only send changed fields
       const payload: any = {}
-      if (name.value !== props.customer.name) {
-        payload.name = name.value
-      }
-      if (email.value !== props.customer.email) {
-        payload.email = email.value
-      }
-      await customerService.update(props.customer.uuid, payload)
+      if (name.value !== props.product.name) payload.name = name.value
+      if (price.value !== props.product.price) payload.price = price.value
+      await productService.update(props.product.uuid, payload)
     } else {
-      // For new customers, always send both
-      await customerService.create({ name: name.value, email: email.value })
+      await productService.create({ name: name.value, price: price.value })
     }
     emit('saved')
     onClose()
   } catch (err: any) {
-    alert(err?.message || 'Unable to save customer.')
+    alert(err?.message || 'Unable to save product.')
   }
 }
 </script>

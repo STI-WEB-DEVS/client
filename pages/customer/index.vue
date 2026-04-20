@@ -117,25 +117,26 @@
       </div>
 
       <CreateCustomerModal
-        :open="isCreateModalOpen"
-        :customer="selectedCustomer"
-        @close="() => (isCreateModalOpen.value = false)"
-        @saved="onCustomerSaved"
-      />
+  :open="isCreateModalOpen"
+  :customer="selectedCustomer"
+  @close="isCreateModalOpen = false"
+  @saved="onCustomerSaved"
+/>
 
-      <ConfirmModal
-        :open="isConfirmModalOpen"
-        :title="confirmTitle"
-        :message="confirmMessage"
-        @close="closeConfirmModal"
-        @confirm="deleteCustomer"
-      />
+<ConfirmModal
+  :open="isConfirmModalOpen"
+  :title="confirmTitle"
+  :message="confirmMessage"
+  @close="closeConfirmModal"
+  @confirm="deleteCustomer"
+/>
 
-      <FeedbackModal
-        :open="Boolean(feedbackMessage)"
-        :message="feedbackMessage"
-        @close="closeFeedbackModal"
-      />
+<FeedbackModal
+  :open="Boolean(feedbackMessage)"
+  :message="feedbackMessage"
+  @close="closeFeedbackModal"
+/>
+
     </div>
   </NuxtLayout>
 </template>

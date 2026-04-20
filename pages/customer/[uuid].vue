@@ -10,34 +10,26 @@
         </p>
       </div>
 
+      <!-- Loading -->
       <div v-if="pending" class="flex justify-center py-16">
         <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
       </div>
 
+      <!-- Error -->
       <div v-else-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4">
         <p class="text-sm text-red-700">{{ error.message }}</p>
       </div>
 
+      <!-- Customer Details -->
       <div v-else class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
         <div>
-          <p class="text-sm text-gray-500">Customer ID</p>
-          <p class="mt-2 text-base font-medium text-gray-900">{{ customer?.id ?? '—' }}</p>
-        </div>
-
-        <div>
           <p class="text-sm text-gray-500">UUID</p>
-          <p class="mt-2 break-all text-base font-medium text-gray-900">{{ customer?.uuid ?? '—' }}</p>
+          <p class="mt-2 break-all text-base font-medium text-gray-900">
+            {{ customer?.uuid ?? customer?.data?.uuid ?? '—' }}
+          </p>
         </div>
 
-        <div>
-          <p class="text-sm text-gray-500">Name</p>
-          <p class="mt-2 text-base font-medium text-gray-900">{{ customer?.name ?? '—' }}</p>
-        </div>
-
-        <div>
-          <p class="text-sm text-gray-500">Email</p>
-          <p class="mt-2 text-base font-medium text-gray-900">{{ customer?.email ?? '—' }}</p>
-        </div>
+       
       </div>
     </div>
   </NuxtLayout>
@@ -61,6 +53,7 @@ const fetchCustomer = async () => {
 
   try {
     customer.value = await customerService.show(uuid)
+    console.log('Fetched customer:', customer.value) // 👈 log to confirm shape
   } catch (err: any) {
     error.value = err
   } finally {
