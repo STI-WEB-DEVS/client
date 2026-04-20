@@ -107,9 +107,25 @@
               </MenuButton>
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
-                  <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
+                  <!-- <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
                     <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
-                  </MenuItem>
+                  </MenuItem> -->
+                  <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
+                    <button
+                      v-if="item.action"
+                      @click="item.action"
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full text-left px-3 py-1 text-sm/6 text-gray-900']"
+                    >
+                      {{ item.name }}
+                    </button>
+                    <a
+                      v-else
+                      :href="item.href"
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']"
+                    >
+                      {{ item.name }}
+                    </a>
+                </MenuItem>
                 </MenuItems>
               </transition>
             </Menu>
@@ -124,10 +140,25 @@
       </main>
     </div>
   </div>
+  <ConfirmModal
+  :open="isDeleteModalOpen"
+  :loading="isSaving"
+  title="Logout Confirmation"
+  message="Are you sure you want to logout?"
+  confirm-text="Logout"
+  cancel-text="Cancel"
+  loading-text="Logging out..."
+  variant="danger"
+  @close="isDeleteModalOpen = false"
+  @confirm="confirmLogout"
+/>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+
 import {
   Dialog,
   DialogPanel,
@@ -138,26 +169,75 @@ import {
   TransitionChild,
   TransitionRoot,
 } from '@headlessui/vue'
+
 import {
   Bars3Icon,
   BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
   Cog6ToothIcon,
-  DocumentDuplicateIcon,
   FolderIcon,
   HomeIcon,
   UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
-import { useRoute } from 'vue-router'
 
+import { ChevronDownIcon } from '@heroicons/vue/20/solid'
+
+import FeedbackModal from '~/components/FeedbackModal.vue'
+import ConfirmModal from '~/components/ConfirmModal.vue'
+
+/* ----------------------------------------
+ * ROUTER
+ * --------------------------------------*/
 const route = useRoute()
+const router = useRouter()
 
+/* ----------------------------------------
+ * STATE
+ * --------------------------------------*/
+const sidebarOpen = ref(false)
+const isDeleteModalOpen = ref(false)
+const isSaving = ref(false)
+
+/* ----------------------------------------
+ * LOGOUT FLOW
+ * --------------------------------------*/
+const logout = () => {
+  console.log('Logout clicked')
+  // just open modal
+  isDeleteModalOpen.value = true
+
+}
+
+const confirmLogout = async () => {
+  try {
+    isSaving.value = true
+    const runtimeConfig = useRuntimeConfig()
+    const token = localStorage.getItem('_token')
+
+    await $fetch('/logout', {
+      baseURL: runtimeConfig.public.apiBaseURL,
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+  } catch (error) {
+    console.error('Logout failed:', error)
+  } finally {
+    localStorage.removeItem('_token')
+    isSaving.value = false
+    isDeleteModalOpen.value = false
+    router.push('/')
+  }
+}
+
+/* ----------------------------------------
+ * NAVIGATION
+ * --------------------------------------*/
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
+  { name: 'Customers', href: '/customer', icon: UserGroupIcon }, // ✅ fixed route
   { name: 'Products', href: '/product', icon: FolderIcon },
   // { name: 'Calendar', href: '#', icon: CalendarIcon },
   // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
@@ -166,8 +246,6 @@ const navigation = [
 
 const userNavigation = [
   { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Sign out', action: logout },
 ]
-
-const sidebarOpen = ref(false)
 </script>

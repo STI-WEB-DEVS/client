@@ -113,11 +113,15 @@
         @submit="handleFormSubmit"
       />
 
-      <DeleteConfirmationModal
+      <ConfirmModal
         :open="isDeleteModalOpen"
         :loading="isSaving"
-        :title="'Delete Customer'"
-        :message="`Are you sure you want to delete ${selectedCustomer?.name}? This action cannot be undone.`"
+        title="Delete Customer"
+        message="This action cannot be undone. Are you sure?"
+        confirm-text="Delete"
+        cancel-text="Cancel"
+        loading-text="Deleting..."
+        variant="danger"
         @close="isDeleteModalOpen = false"
         @confirm="confirmDelete"
       />
@@ -142,7 +146,7 @@ import {
 } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
 import CustomerFormModal from '~/components/CustomerFormModal.vue';
-import DeleteConfirmationModal from '~/components/DeleteConfirmationModal.vue';
+import ConfirmModal from '~/components/ConfirmModal.vue';
 import FeedbackModal from '~/components/FeedbackModal.vue';
 
 const router = useRouter();

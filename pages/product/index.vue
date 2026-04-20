@@ -96,11 +96,15 @@
         @submit="handleFormSubmit"
       />
 
-      <DeleteConfirmationModal
+      <ConfirmModal
         :open="isDeleteModalOpen"
         :loading="isSaving"
-        :title="'Delete Product'"
-        :message="`Are you sure you want to delete ${selectedProduct?.name}?`"
+        title="Delete Product"
+        message="This action cannot be undone. Are you sure?"
+        confirm-text="Delete"
+        cancel-text="Cancel"
+        loading-text="Deleting..."
+        variant="danger"
         @close="isDeleteModalOpen = false"
         @confirm="confirmDelete"
       />
@@ -119,7 +123,7 @@ import { useRouter } from 'vue-router';
 import { PlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { productService } from '~/api/product/ProductService';
 import ProductFormModal from '~/components/ProductFormModal.vue';
-import DeleteConfirmationModal from '~/components/DeleteConfirmationModal.vue';
+import ConfirmModal from '~/components/ConfirmModal.vue';
 
 const router = useRouter();
 

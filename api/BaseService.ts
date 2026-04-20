@@ -1,7 +1,7 @@
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
-    const token = import.meta.client ? localStorage.getItem('_token') : null;
+    const token = localStorage.getItem('_token');
 
     const headers: Record<string, string> = {
       Accept: 'application/json',
