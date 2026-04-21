@@ -1,9 +1,13 @@
 <template>
   <NuxtLayout>
     <div class="space-y-6">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div>
-          <h1 class="text-xl font-semibold tracking-tight text-gray-900">Products</h1>
+          <h1 class="text-xl font-semibold tracking-tight text-gray-900">
+            Products
+          </h1>
           <p class="mt-1 text-sm text-gray-500">
             Displaying product records from your API.
           </p>
@@ -20,40 +24,85 @@
       </div>
 
       <div v-if="pending" class="flex justify-center py-16">
-        <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
+        <div
+          class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"
+        ></div>
       </div>
 
-      <div v-else-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4">
+      <div
+        v-else-if="error"
+        class="rounded-xl border border-red-200 bg-red-50 p-4"
+      >
         <p class="text-sm text-red-700">{{ error.message }}</p>
       </div>
 
-      <div v-else class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div
+        v-else
+        class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+      >
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Product Name</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Product Price</th>
-                <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >
+                  ID
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >
+                  Product Name
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >
+                  Product Price
+                </th>
+                <th
+                  class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >
+                  Actions
+                </th>
               </tr>
             </thead>
 
             <tbody class="divide-y divide-gray-100 bg-white">
-              <tr v-for="product in products?.data" :key="product.id" class="transition hover:bg-gray-50">
-                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ product.id }}</td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ product.name }}</td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">${{ product.price }}</td>
+              <tr
+                v-for="product in products?.data"
+                :key="product.id"
+                class="transition hover:bg-gray-50"
+              >
+                <td
+                  class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900"
+                >
+                  {{ product.id }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
+                  {{ product.name }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  ${{ product.price }}
+                </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
-                    <button @click="handleView(product)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <button
+                      @click="handleView(product)"
+                      class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
                       <EyeIcon class="h-4 w-4" />
                       <span>View</span>
                     </button>
-                    <button @click="handleEdit(product)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <button
+                      @click="handleEdit(product)"
+                      class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
                       <PencilSquareIcon class="h-4 w-4" />
                     </button>
-                    <button @click="handleDelete(product)" class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50">
+                    <button
+                      @click="handleDelete(product)"
+                      class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+                    >
                       <TrashIcon class="h-4 w-4" />
                     </button>
                   </div>
@@ -78,18 +127,27 @@
         :title="productToDelete?.name || 'this product'"
         @close="isDeleteModalOpen = false"
         @confirm="confirmDelete"
-      />  
+      />
 
-      <FeedbackModal :open="isFeedbackModalOpen" :message="feedbackMessage" @close="closeFeedbackModal" />
+      <FeedbackModal
+        :open="isFeedbackModalOpen"
+        :message="feedbackMessage"
+        @close="closeFeedbackModal"
+      />
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { PlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
-import { productsService } from '~/api/products/ProductsService'; 
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import {
+  PlusIcon,
+  EyeIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from "@heroicons/vue/24/outline";
+import { productsService } from "~/api/products/ProductsService";
 const router = useRouter();
 
 // State
@@ -104,11 +162,8 @@ const selectedProduct = ref<any>(null);
 const isDeleteModalOpen = ref(false);
 const productToDelete = ref<any>(null);
 
-
 const isFeedbackModalOpen = ref(false);
-const feedbackMessage = ref('');
-
-
+const feedbackMessage = ref("");
 
 const fetchProducts = async () => {
   pending.value = true;
@@ -138,15 +193,15 @@ const handleFormSubmit = async (formData: any) => {
   try {
     if (selectedProduct.value) {
       await productsService.update(selectedProduct.value.uuid, formData);
-      openFeedbackModal('Product updated successfully!');
+      openFeedbackModal("Product updated successfully!");
     } else {
       await productsService.create(formData);
-      openFeedbackModal('Product created successfully!');
+      openFeedbackModal("Product created successfully!");
     }
     isModalOpen.value = false;
     await fetchProducts();
   } catch (err: any) {
-    alert('Error: ' + err.message);
+    alert("Error: " + err.message);
   } finally {
     isSaving.value = false;
   }
@@ -165,9 +220,9 @@ const confirmDelete = async () => {
     isDeleteModalOpen.value = false;
     productToDelete.value = null;
     await fetchProducts();
-    openFeedbackModal('Product deleted successfully!');
+    openFeedbackModal("Product deleted successfully!");
   } catch (err: any) {
-    alert('Error: ' + err.message);
+    alert("Error: " + err.message);
   } finally {
     isSaving.value = false;
   }
@@ -184,6 +239,6 @@ const openFeedbackModal = (message: string) => {
 
 const closeFeedbackModal = () => {
   isFeedbackModalOpen.value = false;
-  feedbackMessage.value = '';
+  feedbackMessage.value = "";
 };
 </script>

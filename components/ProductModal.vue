@@ -1,16 +1,25 @@
 <template>
-  <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+  <div
+    v-if="open"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+  >
     <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
       <h2 class="text-lg font-semibold text-gray-900">
-        {{ isEditMode ? 'Edit Product' : 'Create New Product' }}
+        {{ isEditMode ? "Edit Product" : "Create New Product" }}
       </h2>
       <p class="mb-6 text-sm text-gray-500">
-        {{ isEditMode ? 'Update the product details below.' : 'Fill in the information to add a new product.' }}
+        {{
+          isEditMode
+            ? "Update the product details below."
+            : "Fill in the information to add a new product."
+        }}
       </p>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700">Product Name</label>
+          <label class="block text-sm font-medium text-gray-700"
+            >Product Name</label
+          >
           <input
             v-model="form.name"
             type="text"
@@ -49,7 +58,9 @@
             class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:opacity-50"
           >
             <span v-if="loading">Saving...</span>
-            <span v-else>{{ isEditMode ? 'Update Product' : 'Save Product' }}</span>
+            <span v-else>{{
+              isEditMode ? "Update Product" : "Save Product"
+            }}</span>
           </button>
         </div>
       </form>
@@ -58,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed } from "vue";
 
 const props = defineProps<{
   open: boolean;
@@ -66,27 +77,31 @@ const props = defineProps<{
   product: any | null;
 }>();
 
-const emit = defineEmits(['close', 'submit']);
+const emit = defineEmits(["close", "submit"]);
 
 const form = ref({
-  name: '',
-  price: null as number | null
+  name: "",
+  price: null as number | null,
 });
 
 const isEditMode = computed(() => !!props.product);
 
-watch(() => props.product, (newVal) => {
-  if (newVal) {
-    form.value = { 
-      name: newVal.name, 
-      price: newVal.price 
-    };
-  } else {
-    form.value = { name: '', price: null };
-  }
-}, { immediate: true });
+watch(
+  () => props.product,
+  (newVal) => {
+    if (newVal) {
+      form.value = {
+        name: newVal.name,
+        price: newVal.price,
+      };
+    } else {
+      form.value = { name: "", price: null };
+    }
+  },
+  { immediate: true },
+);
 
 const handleSubmit = () => {
-  emit('submit', { ...form.value });
+  emit("submit", { ...form.value });
 };
 </script>
