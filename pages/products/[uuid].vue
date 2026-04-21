@@ -24,24 +24,7 @@
             {{ product?.uuid ?? product?.data?.uuid ?? '—' }}
           </p>
         </div>
-        <div>
-          <p class="text-sm text-gray-500">Name</p>
-          <p class="mt-2 text-base font-medium text-gray-900">
-            {{ product?.name ?? product?.data?.name ?? '—' }}
-          </p>
-        </div>
-        <div>
-          <p class="text-sm text-gray-500">Price</p>
-          <p class="mt-2 text-base font-medium text-gray-900">
-            {{ product?.price ?? product?.data?.price ?? '—' }}
-          </p>
-        </div>
-        <div>
-          <p class="text-sm text-gray-500">Created At</p>
-          <p class="mt-2 text-base font-medium text-gray-900">
-            {{ product?.created_at ?? product?.data?.created_at ?? '—' }}
-          </p>
-        </div>
+        
       </div>
     </div>
   </NuxtLayout>

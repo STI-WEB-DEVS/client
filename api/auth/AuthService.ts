@@ -39,4 +39,28 @@ export class AuthService {
       }
     }
   }
+
+  async logout(): Promise<void> {
+    const runtimeConfig = useRuntimeConfig();
+    const token = typeof window !== 'undefined' ? localStorage.getItem('_token') : null;
+
+    try {
+      if (token) {
+        await $fetch('/logout', {
+          baseURL: runtimeConfig.public.apiBaseURL,
+          method: 'DELETE',
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    } catch (error: any) {
+      console.error('Logout API call failed:', error);
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('_token');
+      }
+    }
+  }
 }

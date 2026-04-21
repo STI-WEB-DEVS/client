@@ -41,6 +41,9 @@
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Email
                 </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Date Created
+                </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
                 </th>
@@ -61,6 +64,9 @@
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                   {{ customer.email }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  {{ formatDate(customer.created_at) }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
@@ -243,5 +249,15 @@ const onCustomerSaved = async () => {
   isCreateModalOpen.value = false
   await fetchCustomers()
   showSuccess(selectedCustomer.value ? 'Customer updated successfully.' : 'Customer created successfully.')
+}
+
+const formatDate = (date: string) => {
+  if (!date) return ''
+
+  return new Date(date).toLocaleDateString('en-PH', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
 }
 </script>

@@ -43,7 +43,7 @@
               <tr v-for="product in products?.data" :key="product.uuid" class="transition hover:bg-gray-50">
                 <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ product.name }}</td>
                 <td class="px-6 py-4 text-sm text-gray-700">{{ product.price }}</td>
-                <td class="px-6 py-4 text-sm text-gray-500">{{ product.created_at }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">{{ formatDate(product.created_at) }}</td>
                 <td class="px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
                     <button @click="handleView(product)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
@@ -156,4 +156,14 @@ const onProductSaved = async () => {
   feedbackMessage.value = selectedProduct.value ? 'Product updated successfully.' : 'Product created successfully.'
 }
 const closeFeedbackModal = () => { feedbackMessage.value = '' }
+
+const formatDate = (date: string) => {
+  if (!date) return ''
+
+  return new Date(date).toLocaleDateString('en-PH', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
+}
 </script>
