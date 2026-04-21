@@ -2,7 +2,7 @@
   <NuxtLayout>
     <div class="space-y-6">
 
-      <!-- HEADER (UNCHANGED) -->
+      <!-- HEADER -->
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-xl font-semibold tracking-tight text-gray-900">Customers</h1>
@@ -31,7 +31,7 @@
         <p class="text-sm text-red-700">{{ error.message }}</p>
       </div>
 
-      <!-- TABLE (UNCHANGED DESIGN) -->
+      <!-- TABLE -->
       <div v-else class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
@@ -105,24 +105,35 @@
               </tr>
 
             </tbody>
+
           </table>
+        </div>
+
+        <div class="border-t border-gray-200 bg-gray-50 px-6 py-4">
+          <p class="text-sm text-gray-500">
+            Showing
+            <span class="font-medium text-gray-900">{{ customers?.meta?.from ?? 0 }}</span>
+            to
+            <span class="font-medium text-gray-900">{{ customers?.meta?.to ?? 0 }}</span>
+            of
+            <span class="font-medium text-gray-900">{{ customers?.meta?.total ?? 0 }}</span>
+            customers
+          </p>
         </div>
       </div>
 
-      <!-- CREATE / EDIT MODAL (UNCHANGED DESIGN) -->
-      <CustomerFormModal
+      <!-- MODALS -->
+      <CustomerModal
         :open="isFormOpen"
         :mode="mode"
         :customer="selectedCustomer"
         @close="isFormOpen = false"
-        @create="handleCreate"
-        @update="handleUpdate"
+        @save="handleSave"
       />
 
-      <!-- DELETE MODAL (UNCHANGED DESIGN) -->
-      <CustomerDeleteModal
+      <DeleteModal
         :open="isDeleteOpen"
-        :customer="selectedCustomer"
+        :message="`Delete ${selectedCustomer?.name}?`"
         @close="isDeleteOpen = false"
         @confirm="handleDelete"
       />
@@ -134,12 +145,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  PlusIcon,
-  EyeIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from '@heroicons/vue/24/outline'
+import { PlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import { customerService } from '~/api/customer/CustomerService'
 
 const router = useRouter()
@@ -148,14 +154,12 @@ const customers = ref<any>(null)
 const pending = ref(true)
 const error = ref<any>(null)
 
-/* MODALS */
 const isFormOpen = ref(false)
 const isDeleteOpen = ref(false)
 
 const mode = ref<'create' | 'edit'>('create')
 const selectedCustomer = ref<any>(null)
 
-/* LOAD */
 onMounted(async () => {
   try {
     customers.value = await customerService.list()
@@ -164,59 +168,46 @@ onMounted(async () => {
   }
 })
 
-/* OPEN CREATE */
 const openCreate = () => {
   mode.value = 'create'
   selectedCustomer.value = null
   isFormOpen.value = true
 }
 
-/* OPEN EDIT */
-const openEdit = (customer: any) => {
+const openEdit = (c: any) => {
   mode.value = 'edit'
-  selectedCustomer.value = customer
+  selectedCustomer.value = c
   isFormOpen.value = true
 }
 
-/* OPEN DELETE */
-const openDelete = (customer: any) => {
-  selectedCustomer.value = customer
+const openDelete = (c: any) => {
+  selectedCustomer.value = c
   isDeleteOpen.value = true
 }
 
-/* VIEW */
-const handleView = (customer: any) => {
-  router.push(`/customer/${customer.uuid}`)
+const handleView = (c: any) => {
+  router.push(`/customer/${c.uuid}`)
 }
 
-/* CREATE */
-const handleCreate = async (payload: any) => {
-  const res = await customerService.create(payload)
-  customers.value.data.unshift(res?.data ?? res)
-  isFormOpen.value = false
-}
+const handleSave = async (payload: any) => {
+  if (mode.value === 'create') {
+    const res = await customerService.create(payload)
+    customers.value.data.unshift(res?.data ?? res)
+  } else {
+    const res = await customerService.update(selectedCustomer.value.uuid, payload)
 
-/* UPDATE */
-const handleUpdate = async (payload: any) => {
-  const res = await customerService.update(selectedCustomer.value.uuid, payload)
-
-  const index = customers.value.data.findIndex(
-    (c: any) => c.uuid === selectedCustomer.value.uuid
-  )
-
-  if (index !== -1) {
-    customers.value.data[index] = res?.data ?? res
+    const i = customers.value.data.findIndex((x: any) => x.uuid === selectedCustomer.value.uuid)
+    if (i !== -1) customers.value.data[i] = res?.data ?? res
   }
 
   isFormOpen.value = false
 }
 
-/* DELETE */
 const handleDelete = async () => {
   await customerService.delete(selectedCustomer.value.uuid)
 
   customers.value.data = customers.value.data.filter(
-    (c: any) => c.uuid !== selectedCustomer.value.uuid
+    (x: any) => x.uuid !== selectedCustomer.value.uuid
   )
 
   isDeleteOpen.value = false
