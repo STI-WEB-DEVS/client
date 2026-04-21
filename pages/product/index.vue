@@ -1,8 +1,6 @@
 <template>
   <NuxtLayout>
     <div class="space-y-6">
-
-      <!-- HEADER -->
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-xl font-semibold tracking-tight text-gray-900">Customers</h1>
@@ -21,12 +19,10 @@
         </button>
       </div>
 
-      <!-- LOADING -->
       <div v-if="pending" class="flex justify-center py-16">
         <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
       </div>
 
-      <!-- ERROR -->
       <div v-else-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4">
         <p class="text-sm text-red-700">{{ error.message }}</p>
       </div>
@@ -167,7 +163,6 @@ const isDeleteOpen = ref(false)
 const mode = ref<'create' | 'edit'>('create')
 const selectedProduct = ref<any>(null)
 
-/* ✅ FEEDBACK MODAL STATE */
 const feedbackOpen = ref(false)
 const feedbackMessage = ref('')
 
@@ -176,7 +171,6 @@ const showFeedback = (message: string) => {
   feedbackOpen.value = true
 }
 
-/* LOAD */
 onMounted(async () => {
   try {
     products.value = await productService.list()
@@ -188,7 +182,6 @@ onMounted(async () => {
   }
 })
 
-/* ACTIONS */
 const openCreate = () => {
   mode.value = 'create'
   selectedProduct.value = null
@@ -206,12 +199,10 @@ const openDelete = (product: any) => {
   isDeleteOpen.value = true
 }
 
-/* VIEW */
 const handleView = (product: any) => {
   router.push(`/product/${product.uuid}`)
 }
 
-/* SAVE (CREATE + UPDATE) */
 const handleSave = async (payload: any) => {
   try {
     if (mode.value === 'create') {
@@ -237,7 +228,6 @@ const handleSave = async (payload: any) => {
   }
 }
 
-/* DELETE */
 const handleDelete = async () => {
   try {
     await productService.delete(selectedProduct.value.uuid)

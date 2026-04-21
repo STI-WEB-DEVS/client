@@ -138,6 +138,12 @@
         @confirm="handleDelete"
       />
 
+      <FeedbackModal
+        :open="feedbackOpen"
+        :message="feedbackMessage"
+        @close="feedbackOpen = false"
+      />
+
     </div>
   </NuxtLayout>
 </template>
@@ -147,6 +153,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { PlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import { customerService } from '~/api/customer/CustomerService'
+import FeedbackModal from '~/components/FeedbackModal.vue'
 
 const router = useRouter()
 
@@ -160,9 +167,20 @@ const isDeleteOpen = ref(false)
 const mode = ref<'create' | 'edit'>('create')
 const selectedCustomer = ref<any>(null)
 
+const feedbackOpen = ref(false)
+const feedbackMessage = ref('')
+
+const showFeedback = (message: string) => {
+  feedbackMessage.value = message
+  feedbackOpen.value = true
+}
+
 onMounted(async () => {
   try {
     customers.value = await customerService.list()
+  } catch (err: any) {
+    error.value = err
+    showFeedback(err?.message || 'Failed to load customers')
   } finally {
     pending.value = false
   }
@@ -174,42 +192,59 @@ const openCreate = () => {
   isFormOpen.value = true
 }
 
-const openEdit = (c: any) => {
+const openEdit = (customer: any) => {
   mode.value = 'edit'
-  selectedCustomer.value = c
+  selectedCustomer.value = customer
   isFormOpen.value = true
 }
 
-const openDelete = (c: any) => {
-  selectedCustomer.value = c
+const openDelete = (customer: any) => {
+  selectedCustomer.value = customer
   isDeleteOpen.value = true
 }
 
-const handleView = (c: any) => {
-  router.push(`/customer/${c.uuid}`)
+const handleView = (customer: any) => {
+  router.push(`/customer/${customer.uuid}`)
 }
 
 const handleSave = async (payload: any) => {
-  if (mode.value === 'create') {
-    const res = await customerService.create(payload)
-    customers.value.data.unshift(res?.data ?? res)
-  } else {
-    const res = await customerService.update(selectedCustomer.value.uuid, payload)
+  try {
+    if (mode.value === 'create') {
+      const res = await customerService.create(payload)
+      customers.value.data.unshift(res?.data ?? res)
 
-    const i = customers.value.data.findIndex((x: any) => x.uuid === selectedCustomer.value.uuid)
-    if (i !== -1) customers.value.data[i] = res?.data ?? res
+      showFeedback('Customer created successfully!')
+    } else {
+      const res = await customerService.update(selectedCustomer.value.uuid, payload)
+
+      const i = customers.value.data.findIndex(
+        (c: any) => c.uuid === selectedCustomer.value.uuid
+      )
+
+      if (i !== -1) customers.value.data[i] = res?.data ?? res
+
+      showFeedback('Customer updated successfully!')
+    }
+
+    isFormOpen.value = false
+  } catch (err: any) {
+    showFeedback(err?.message || 'Something went wrong')
   }
-
-  isFormOpen.value = false
 }
 
 const handleDelete = async () => {
-  await customerService.delete(selectedCustomer.value.uuid)
+  try {
+    await customerService.delete(selectedCustomer.value.uuid)
 
-  customers.value.data = customers.value.data.filter(
-    (x: any) => x.uuid !== selectedCustomer.value.uuid
-  )
+    customers.value.data = customers.value.data.filter(
+      (c: any) => c.uuid !== selectedCustomer.value.uuid
+    )
 
-  isDeleteOpen.value = false
+    isDeleteOpen.value = false
+
+    showFeedback('Customer deleted successfully!')
+  } catch (err: any) {
+    showFeedback(err?.message || 'Delete failed')
+  }
 }
 </script>
