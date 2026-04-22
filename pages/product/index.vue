@@ -106,87 +106,18 @@
         @close="closeFeedbackModal"
       />
 
-      <teleport to="body">
-        <transition name="fade">
-          <div
-            v-if="isFormModalOpen"
-            class="fixed inset-0 z-50 flex items-center justify-center p-4"
-          >
-            <div
-              class="absolute inset-0 bg-black/30 backdrop-blur-sm"
-              @click="closeFormModal"
-            />
-
-            <div class="relative z-10 w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-              <div class="flex items-start justify-between gap-4">
-                <div>
-                  <h2 class="text-lg font-semibold text-gray-900">
-                    {{ formMode === 'create' ? 'Create product' : 'Edit product' }}
-                  </h2>
-                  <p class="mt-1 text-sm text-gray-500">
-                    {{ formMode === 'create'
-                      ? 'Add a new product to the database.'
-                      : 'Update the selected product record in the database.' }}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  class="rounded-md p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
-                  @click="closeFormModal"
-                >
-                  x
-                </button>
-              </div>
-
-              <form class="mt-6 space-y-4" @submit.prevent="submitProductForm">
-                <div>
-                  <label for="product-name" class="block text-sm font-medium text-gray-900">Name</label>
-                  <input
-                    id="product-name"
-                    v-model="form.name"
-                    type="text"
-                    required
-                    class="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-gray-900"
-                  />
-                </div>
-
-                <div>
-                  <label for="product-price" class="block text-sm font-medium text-gray-900">Price</label>
-                  <input
-                    id="product-price"
-                    v-model="form.price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    required
-                    class="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-gray-900"
-                  />
-                </div>
-
-                <p v-if="formError" class="text-sm text-red-600">{{ formError }}</p>
-
-                <div class="flex justify-end gap-3">
-                  <button
-                    type="button"
-                    class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                    @click="closeFormModal"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    :disabled="isSubmitting"
-                    class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {{ isSubmitting ? 'Saving...' : formMode === 'create' ? 'Create product' : 'Save changes' }}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </transition>
-      </teleport>
+      <ProductFormModal
+        :open="isFormModalOpen"
+        :mode="formMode"
+        :name="form.name"
+        :price="form.price"
+        :error="formError"
+        :is-submitting="isSubmitting"
+        @close="closeFormModal"
+        @submit="submitProductForm"
+        @update:name="form.name = $event"
+        @update:price="form.price = $event"
+      />
     </div>
   </NuxtLayout>
 </template>
@@ -349,15 +280,3 @@ const handleDelete = async (product: Product) => {
   }
 };
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
