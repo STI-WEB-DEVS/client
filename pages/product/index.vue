@@ -81,17 +81,17 @@
         </template>
       </Table>
 
-      <FeedbackModal
-        :open="isModalOpen"
-        :title="modalTitle"
-        :confirm-text="confirmText"
-        :cancel-text="modalMode !== 'view' ? 'Cancel' : undefined"
-        :variant="modalMode === 'delete' ? 'danger' : 'info'"
+      <BaseModal
+        :open="isMainModalOpen"
+        :title="mainModalTitle"
+        :confirm-text="mainConfirmText"
+        :cancel-text="mainModalMode !== 'view' ? 'Cancel' : undefined"
+        :variant="mainModalMode === 'delete' ? 'danger' : 'primary'"
         :loading="submitting"
-        @close="closeModal"
-        @confirm="handleModalConfirm"
+        @close="closeMainModal"
+        @confirm="handleMainModalConfirm"
       >
-        <div v-if="modalMode === 'delete'">
+        <div v-if="mainModalMode === 'delete'">
           <p>
             Are you sure you want to delete
             <span class="font-semibold text-gray-900">{{
@@ -100,11 +100,11 @@
           </p>
         </div>
 
-        <div v-else-if="modalMode === 'edit' || modalMode === 'create'">
+        <div v-else-if="mainModalMode === 'edit' || mainModalMode === 'create'">
           <ProductForm v-model="form" :disabled="submitting" />
         </div>
 
-        <div v-else-if="modalMode === 'view'" class="space-y-4">
+        <div v-else-if="mainModalMode === 'view'" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
               <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</p>
@@ -124,7 +124,15 @@
             </div>
           </div>
         </div>
-      </FeedbackModal>
+      </BaseModal>
+
+      <FeedbackModal
+        :open="feedback.open"
+        :type="feedback.type"
+        :title="feedback.title"
+        :message="feedback.message"
+        @close="feedback.open = false"
+      />
     </div>
   </NuxtLayout>
 </template>
@@ -153,16 +161,28 @@ const pending = ref(true);
 const error = ref<any>(null);
 const submitting = ref(false);
 
-const isModalOpen = ref(false);
-const modalMode = ref<"create" | "edit" | "delete" | "view">("view");
+const isMainModalOpen = ref(false);
+const mainModalMode = ref<"create" | "edit" | "delete" | "view">("view");
+const feedback = ref<{
+  open: boolean;
+  type: "success" | "error";
+  title: string;
+  message: string;
+}>({
+  open: false,
+  type: "success",
+  title: "",
+  message: "",
+});
+
 const selectedProduct = ref<any>(null);
 const form = ref({
   name: "",
   price: "",
 });
 
-const modalTitle = computed(() => {
-  switch (modalMode.value) {
+const mainModalTitle = computed(() => {
+  switch (mainModalMode.value) {
     case "create":
       return "Create Product";
     case "edit":
@@ -176,8 +196,8 @@ const modalTitle = computed(() => {
   }
 });
 
-const confirmText = computed(() => {
-  switch (modalMode.value) {
+const mainConfirmText = computed(() => {
+  switch (mainModalMode.value) {
     case "create":
       return "Create";
     case "edit":
@@ -205,40 +225,50 @@ const loadProducts = async () => {
 
 onMounted(loadProducts);
 
-const closeModal = () => {
-  isModalOpen.value = false;
+const closeMainModal = () => {
+  isMainModalOpen.value = false;
   selectedProduct.value = null;
   submitting.value = false;
 };
 
-const handleModalConfirm = async () => {
-  if (modalMode.value === "view") {
-    closeModal();
+const showFeedback = (type: "success" | "error", title: string, message: string) => {
+  feedback.value = { open: true, type, title, message };
+};
+
+const handleMainModalConfirm = async () => {
+  if (mainModalMode.value === "view") {
+    closeMainModal();
     return;
   }
 
   submitting.value = true;
   try {
-    if (modalMode.value === "delete") {
+    let successMessage = "";
+    if (mainModalMode.value === "delete") {
       await productService.delete(selectedProduct.value.uuid);
-    } else if (modalMode.value === "edit") {
+      successMessage = "Product has been deleted successfully.";
+    } else if (mainModalMode.value === "edit") {
       await productService.update(selectedProduct.value.uuid, form.value);
-    } else if (modalMode.value === "create") {
+      successMessage = "Product details updated successfully.";
+    } else if (mainModalMode.value === "create") {
       await productService.create(form.value);
+      successMessage = "New product created successfully.";
     }
+    
     await loadProducts();
-    closeModal();
+    closeMainModal();
+    showFeedback("success", "Success", successMessage);
   } catch (err: any) {
-    alert(err.message || "An error occurred");
+    showFeedback("error", "Action Failed", err.message || "An unexpected error occurred. Please try again.");
   } finally {
     submitting.value = false;
   }
 };
 
 const handleCreate = () => {
-  modalMode.value = "create";
+  mainModalMode.value = "create";
   form.value = { name: "", price: "" };
-  isModalOpen.value = true;
+  isMainModalOpen.value = true;
 };
 
 const handleView = (product: any) => {
@@ -246,15 +276,15 @@ const handleView = (product: any) => {
 };
 
 const handleEdit = (product: any) => {
-  modalMode.value = "edit";
+  mainModalMode.value = "edit";
   selectedProduct.value = product;
   form.value = { name: product.name, price: product.price };
-  isModalOpen.value = true;
+  isMainModalOpen.value = true;
 };
 
 const handleDelete = (product: any) => {
-  modalMode.value = "delete";
+  mainModalMode.value = "delete";
   selectedProduct.value = product;
-  isModalOpen.value = true;
+  isMainModalOpen.value = true;
 };
 </script>
