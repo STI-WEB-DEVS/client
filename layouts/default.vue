@@ -150,6 +150,10 @@
           Are you sure you want to sign out from your account?
         </p>
 
+        <div v-if="logoutError" class="mt-4 rounded-md bg-red-50 p-3">
+          <p class="text-sm text-red-700">{{ logoutError }}</p>
+        </div>
+
         <div class="mt-6 flex justify-end gap-3">
           <button
             type="button"
@@ -208,21 +212,28 @@ const navigation = [
 const sidebarOpen = ref(false)
 const isLogoutConfirmOpen = ref(false)
 const isLoggingOut = ref(false)
+const logoutError = ref<string | null>(null)
 
 const handleSignOut = async () => {
   isLogoutConfirmOpen.value = true
+  logoutError.value = null
 }
 
 const confirmSignOut = async () => {
   isLoggingOut.value = true
+  logoutError.value = null
 
   try {
+    // Call logout endpoint - token will be cleared only on success
     await authService.logout()
+    
+    // Only close modal and redirect if logout was successful
     isLogoutConfirmOpen.value = false
     await navigateTo('/')
-  } catch (error) {
-    // Keep token intact if logout endpoint fails.
-    console.error(error)
+  } catch (error: any) {
+    // Keep modal open and show error if logout fails
+    logoutError.value = error instanceof Error ? error.message : 'Failed to sign out. Please try again.'
+    console.error('Logout error:', error)
   } finally {
     isLoggingOut.value = false
   }

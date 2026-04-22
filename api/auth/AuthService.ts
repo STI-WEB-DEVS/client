@@ -28,9 +28,20 @@ class AuthService extends BaseService {
   }
 
   async logout(): Promise<LogoutResponse> {
-    const response = await this.request<LogoutResponse>(`${this.resource}/logout`, 'POST');
-    this.clearToken();
-    return response;
+    try {
+      const response = await this.request<LogoutResponse>(`${this.resource}/logout`, 'POST');
+      // Only clear token on successful logout response from backend
+      this.clearToken();
+      return response;
+    } catch (error) {
+      // Don't clear token if logout fails, let caller decide what to do
+      throw error;
+    }
+  }
+
+  // Public method to manually clear token if needed
+  public getTokenClearer() {
+    return () => this.clearToken();
   }
 }
 
