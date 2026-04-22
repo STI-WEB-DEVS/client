@@ -4,14 +4,11 @@
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-xl font-semibold tracking-tight text-gray-900">Customers</h1>
-          <p class="mt-1 text-sm text-gray-500">
-            Displaying customer records from your API.
-          </p>
+          <p class="mt-1 text-sm text-gray-500">Displaying customer records from your API.</p>
         </div>
-
         <button
           type="button"
-          @click="handleCreate"
+          @click="openModal('create')"
           class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
         >
           <PlusIcon class="h-4 w-4" />
@@ -32,59 +29,42 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  ID
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Name
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Email
-                </th>
-                <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Actions
-                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Name</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Email</th>
+                <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
             </thead>
-
             <tbody class="divide-y divide-gray-100 bg-white">
               <tr
                 v-for="customer in customers?.data"
                 :key="customer.id"
                 class="transition hover:bg-gray-50"
               >
-                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ customer.id }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                  {{ customer.name }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ customer.email }}
-                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ customer.id }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ customer.name }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ customer.email }}</td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
                     <button
                       type="button"
-                      @click="handleView(customer)"
+                      @click="router.push(`/customer/${customer.uuid}`)"
                       class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                       <EyeIcon class="h-4 w-4" />
                       <span>View</span>
                     </button>
-
                     <button
                       type="button"
-                      @click="handleEditClick(customer)"
+                      @click="openModal('edit', customer)"
                       class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                       <PencilSquareIcon class="h-4 w-4" />
                       <span>Edit</span>
                     </button>
-
                     <button
                       type="button"
-                      @click="handleDeleteClick(customer)"
+                      @click="openModal('delete', customer)"
                       class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
                     >
                       <TrashIcon class="h-4 w-4" />
@@ -93,16 +73,12 @@
                   </div>
                 </td>
               </tr>
-
               <tr v-if="!customers?.data?.length">
-                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
-                  No customers found.
-                </td>
+                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">No customers found.</td>
               </tr>
             </tbody>
           </table>
         </div>
-
         <div class="border-t border-gray-200 bg-gray-50 px-6 py-4">
           <p class="text-sm text-gray-500">
             Showing
@@ -116,100 +92,66 @@
         </div>
       </div>
 
-        <CreateModal 
-        :open="isCreateOpen" 
-        entityType="Customer" 
-        :service="customerService"
-        @close="isCreateOpen = false"
-        @success="handleActionSuccess" 
+      <CustomerModals
+        :open-modal="activeModal"
+        :customer="selectedCustomer"
+        @close="closeModal"
+        @success="onSuccess"
       />
 
-      <EditModal 
-        :open="isEditOpen" 
-        entityType="Customer" 
-        :entityData="selectedCustomer"
-        :service="customerService"
-        @close="isEditOpen = false"
-        @success="handleActionSuccess" 
-      />
-
-      <DeleteModal 
-        :open="isDeleteOpen" 
-        :entityName="selectedCustomer?.name"
-        :uuid="selectedCustomer?.uuid"
-        :service="customerService"
-        @close="isDeleteOpen = false"
-        @success="handleActionSuccess" 
-      />
-
-      <!-- <FeedbackModal
-        :open="isFeedbackModalOpen"
-        :message="feedbackMessage"
-        @close="closeFeedbackModal" -->
+      <FeedbackModal
+        :type="feedbackType"
+        @dismissed="feedbackType = null"
       />
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
-  import { customerService } from '~/api/customer/CustomerService';
+  import { ref, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { PlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
+  import { customerService } from '~/api/customer/CustomerService'
 
-  
+  type FeedbackType = 'created' | 'updated' | 'deleted' | null
+  const feedbackType = ref<FeedbackType>(null)
 
-  // 1. Control Visibility for all modals
-  const isCreateOpen = ref(false);
-  const isEditOpen = ref(false);
-  const isDeleteOpen = ref(false);
-  const isFeedbackOpen = ref(false);
+  const router = useRouter()
 
-  // 2. Data State
-  const selectedCustomer = ref<any>(null);
-  const feedbackMessage = ref('');
+  const customers = ref<any>(null)
+  const pending = ref(true)
+  const error = ref<any>(null)
 
-  const refreshData = async () => {
-    pending.value = true;
-    error.value = null;
+  const activeModal = ref<'create' | 'edit' | 'delete' | null>(null)
+  const selectedCustomer = ref<any>(null)
 
+  const fetchCustomers = async () => {
+    pending.value = true
+    error.value = null
     try {
-      // This fetches the fresh list from your API
-      customers.value = await customerService.list();
+      customers.value = await customerService.list()
     } catch (err: any) {
-      error.value = err;
+      error.value = err
     } finally {
-      pending.value = false;
+      pending.value = false
     }
-  };
+  }
 
-  // 2. Call it when the page first opens
-  onMounted(() => {
-    refreshData();
-  });
+  onMounted(fetchCustomers)
 
-  // 3. The Unified "Success" Connection
-  // This is the only function that talks to the Feedback Modal now
-  const handleActionSuccess = (message: string) => {
-    // Close all action modals
-    isCreateOpen.value = false;
-    isEditOpen.value = false;
-    isDeleteOpen.value = false;
+  const openModal = (type: 'create' | 'edit' | 'delete', customer: any = null) => {
+    selectedCustomer.value = customer
+    activeModal.value = type
+  }
 
-    // Trigger the feedback light
-    feedbackMessage.value = message;
-    isFeedbackOpen.value = true;
+  const closeModal = () => {
+    activeModal.value = null
+    selectedCustomer.value = null
+  }
 
-    // Refresh your table data to show the changes
-    refreshData(); 
-  };
-
-  // 4. Button Handlers (Table Actions)
-  const handleEditClick = (customer: any) => {
-    selectedCustomer.value = customer;
-    isEditOpen.value = true;
-  };
-
-  const handleDeleteClick = (customer: any) => {
-    selectedCustomer.value = customer;
-    isDeleteOpen.value = true;
-  };
+  const onSuccess = (action: 'created' | 'updated' | 'deleted') => {
+    fetchCustomers()
+    feedbackType.value = action
+  }
+  
 </script>
