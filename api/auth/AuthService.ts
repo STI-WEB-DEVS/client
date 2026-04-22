@@ -29,7 +29,7 @@ class AuthService extends BaseService {
 
   async logout(): Promise<LogoutResponse> {
     try {
-      const response = await this.request<LogoutResponse>(`${this.resource}/logout`, 'POST');
+      const response = await this.request<LogoutResponse>(`${this.resource}/logout`, 'DELETE');
       // Only clear token on successful logout response from backend
       this.clearToken();
       return response;
