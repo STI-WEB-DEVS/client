@@ -28,9 +28,11 @@ class AuthService extends BaseService {
   }
 
   async logout(): Promise<LogoutResponse> {
-    const response = await this.request<LogoutResponse>(`${this.resource}/logout`, 'POST');
-    this.clearToken();
-    return response;
+    try {
+      return await this.request<LogoutResponse>(`${this.resource}/logout`, 'POST');
+    } finally {
+      this.clearToken();
+    }
   }
 }
 
