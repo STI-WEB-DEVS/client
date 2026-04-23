@@ -3,12 +3,12 @@
     <div class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-xl font-semibold tracking-tight text-gray-900">Customers</h1>
-          <p class="mt-1 text-sm text-gray-500">Displaying customer records from your API.</p>
+          <h1 class="text-xl font-semibold tracking-tight text-gray-900">Products</h1>
+          <p class="mt-1 text-sm text-gray-500">Displaying product records from your API.</p>
         </div>
         <button @click="openCreateModal" class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800">
           <PlusIcon class="h-4 w-4" />
-          <span>Create Customer</span>
+          <span>Create Product</span>
         </button>
       </div>
 
@@ -23,30 +23,30 @@
               <tr>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Name</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Email</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Price</th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 bg-white">
-              <tr v-for="customer in customers" :key="customer.id">
-                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ customer.id }}</td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ customer.name }}</td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ customer.email }}</td>
+              <tr v-for="product in products" :key="product.id">
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ product.id }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ product.name }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">₱{{ formatPrice(product.price) }}</td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
-                    <button @click="openEditModal(customer)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <button @click="openEditModal(product)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
                       <PencilSquareIcon class="h-4 w-4" />
                       <span>Edit</span>
                     </button>
-                    <button @click="deleteCustomer(customer)" class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50">
+                    <button @click="deleteProduct(product)" class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50">
                       <TrashIcon class="h-4 w-4" />
                       <span>Delete</span>
                     </button>
                   </div>
                 </td>
               </tr>
-              <tr v-if="!customers?.length">
-                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">No customers found.</td>
+              <tr v-if="!products?.length">
+                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">No products found.</td>
               </tr>
             </tbody>
           </table>
@@ -55,7 +55,7 @@
           <p class="text-sm text-gray-500">
             Showing <span class="font-medium">{{ meta?.from ?? 0 }}</span> to
             <span class="font-medium">{{ meta?.to ?? 0 }}</span> of
-            <span class="font-medium">{{ meta?.total ?? 0 }}</span> customers
+            <span class="font-medium">{{ meta?.total ?? 0 }}</span> products
           </p>
         </div>
       </div>
@@ -65,20 +65,20 @@
         <div class="flex min-h-screen items-center justify-center p-4">
           <div class="fixed inset-0 bg-gray-500 bg-opacity-75" @click="closeModal"></div>
           <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-semibold mb-4">{{ isEditing ? 'Edit Customer' : 'Create Customer' }}</h3>
+            <h3 class="text-lg font-semibold mb-4">{{ isEditing ? 'Edit Product' : 'Create Product' }}</h3>
             <div class="space-y-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700">Name</label>
                 <input v-model="form.name" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700">Email</label>
-                <input v-model="form.email" type="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                <label class="block text-sm font-medium text-gray-700">Price</label>
+                <input v-model="form.price" type="number" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
               </div>
             </div>
             <div class="mt-6 flex justify-end gap-3">
               <button @click="closeModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">Cancel</button>
-              <button @click="saveCustomer" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Save</button>
+              <button @click="saveProduct" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Save</button>
             </div>
           </div>
         </div>
@@ -89,8 +89,8 @@
         <div class="flex min-h-screen items-center justify-center p-4">
           <div class="fixed inset-0 bg-gray-500 bg-opacity-75" @click="showDeleteModal = false"></div>
           <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-semibold mb-4">Delete Customer</h3>
-            <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete "{{ customerToDelete?.name }}"?</p>
+            <h3 class="text-lg font-semibold mb-4">Delete Product</h3>
+            <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete "{{ productToDelete?.name }}"?</p>
             <div class="flex justify-end gap-3">
               <button @click="showDeleteModal = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">Cancel</button>
               <button @click="confirmDelete" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">Delete</button>
@@ -107,37 +107,33 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { PlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
-import { customerService } from '~/api/customer/CustomerService'
+import { productService } from '~/api/product/ProductService'
 
-const customers = ref([])
+const products = ref([])
 const meta = ref({})
 const pending = ref(true)
 const showModal = ref(false)
 const showDeleteModal = ref(false)
 const isEditing = ref(false)
 const editingUuid = ref(null)
-const customerToDelete = ref(null)
-const form = ref({ name: '', email: '' })
+const productToDelete = ref(null)
+const form = ref({ name: '', price: '' })
 const isFeedbackModalOpen = ref(false)
 const feedbackMessage = ref('')
 
-const fetchCustomers = async () => {
+const formatPrice = (price: string | number) => {
+  return Number(price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+const fetchProducts = async () => {
   pending.value = true
   try {
-    const token = localStorage.getItem('_token')
-    if (!token) {
-      console.log('No token found, redirecting to login...')
-      await navigateTo('/')
-      return
-    }
-    const response = await customerService.list()
-    customers.value = response.data || []
+    const response = await productService.list()
+    products.value = response.data || []
     meta.value = response.meta || {}
+    console.log('Products loaded:', products.value)
   } catch (error: any) {
-    console.error('Error fetching customers:', error)
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      await navigateTo('/')
-    }
+    console.error('Error fetching products:', error)
   } finally {
     pending.value = false
   }
@@ -146,58 +142,65 @@ const fetchCustomers = async () => {
 const openCreateModal = () => {
   isEditing.value = false
   editingUuid.value = null
-  form.value = { name: '', email: '' }
+  form.value = { name: '', price: '' }
   showModal.value = true
 }
 
-const openEditModal = (customer: any) => {
+const openEditModal = (product: any) => {
+  console.log('Edit - Using UUID:', product.uuid)
   isEditing.value = true
-  editingUuid.value = customer.uuid
-  form.value = { name: customer.name, email: customer.email }
+  editingUuid.value = product.uuid
+  form.value = { name: product.name, price: product.price }
   showModal.value = true
 }
 
-const saveCustomer = async () => {
+const saveProduct = async () => {
   try {
     if (isEditing.value) {
-      await customerService.update(editingUuid.value, form.value)
-      feedbackMessage.value = 'Customer updated successfully!'
+      console.log('Update - Sending UUID:', editingUuid.value)
+      await productService.update(editingUuid.value, form.value)
+      feedbackMessage.value = 'Product updated successfully!'
     } else {
-      await customerService.create(form.value)
-      feedbackMessage.value = 'Customer created successfully!'
+      await productService.create(form.value)
+      feedbackMessage.value = 'Product created successfully!'
     }
     closeModal()
-    await fetchCustomers()
+    await fetchProducts()
     isFeedbackModalOpen.value = true
     setTimeout(() => { isFeedbackModalOpen.value = false }, 3000)
   } catch (error: any) {
-    feedbackMessage.value = error.message || 'Error saving customer'
+    console.error('Save error:', error)
+    feedbackMessage.value = error.message || 'Error saving product'
     isFeedbackModalOpen.value = true
   }
 }
 
-const deleteCustomer = (customer: any) => {
-  customerToDelete.value = customer
+const deleteProduct = (product: any) => {
+  console.log('Delete - Product:', product)
+  console.log('Delete - Using UUID:', product.uuid)
+  productToDelete.value = product
   showDeleteModal.value = true
 }
 
 const confirmDelete = async () => {
+  console.log('Confirm delete - UUID:', productToDelete.value.uuid)
   try {
-    await customerService.delete(customerToDelete.value.uuid)
-    feedbackMessage.value = 'Customer deleted successfully!'
+    await productService.delete(productToDelete.value.uuid)
+    feedbackMessage.value = 'Product deleted successfully!'
     showDeleteModal.value = false
-    await fetchCustomers()
+    await fetchProducts()
     isFeedbackModalOpen.value = true
     setTimeout(() => { isFeedbackModalOpen.value = false }, 3000)
   } catch (error: any) {
-    feedbackMessage.value = error.message || 'Error deleting customer'
+    console.error('Delete error:', error)
+    feedbackMessage.value = error.message || 'Error deleting product'
     isFeedbackModalOpen.value = true
   }
 }
 
 const closeModal = () => {
   showModal.value = false
-  form.value = { name: '', email: '' }
+  form.value = { name: '', price: '' }
   editingUuid.value = null
   isEditing.value = false
 }
@@ -209,9 +212,9 @@ const closeFeedbackModal = () => {
 onMounted(() => {
   const token = localStorage.getItem('_token');
   if (!token) {
-    navigateTo('/')
+    navigateTo('/');
   } else {
-    fetchCustomers()
+    fetchProducts();
   }
 });
 </script>
