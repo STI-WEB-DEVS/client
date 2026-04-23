@@ -129,6 +129,81 @@
         </div>
       </main>
     </div>
+
+    <!-- Creative Logout Confirmation Modal -->
+    <TransitionRoot appear :show="showLogoutModal" as="template">
+      <Dialog as="div" class="relative z-50" @close="showLogoutModal = false">
+        <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100" leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 overflow-y-auto">
+          <div class="flex min-h-full items-center justify-center p-4 text-center">
+            <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95" enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100" leave-to="opacity-0 scale-95">
+              <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <div class="text-center">
+                  <!-- Animated icon -->
+                  <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-200 animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-12 w-12 text-red-600 animate-bounce">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                    </svg>
+                  </div>
+                  
+                  <DialogTitle as="h3" class="mt-6 text-2xl font-bold text-gray-900">
+                    Ready to leave?
+                  </DialogTitle>
+                  
+                  <div class="mt-3">
+                    <p class="text-base text-gray-500">
+                      You're about to sign out of your account. 
+                      <span class="block text-sm text-gray-400 mt-1">We'll miss you! 👋</span>
+                    </p>
+                  </div>
+
+                  <!-- User info preview -->
+                  <div class="mt-4 rounded-lg bg-gray-50 p-3">
+                    <div class="flex items-center justify-center gap-2 text-sm text-gray-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                      </svg>
+                      <span>Logged in as <strong class="text-gray-900">test@cs.com</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-8 flex gap-3">
+                  <button
+                    type="button"
+                    class="inline-flex w-full justify-center rounded-xl border border-gray-300 bg-white px-4 py-3 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200"
+                    @click="cancelLogout"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Stay
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex w-full justify-center rounded-xl bg-gradient-to-r from-red-600 to-red-700 px-4 py-3 text-base font-medium text-white shadow-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+                    @click="confirmLogout"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                    </svg>
+                    Sign Out
+                  </button>
+                </div>
+
+                <!-- Decorative footer -->
+                <div class="mt-4 text-center">
+                  <p class="text-xs text-gray-400">Your session will be securely terminated</p>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
   </div>
 </template>
 
@@ -137,6 +212,7 @@ import { ref } from 'vue'
 import {
   Dialog,
   DialogPanel,
+  DialogTitle,
   Menu,
   MenuButton,
   MenuItem,
@@ -173,6 +249,7 @@ const userNavigation = [
 ]
 
 const sidebarOpen = ref(false)
+const showLogoutModal = ref(false)
 
 const handleLogout = async () => {
   try {
@@ -186,7 +263,16 @@ const handleLogout = async () => {
 
 const handleUserAction = async (item) => {
   if (item.action === 'logout') {
-    await handleLogout();
+    showLogoutModal.value = true;
   }
+}
+
+const confirmLogout = async () => {
+  showLogoutModal.value = false;
+  await handleLogout();
+}
+
+const cancelLogout = () => {
+  showLogoutModal.value = false;
 }
 </script>
