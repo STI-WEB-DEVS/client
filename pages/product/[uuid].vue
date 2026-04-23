@@ -5,9 +5,6 @@
           <h1 class="text-xl font-semibold tracking-tight text-gray-900">
             View Product
           </h1>
-          <p class="mt-1 text-sm text-gray-500">
-            Dedicated product page using the UUID from the route.
-          </p>
         </div>
   
         <div v-if="pending" class="flex justify-center py-16">

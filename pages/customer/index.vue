@@ -96,12 +96,17 @@
         :open-modal="activeModal"
         :customer="selectedCustomer"
         @close="closeModal"
-        @success="onSuccess"
+        @submit="onFormSubmit"
+        @success="onDeleteSuccess"
       />
 
       <FeedbackModal
-        :type="feedbackType"
-        @dismissed="feedbackType = null"
+        :open="feedbackOpen"
+        :action="feedbackAction"
+        :item-name="selectedCustomer?.name"
+        :on-confirm="runApiCall"
+        @success="onApiSuccess"
+        @close="feedbackOpen = false"
       />
     </div>
   </NuxtLayout>
@@ -113,9 +118,6 @@
   import { PlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
   import { customerService } from '~/api/customer/CustomerService'
 
-  type FeedbackType = 'created' | 'updated' | 'deleted' | null
-  const feedbackType = ref<FeedbackType>(null)
-
   const router = useRouter()
 
   const customers = ref<any>(null)
@@ -124,6 +126,11 @@
 
   const activeModal = ref<'create' | 'edit' | 'delete' | null>(null)
   const selectedCustomer = ref<any>(null)
+
+  type FeedbackAction = 'create' | 'edit' | null
+  const feedbackOpen = ref(false)
+  const feedbackAction = ref<FeedbackAction>(null)
+  const pendingForm = ref<{ name: string; email: string } | null>(null)
 
   const fetchCustomers = async () => {
     pending.value = true
@@ -149,9 +156,26 @@
     selectedCustomer.value = null
   }
 
-  const onSuccess = (action: 'created' | 'updated' | 'deleted') => {
-    fetchCustomers()
-    feedbackType.value = action
+  const onFormSubmit = (action: 'create' | 'edit', form: { name: string; email: string }) => {
+    pendingForm.value = form
+    feedbackAction.value = action
+    activeModal.value = null   
+    feedbackOpen.value = true  
   }
-  
+
+  const runApiCall = async () => {
+    if (feedbackAction.value === 'create') {
+      await customerService.create(pendingForm.value!)
+    } else if (feedbackAction.value === 'edit') {
+      await customerService.update(selectedCustomer.value.uuid, pendingForm.value!)
+    }
+  }
+
+  const onApiSuccess = () => {
+    fetchCustomers()
+  }
+
+  const onDeleteSuccess = (action: 'deleted') => {
+    fetchCustomers()
+  }
 </script>

@@ -96,7 +96,17 @@
         :open-modal="activeModal"
         :product="selectedProduct"
         @close="closeModal"
-        @success="onSuccess"
+        @submit="onFormSubmit"
+        @success="onDeleteSuccess"
+      />
+
+      <FeedbackModal
+        :open="feedbackOpen"
+        :action="feedbackAction"
+        :item-name="selectedProduct?.name"
+        :on-confirm="runApiCall"
+        @success="onApiSuccess"
+        @close="feedbackOpen = false"
       />
     </div>
   </NuxtLayout>
@@ -116,6 +126,11 @@
 
   const activeModal = ref<'create' | 'edit' | 'delete' | null>(null)
   const selectedProduct = ref<any>(null)
+
+  type FeedbackAction = 'create' | 'edit' | null
+  const feedbackOpen = ref(false)
+  const feedbackAction = ref<FeedbackAction>(null)
+  const pendingForm = ref<{ name: string; price: string } | null>(null)
 
   const fetchProducts = async () => {
     pending.value = true
@@ -141,7 +156,26 @@
     selectedProduct.value = null
   }
 
-  const onSuccess = () => {
+  const onFormSubmit = (action: 'create' | 'edit', form: { name: string; price: string }) => {
+    pendingForm.value = form
+    feedbackAction.value = action
+    activeModal.value = null   
+    feedbackOpen.value = true  
+  }
+
+  const runApiCall = async () => {
+    if (feedbackAction.value === 'create') {
+      await productService.create(pendingForm.value!)
+    } else if (feedbackAction.value === 'edit') {
+      await productService.update(selectedProduct.value.uuid, pendingForm.value!)
+    }
+  }
+
+  const onApiSuccess = () => {
+    fetchProducts()
+  }
+
+  const onDeleteSuccess = (action: 'deleted') => {
     fetchProducts()
   }
 </script>
