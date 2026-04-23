@@ -22,7 +22,7 @@
             <p class="mt-1 text-base font-medium text-gray-900">{{ product?.name }}</p>
           </div>
           <div class="mb-4">
-            <p class="text-sm text-gray-500">Product Name</p>
+            <p class="text-sm text-gray-500">Product Price</p>
             <p class="mt-1 text-base font-medium text-gray-900">{{ product?.price }}</p>
           </div>
             <p class="text-sm text-gray-500">Product UUID</p>

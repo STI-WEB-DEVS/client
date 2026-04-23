@@ -87,7 +87,8 @@
         <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
 
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <div class="flex flex-1"></div> <div class="flex items-center gap-x-4 lg:gap-x-6">
+          <div class="flex flex-1"></div>
+          <div class="flex items-center gap-x-4 lg:gap-x-6">
             <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
               <span class="sr-only">View notifications</span>
               <BellIcon class="size-6" aria-hidden="true" />
@@ -107,8 +108,20 @@
               </MenuButton>
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
-                  <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
+                  <MenuItem v-slot="{ active }">
+                    <a href="#" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">
+                      Your profile
+                    </a>
+                  </MenuItem>
+                  <MenuItem v-slot="{ active }">
+                    <button
+                      type="button"
+                      :disabled="isSigningOut"
+                      @click="handleSignOut"
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full px-3 py-1 text-left text-sm/6 text-gray-900 disabled:opacity-50']"
+                    >
+                      {{ isSigningOut ? 'Signing out...' : 'Sign out' }}
+                    </button>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -119,7 +132,7 @@
 
       <main class="py-10">
         <div class="px-4 sm:px-6 lg:px-8">
-            <slot></slot>
+          <slot></slot>
         </div>
       </main>
     </div>
@@ -141,33 +154,35 @@ import {
 import {
   Bars3Icon,
   BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
   Cog6ToothIcon,
-  DocumentDuplicateIcon,
   FolderIcon,
   HomeIcon,
   UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
+import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 import { useRoute } from 'vue-router'
+import { AuthService } from '~/api/auth/AuthService'
 
 const route = useRoute()
+const authService = new AuthService()
+const isSigningOut = ref(false)
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/customer', icon: UserGroupIcon },
   { name: 'Product', href: '/product', icon: FolderIcon },
-  // { name: 'Calendar', href: '#', icon: CalendarIcon },
-  // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  // { name: 'Reports', href: '#', icon: ChartPieIcon },
 ]
 
-const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
-]
+const handleSignOut = async () => {
+  isSigningOut.value = true
+  try {
+    await authService.logout()
+    await navigateTo('/')
+  } finally {
+    isSigningOut.value = false
+  }
+}
 
 const sidebarOpen = ref(false)
 </script>
