@@ -31,10 +31,6 @@ class CustomerService extends BaseService {
     async delete(uuid: string): Promise<any> {
         return await this.request(`${this.resource}/${uuid}`, 'DELETE');
     }
-
-    async restore(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}/restore`, 'POST');
-    }
 }
 
 export const customerService = CustomerService.getInstance();

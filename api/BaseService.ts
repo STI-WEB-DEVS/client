@@ -11,43 +11,42 @@ export class BaseService {
 
     if (token) {
       headers.Authorization = `Bearer ${token}`;
+
+export default class BaseService {
+    protected async request(url: string, method: string, data?: any): Promise<any> {
+        const config = useRuntimeConfig();
+        const token = localStorage.getItem('_token');
+        
+        const headers: HeadersInit = {
+            'Accept': 'application/json',
+        };
+        
+        // Only add Content-Type for requests that have a body
+        if (data && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+            headers['Content-Type'] = 'application/json';
+        }
+        
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const options: RequestInit = {
+            method,
+            headers,
+        };
+        
+        // Only add body for POST, PUT, PATCH methods
+        if (data && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+            options.body = JSON.stringify(data);
+        }
+        
+        const response = await fetch(`${config.public.apiBaseURL}${url}`, options);
+        
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.message || `Request failed with status ${response.status}`);
+        }
+        
+        return response.json();
     }
-
-    const config: any = {
-      baseURL: runtimeConfig.public.apiBaseURL,
-      method,
-      headers,
-    };
-
-    if (method.toUpperCase() === 'GET') {
-      config.params = params;
-    } else {
-      config.body = params;
-    }
-
-    try {
-      return await $fetch<T>(url, config);
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const message =
-        error?.response?._data?.message ||
-        error?.data?.message ||
-        error?.message;
-
-      switch (status) {
-        case 400:
-        case 401:
-        case 404:
-        case 422:
-        case 429:
-          throw new Error(message || 'Validation or Request Error');
-        case 500:
-          throw new Error('Server error. Please try again or contact the administrator.');
-        default:
-          throw new Error(message || 'Something went wrong. Please try again.');
-      }
-    }
-  }
 }
-
-export default BaseService;
