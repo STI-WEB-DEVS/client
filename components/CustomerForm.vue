@@ -11,11 +11,10 @@
     </div>
     
     <div>
-      <label class="block text-sm font-medium text-gray-700">Price</label>
+      <label class="block text-sm font-medium text-gray-700">Email</label>
       <input
-        v-model="formData.price"
-        type="number"
-        step="0.01"
+        v-model="formData.email"
+        type="email"
         required
         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
       />
@@ -36,7 +35,7 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps<{
-  initialData?: { name: string; price: number }
+  initialData?: { name: string; email: string }
   isEdit?: boolean
 }>()
 
@@ -45,7 +44,7 @@ const emit = defineEmits(['submit', 'cancel'])
 const loading = ref(false)
 const formData = ref({
   name: props.initialData?.name || '',
-  price: props.initialData?.price || 0
+  email: props.initialData?.email || ''
 })
 
 watch(() => props.initialData, (newData) => {
