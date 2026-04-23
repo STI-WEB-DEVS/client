@@ -39,7 +39,7 @@
                   Email
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                   Created At
+                  Created At
                 </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
@@ -113,14 +113,9 @@
 
       <FeedbackModal :open="isFeedbackModalOpen" :message="feedbackMessage" @close="closeFeedbackModal" />
 
-      <FeedbackModal
-        :open="isDeleteModalOpen"
-        title="Confirm Delete"
-        :message="`Are you sure you want to delete ${customerToDelete?.name}?`"
-        show-cancel
-        @close="isDeleteModalOpen = false"
-        @confirm="confirmDelete"
-      />
+      <FeedbackModal :open="isDeleteModalOpen" title="Confirm Delete"
+        :message="`Are you sure you want to delete ${customerToDelete?.name}?`" show-cancel
+        @close="isDeleteModalOpen = false" @confirm="confirmDelete" />
     </div>
   </NuxtLayout>
 </template>
