@@ -1,42 +1,70 @@
-export interface LoginResponse {
-  token: string;
-}
-
 export class AuthService {
-  async login(email: string, password: string): Promise<LoginResponse> {
-    const runtimeConfig = useRuntimeConfig();
+    private apiBase: string;
 
-    try {
-      return await $fetch<LoginResponse>('/login', {
-        baseURL: runtimeConfig.public.apiBaseURL,
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-        },
-        body: {
-          email,
-          password,
-        },
-      });
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const message =
-        error?.response?._data?.message ||
-        error?.data?.message ||
-        error?.message;
-
-      switch (status) {
-        case 400:
-        case 401:
-        case 404:
-        case 422:
-        case 429:
-          throw new Error(message || 'Validation or Request Error');
-        case 500:
-          throw new Error('Server error. Please try again or contact the administrator.');
-        default:
-          throw new Error(message || 'Something went wrong. Please try again.');
-      }
+    constructor() {
+        const config = useRuntimeConfig();
+        this.apiBase = config.public.apiBaseURL;
     }
-  }
+
+    async login(email: string, password: string) {
+        const response = await fetch(`${this.apiBase}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.token) {
+            localStorage.setItem('_token', data.token);
+            return { success: true, data };
+        }
+        
+        throw new Error(data.message || 'Login failed');
+    }
+
+    async logout() {
+        const token = localStorage.getItem('_token');
+        
+        if (!token) {
+            localStorage.removeItem('_token');
+            return { success: true };
+        }
+        
+        try {
+            const response = await fetch(`${this.apiBase}/logout`, {
+                method: 'DELETE',  // Changed from POST to DELETE
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.ok) {
+                localStorage.removeItem('_token');
+                return { success: true };
+            } else {
+                // If server returns error, still clear local token
+                localStorage.removeItem('_token');
+                throw new Error('Logout failed on server');
+            }
+        } catch (error) {
+            // If network error, still clear local token
+            localStorage.removeItem('_token');
+            throw error;
+        }
+    }
+
+    isAuthenticated(): boolean {
+        const token = localStorage.getItem('_token');
+        return !!token;
+    }
+
+    getToken(): string | null {
+        return localStorage.getItem('_token');
+    }
 }
