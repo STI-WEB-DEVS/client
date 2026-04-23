@@ -1,33 +1,3 @@
-import BaseService from '../BaseService'
-
-class ProductService extends BaseService {
-  constructor() {
-    super('/products')
-  }
-
-  async list(params?: any) {
-    return this.get('', { params })
-  }
-
-  async get(uuid: string) {
-    return this.get(`/${uuid}`)
-  }
-
-  async create(data: any) {
-    return this.post('', data)
-  }
-
-  async update(uuid: string, data: any) {
-    return this.put(`/${uuid}`, data)
-  }
-
-  async delete(uuid: string) {
-    return this.delete(`/${uuid}`)
-  }
-}
-
-export default new ProductService()
-
 import BaseService from '~/api/BaseService';
 
 class ProductService extends BaseService {
@@ -54,13 +24,13 @@ class ProductService extends BaseService {
         return await this.request(`${this.resource}/${uuid}`, 'GET');
     }
 
-    async delete(uuid: string): Promise<any> {
-    return await this.request(`${this.resource}/${uuid}`, 'DELETE');
-}
-
     async update(uuid: string, payload: object): Promise<any> {
-    return await this.request(`${this.resource}/${uuid}`, 'PUT', payload);
-}
+        return await this.request(`${this.resource}/${uuid}`, 'PUT', payload);
+    }
+
+    async delete(uuid: string): Promise<any> {
+        return await this.request(`${this.resource}/${uuid}`, 'DELETE');
+    }
 }
 
 export const productService = ProductService.getInstance();

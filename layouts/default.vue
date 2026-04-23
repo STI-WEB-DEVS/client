@@ -109,8 +109,6 @@
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-
-                    <a :href="item.href" :class="[active ? 'bg-gray-50' : '', 'block px-3 py-1 text-sm text-gray-900']">{{ item.name }}</a>
                     <button 
                       @click="handleUserAction(item)"
                       :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full text-left px-3 py-1 text-sm/6 text-gray-900']"
@@ -156,26 +154,17 @@ import {
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
-<<<<<<< HEAD
-import { useRoute } from 'vue-router'
-=======
 import { useRoute, useRouter } from 'vue-router'
 import { AuthService } from '~/api/auth/AuthService'
->>>>>>> main
 
 const route = useRoute()
 const router = useRouter()
 const authService = new AuthService()
 
-// ✅ UPDATED NAVIGATION (Products added)
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/customer', icon: UserGroupIcon },
-<<<<<<< HEAD
-  { name: 'Products', href: '/products', icon: FolderIcon },
-=======
   { name: 'Products', href: '/product', icon: FolderIcon },
->>>>>>> main
 ]
 
 const userNavigation = [
