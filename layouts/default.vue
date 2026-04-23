@@ -108,7 +108,8 @@
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
+                    <button v-if="item.name === 'Sign out'" @click="handleSignOut" :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full text-left px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</button>
+                    <a v-else :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -172,4 +173,19 @@ const userNavigation = [
 ]
 
 const sidebarOpen = ref(false)
+
+import { AuthService } from '~/api/auth/AuthService'
+import { navigateTo } from '#app'
+
+const authService = new AuthService()
+
+const handleSignOut = async () => {
+  try {
+    await authService.logout()
+    localStorage.removeItem('_token')
+    await navigateTo('/')
+  } catch (error) {
+    console.error('Logout failed:', error)
+  }
+}
 </script>

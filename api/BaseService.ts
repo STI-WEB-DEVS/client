@@ -43,11 +43,9 @@ export class BaseService {
       // 4. Automatically clear the key if the token is expired/unauthorized (401)
       if (status === 401) {
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('auth_token');
-          // Optional: redirect to login
-          // window.location.href = '/login';
+          localStorage.removeItem('_token');
         }
-        throw new Error("Session expired. Please login again.");
+        throw new Error("Unauthenticated");
       }
 
       switch (status) {

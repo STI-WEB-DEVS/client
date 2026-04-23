@@ -49,15 +49,7 @@
               />
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Description</label>
-              <textarea
-                v-model="description"
-                class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
-                placeholder="Product description"
-                rows="3"
-              ></textarea>
-            </div>
+
 
             <div v-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
               {{ error.message ?? error }}
@@ -101,7 +93,6 @@ const emit = defineEmits<{
 
 const name = ref('');
 const price = ref('');
-const description = ref('');
 const pending = ref(false);
 const error = ref<any>(null);
 
@@ -113,11 +104,9 @@ const handleSubmit = async () => {
     await productService.create({
       name: name.value,
       price: parseFloat(price.value),
-      description: description.value,
     });
     name.value = '';
     price.value = '';
-    description.value = '';
     emit('created');
     emit('close');
   } catch (err: any) {

@@ -41,13 +41,8 @@
             </div>
 
             <div>
-              <p class="text-sm text-gray-500">Phone</p>
-              <p class="mt-2 text-base font-medium text-gray-900">{{ customer?.phone || 'N/A' }}</p>
-            </div>
-
-            <div>
-              <p class="text-sm text-gray-500">Address</p>
-              <p class="mt-2 text-base font-medium text-gray-900">{{ customer?.address || 'N/A' }}</p>
+              <p class="text-sm text-gray-500">Created At</p>
+              <p class="mt-2 text-base font-medium text-gray-900">{{ new Date(customer?.created_at).toLocaleDateString() }}</p>
             </div>
           </div>
 

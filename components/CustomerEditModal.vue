@@ -47,25 +47,6 @@
               />
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Phone</label>
-              <input
-                v-model="phone"
-                type="tel"
-                class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
-                placeholder="+1 (555) 123-4567"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Address</label>
-              <textarea
-                v-model="address"
-                class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
-                placeholder="123 Main St, City, State, ZIP"
-                rows="3"
-              ></textarea>
-            </div>
 
             <div v-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
               {{ error.message ?? error }}
@@ -110,8 +91,6 @@ const emit = defineEmits<{
 
 const name = ref('');
 const email = ref('');
-const phone = ref('');
-const address = ref('');
 const saving = ref(false);
 const error = ref<any>(null);
 
@@ -119,8 +98,6 @@ watch(() => props.customer, (newCustomer) => {
   if (newCustomer) {
     name.value = newCustomer.name || '';
     email.value = newCustomer.email || '';
-    phone.value = newCustomer.phone || '';
-    address.value = newCustomer.address || '';
   }
 }, { immediate: true });
 
@@ -132,8 +109,6 @@ const handleSubmit = async () => {
     await customerService.update(props.customer.uuid, {
       name: name.value,
       email: email.value,
-      phone: phone.value,
-      address: address.value,
     });
     emit('updated');
     emit('close');

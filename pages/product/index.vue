@@ -33,9 +33,6 @@
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  UUID
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Name
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -53,9 +50,6 @@
                 :key="product.uuid"
                 class="transition hover:bg-gray-50"
               >
-                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ product.uuid }}
-                </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   {{ product.name }}
                 </td>
@@ -135,11 +129,14 @@
         @updated="onProductUpdated"
       />
 
-      <ProductViewModal
-        :open="isViewModalOpen"
-        :product="selectedProduct"
-        @close="closeViewModal"
-        @edit="openEditFromView"
+      <DeleteConfirmationModal
+        :open="isDeleteModalOpen"
+        title="Delete Product"
+        :message="`Are you sure you want to delete ${productToDelete?.name}? This action cannot be undone.`"
+        :pending="deletePending"
+        :error="deleteError"
+        @close="closeDeleteModal"
+        @confirm="confirmDelete"
       />
     </div>
   </NuxtLayout>
@@ -147,6 +144,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   PlusIcon,
   EyeIcon,
@@ -154,18 +152,25 @@ import {
   TrashIcon,
 } from '@heroicons/vue/24/outline';
 import { productService } from '~/api/product/ProductService';
+import ProductCreateModal from '~/components/ProductCreateModal.vue';
+import ProductEditModal from '~/components/ProductEditModal.vue';
+import DeleteConfirmationModal from '~/components/DeleteConfirmationModal.vue';
 
+const router = useRouter();
 const products = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
-
 const isCreateModalOpen = ref(false);
 const isEditModalOpen = ref(false);
-const isViewModalOpen = ref(false);
 const selectedProduct = ref<any>(null);
+
+const isDeleteModalOpen = ref(false);
+const productToDelete = ref<any>(null);
+const deletePending = ref(false);
+const deleteError = ref<string | null>(null);
 
 const loadProducts = async () => {
   pending.value = true;
@@ -197,8 +202,7 @@ const handleCreate = () => {
 };
 
 const handleView = (product: any) => {
-  selectedProduct.value = product;
-  isViewModalOpen.value = true;
+  router.push(`/product/${product.uuid}`);
 };
 
 const handleEdit = (product: any) => {
@@ -206,24 +210,34 @@ const handleEdit = (product: any) => {
   isEditModalOpen.value = true;
 };
 
-const handleDelete = async (product: any) => {
-  const confirmed = window.confirm(`Delete ${product.name}?`);
+const handleDelete = (product: any) => {
+  productToDelete.value = product;
+  isDeleteModalOpen.value = true;
+};
 
-  if (!confirmed) {
-    return;
-  }
+const closeDeleteModal = () => {
+  if (deletePending.value) return;
+  isDeleteModalOpen.value = false;
+  productToDelete.value = null;
+  deleteError.value = null;
+};
 
-  pending.value = true;
-  error.value = null;
+const confirmDelete = async () => {
+  if (!productToDelete.value) return;
+
+  deletePending.value = true;
+  deleteError.value = null;
 
   try {
-    await productService.delete(product.uuid);
+    await productService.delete(productToDelete.value.uuid);
     await loadProducts();
+    isDeleteModalOpen.value = false;
+    productToDelete.value = null;
     openFeedbackModal('Product deleted successfully.');
   } catch (err: any) {
-    error.value = err;
+    deleteError.value = err.message || err;
   } finally {
-    pending.value = false;
+    deletePending.value = false;
   }
 };
 
@@ -234,16 +248,6 @@ const closeCreateModal = () => {
 const closeEditModal = () => {
   isEditModalOpen.value = false;
   selectedProduct.value = null;
-};
-
-const closeViewModal = () => {
-  isViewModalOpen.value = false;
-  selectedProduct.value = null;
-};
-
-const openEditFromView = () => {
-  isViewModalOpen.value = false;
-  isEditModalOpen.value = true;
 };
 
 const onProductCreated = async () => {

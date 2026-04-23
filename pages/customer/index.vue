@@ -33,16 +33,13 @@
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  UUID
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Name
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Email
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Phone
+                  Created At
                 </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
@@ -56,9 +53,6 @@
                 :key="customer.uuid"
                 class="transition hover:bg-gray-50"
               >
-                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ customer.uuid }}
-                </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   {{ customer.name }}
                 </td>
@@ -66,7 +60,7 @@
                   {{ customer.email }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ customer.phone || 'N/A' }}
+                  {{ new Date(customer.created_at).toLocaleDateString() }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
@@ -101,7 +95,7 @@
               </tr>
 
               <tr v-if="!customers?.data?.length">
-                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
+                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
                   No customers found.
                 </td>
               </tr>
@@ -141,11 +135,14 @@
         @updated="onCustomerUpdated"
       />
 
-      <CustomerViewModal
-        :open="isViewModalOpen"
-        :customer="selectedCustomer"
-        @close="closeViewModal"
-        @edit="openEditFromView"
+      <DeleteConfirmationModal
+        :open="isDeleteModalOpen"
+        title="Delete Customer"
+        :message="`Are you sure you want to delete ${customerToDelete?.name}? This action cannot be undone.`"
+        :pending="deletePending"
+        :error="deleteError"
+        @close="closeDeleteModal"
+        @confirm="confirmDelete"
       />
     </div>
   </NuxtLayout>
@@ -153,6 +150,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   PlusIcon,
   EyeIcon,
@@ -162,18 +160,23 @@ import {
 import { customerService } from '~/api/customer/CustomerService';
 import CustomerCreateModal from '~/components/CustomerCreateModal.vue';
 import CustomerEditModal from '~/components/CustomerEditModal.vue';
+import DeleteConfirmationModal from '~/components/DeleteConfirmationModal.vue';
 
+const router = useRouter();
 const customers = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
-
 const isCreateModalOpen = ref(false);
 const isEditModalOpen = ref(false);
-const isViewModalOpen = ref(false);
 const selectedCustomer = ref<any>(null);
+
+const isDeleteModalOpen = ref(false);
+const customerToDelete = ref<any>(null);
+const deletePending = ref(false);
+const deleteError = ref<string | null>(null);
 
 const loadCustomers = async () => {
   pending.value = true;
@@ -205,8 +208,7 @@ const handleCreate = () => {
 };
 
 const handleView = (customer: any) => {
-  selectedCustomer.value = customer;
-  isViewModalOpen.value = true;
+  router.push(`/customer/${customer.uuid}`);
 };
 
 const handleEdit = (customer: any) => {
@@ -214,24 +216,34 @@ const handleEdit = (customer: any) => {
   isEditModalOpen.value = true;
 };
 
-const handleDelete = async (customer: any) => {
-  const confirmed = window.confirm(`Delete ${customer.name}?`);
+const handleDelete = (customer: any) => {
+  customerToDelete.value = customer;
+  isDeleteModalOpen.value = true;
+};
 
-  if (!confirmed) {
-    return;
-  }
+const closeDeleteModal = () => {
+  if (deletePending.value) return;
+  isDeleteModalOpen.value = false;
+  customerToDelete.value = null;
+  deleteError.value = null;
+};
 
-  pending.value = true;
-  error.value = null;
+const confirmDelete = async () => {
+  if (!customerToDelete.value) return;
+
+  deletePending.value = true;
+  deleteError.value = null;
 
   try {
-    await customerService.delete(customer.uuid);
+    await customerService.delete(customerToDelete.value.uuid);
     await loadCustomers();
+    isDeleteModalOpen.value = false;
+    customerToDelete.value = null;
     openFeedbackModal('Customer deleted successfully.');
   } catch (err: any) {
-    error.value = err;
+    deleteError.value = err.message || err;
   } finally {
-    pending.value = false;
+    deletePending.value = false;
   }
 };
 
@@ -242,16 +254,6 @@ const closeCreateModal = () => {
 const closeEditModal = () => {
   isEditModalOpen.value = false;
   selectedCustomer.value = null;
-};
-
-const closeViewModal = () => {
-  isViewModalOpen.value = false;
-  selectedCustomer.value = null;
-};
-
-const openEditFromView = () => {
-  isViewModalOpen.value = false;
-  isEditModalOpen.value = true;
 };
 
 const onCustomerCreated = async () => {
