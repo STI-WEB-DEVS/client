@@ -27,6 +27,28 @@
           <p class="mt-2 break-all text-base font-medium text-gray-900">
             {{ customer?.uuid ?? customer?.data?.uuid ?? '—' }}
           </p>
+          <div>
+            <p class="text-sm text-gray-500">Name</p>
+            <p class="mt-2 break-all text-base font-medium text-gray-900">
+              {{ customer?.name ?? customer?.data?.name ?? '—' }}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm text-gray-500">Email</p>
+            <p class="mt-2 break-all text-base font-medium text-gray-900">
+              {{ customer?.email ?? customer?.data?.email ?? '—' }}
+            </p>
+          </div>
+             <div>
+            <p class="text-sm text-gray-500">Date Created</p>
+            <p class="mt-2 break-all text-base font-medium text-gray-900">
+              {{ formatDate(customer.created_at) }}
+            </p>
+          </div>
+
+      
+          
         </div>
 
        
@@ -59,6 +81,11 @@ const fetchCustomer = async () => {
   } finally {
     pending.value = false
   }
+}
+const formatDate = (date: string) => {
+  if (!date) return 'N/A'
+  const d = new Date(date)
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
 onMounted(fetchCustomer)

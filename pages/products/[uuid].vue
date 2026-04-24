@@ -24,7 +24,30 @@
             {{ product?.uuid ?? product?.data?.uuid ?? '—' }}
           </p>
         </div>
-        
+        <div>
+          <p class="text-sm text-gray-500">Name</p>
+          <p class="mt-2 break-all text-base font-medium text-gray-900">
+            {{ product?.name ?? product?.data?.name ?? '—' }}
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Description</p>
+          <p class="mt-2 break-all text-base font-medium text-gray-900">
+            {{ product?.description ?? product?.data?.description ?? '—' }}
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Price</p>
+          <p class="mt-2 break-all text-base font-medium text-gray-900">
+            {{ product?.price ?? product?.data?.price ?? '—' }}
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Date Created</p>
+          <p class="mt-2 break-all text-base font-medium text-gray-900">
+            {{ formatDate(product.created_at) }}
+          </p>
+        </div>
       </div>
     </div>
   </NuxtLayout>
@@ -53,6 +76,11 @@ const fetchProduct = async () => {
   } finally {
     pending.value = false
   }
+}
+const formatDate = (date: string) => {
+  if (!date) return 'N/A'
+  const d = new Date(date)
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
 onMounted(fetchProduct)
