@@ -3,17 +3,17 @@
     <div class="space-y-6">
       <div class="flex items-center gap-4">
         <button
-          @click="router.push('/customer')"
+          @click="router.push('/product')"
           class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition hover:bg-gray-50 hover:text-gray-900"
         >
           <ArrowLeftIcon class="h-5 w-5" />
         </button>
         <div>
           <h1 class="text-xl font-semibold tracking-tight text-gray-900">
-            View Customer
+            View Product
           </h1>
           <p class="mt-1 text-sm text-gray-500">
-            Details for customer record {{ uuid }}
+            Details for product record {{ uuid }}
           </p>
         </div>
       </div>
@@ -31,7 +31,7 @@
         <p class="text-sm text-red-700">{{ error.message }}</p>
       </div>
 
-      <div v-else-if="customer" class="grid gap-6 lg:grid-cols-3">
+      <div v-else-if="product" class="grid gap-6 lg:grid-cols-3">
         <div
           class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:col-span-2"
         >
@@ -39,7 +39,7 @@
             <h2
               class="text-sm font-semibold uppercase tracking-wider text-gray-500"
             >
-              General Information
+              Product Information
             </h2>
           </div>
           <div class="divide-y divide-gray-100 px-6">
@@ -47,19 +47,21 @@
               <p
                 class="text-xs font-medium uppercase tracking-wider text-gray-400"
               >
-                Full Name
+                Product Name
               </p>
               <p class="mt-1 text-base font-medium text-gray-900">
-                {{ customer.name }}
+                {{ product.name }}
               </p>
             </div>
             <div class="py-4">
               <p
                 class="text-xs font-medium uppercase tracking-wider text-gray-400"
               >
-                Email Address
+                Price
               </p>
-              <p class="mt-1 text-base text-gray-700">{{ customer.email }}</p>
+              <p class="mt-1 text-xl font-bold text-gray-900">
+                ${{ product.price }}
+              </p>
             </div>
           </div>
         </div>
@@ -82,7 +84,7 @@
                 Internal ID
               </p>
               <p class="mt-1 text-sm font-medium text-gray-900">
-                {{ customer.id }}
+                {{ product.id }}
               </p>
             </div>
             <div>
@@ -92,7 +94,7 @@
                 Public UUID
               </p>
               <p class="mt-1 break-all font-mono text-xs text-gray-600">
-                {{ customer.uuid }}
+                {{ product.uuid }}
               </p>
             </div>
             <div>
@@ -102,7 +104,7 @@
                 Created At
               </p>
               <p class="mt-1 text-sm text-gray-700">
-                {{ formatDate(customer.created_at) }}
+                {{ formatDate(product.created_at) }}
               </p>
             </div>
             <div>
@@ -112,7 +114,7 @@
                 Last Updated
               </p>
               <p class="mt-1 text-sm text-gray-700">
-                {{ formatDate(customer.updated_at) }}
+                {{ formatDate(product.updated_at) }}
               </p>
             </div>
           </div>
@@ -126,13 +128,13 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ArrowLeftIcon } from "@heroicons/vue/24/outline";
-import { customerService } from "~/api/customer/CustomerService";
+import { productService } from "~/api/product/ProductService";
 
 const route = useRoute();
 const router = useRouter();
 
 const uuid = String(route.params.uuid ?? "");
-const customer = ref<any>(null);
+const product = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 
@@ -145,8 +147,8 @@ onMounted(async () => {
   pending.value = true;
   error.value = null;
   try {
-    const response = await customerService.show(uuid);
-    customer.value = response.data;
+    const response = await productService.show(uuid);
+    product.value = response.data;
   } catch (err: any) {
     error.value = err;
   } finally {

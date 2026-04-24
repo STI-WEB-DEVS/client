@@ -13,29 +13,35 @@
         />
 
         <div
-          class="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+          class="relative z-10 w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl text-center"
         >
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <h2 class="text-lg font-semibold text-gray-900">Feedback</h2>
-              <p class="mt-2 text-sm text-gray-600">
-                {{ message }}
-              </p>
+          <div class="flex flex-col items-center">
+            <div
+              class="mb-4 flex h-16 w-16 items-center justify-center rounded-full"
+              :class="[
+                type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+              ]"
+            >
+              <CheckCircleIcon v-if="type === 'success'" class="h-10 w-10" />
+              <XCircleIcon v-else class="h-10 w-10" />
             </div>
 
-            <button
-              type="button"
-              class="rounded-md p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
-              @click="$emit('close')"
-            >
-              ✕
-            </button>
-          </div>
+            <h2 class="text-xl font-bold text-gray-900">
+              {{ title || (type === 'success' ? 'Success!' : 'Error') }}
+            </h2>
+            
+            <p class="mt-3 text-sm text-gray-600 leading-relaxed">
+              {{ message }}
+            </p>
 
-          <div class="mt-6 flex justify-end">
             <button
               type="button"
-              class="inline-flex items-center justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+              class="mt-8 w-full rounded-xl py-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2"
+              :class="[
+                type === 'success' 
+                  ? 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500' 
+                  : 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
+              ]"
               @click="$emit('close')"
             >
               Okay
@@ -48,14 +54,18 @@
 </template>
 
 <script setup lang="ts">
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/vue/24/outline";
+
 defineProps<{
-  open: boolean
-  message: string
-}>()
+  open: boolean;
+  type: "success" | "error";
+  title?: string;
+  message: string;
+}>();
 
 defineEmits<{
-  (e: 'close'): void
-}>()
+  (e: "close"): void;
+}>();
 </script>
 
 <style scoped>
