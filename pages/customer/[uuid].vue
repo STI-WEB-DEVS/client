@@ -40,10 +40,10 @@
               {{ customer?.email ?? customer?.data?.email ?? '—' }}
             </p>
           </div>
-             <div>
+          <div>
             <p class="text-sm text-gray-500">Date Created</p>
             <p class="mt-2 break-all text-base font-medium text-gray-900">
-              {{ formatDate(customer.created_at) }}
+              {{ formatDate(customer?.created_at ?? customer?.data?.created_at) }}
             </p>
           </div>
 
@@ -83,9 +83,13 @@ const fetchCustomer = async () => {
   }
 }
 const formatDate = (date: string) => {
-  if (!date) return 'N/A'
-  const d = new Date(date)
-  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  if (!date) return ''
+
+  return new Date(date).toLocaleDateString('en-PH', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
 }
 
 onMounted(fetchCustomer)
