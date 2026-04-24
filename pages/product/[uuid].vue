@@ -11,64 +11,100 @@
       </div>
 
       <div v-if="pending" class="flex justify-center py-12">
-        <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
+        <div
+          class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"
+        ></div>
       </div>
 
-      <div v-else-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
-        {{ error.message || 'Failed to load product data.' }}
+      <div
+        v-else-if="error"
+        class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700"
+      >
+        {{ error.message || "Failed to load product data." }}
       </div>
 
-      <div v-else-if="product" class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+      <div
+        v-else-if="product"
+        class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4"
+      >
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Full Name</p>
-          <p class="mt-1 text-lg font-medium text-gray-900">{{ product.name }}</p>
+          <p
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400"
+          >
+            UUID
+          </p>
+          <p class="mt-1 text-lg font-medium text-gray-900">
+            {{ product.uuid }}
+          </p>
         </div>
 
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Price</p>
-          <p class="mt-1 text-lg font-medium text-gray-900">{{ product.price }}</p>
+          <p
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400"
+          >
+            Name
+          </p>
+          <p class="mt-1 text-lg font-medium text-gray-900">
+            {{ product.name }}
+          </p>
         </div>
 
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Created At</p>
-          <p class="mt-1 text-lg font-medium text-gray-900">{{ product.created_at }}</p>
+          <p
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400"
+          >
+            Price
+          </p>
+          <p class="mt-1 text-lg font-medium text-gray-900">
+            {{ product.price }}
+          </p>
         </div>
-        
+
+        <div>
+          <p
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400"
+          >
+            Created At
+          </p>
+          <p class="mt-1 text-lg font-medium text-gray-900">
+            {{ product.created_at }}
+          </p>
+        </div>
       </div>
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { productService } from '~/api/product/ProductService'
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { productService } from "~/api/product/ProductService";
 
-const route = useRoute()
-const uuid = String(route.params.uuid ?? '')
+const route = useRoute();
+const uuid = String(route.params.uuid ?? "");
 
 // State for the data
-const product = ref<any>(null)
-const pending = ref(true)
-const error = ref<any>(null)
+const product = ref<any>(null);
+const pending = ref(true);
+const error = ref<any>(null);
 
 const fetchProductDetails = async () => {
-  pending.value = true
+  pending.value = true;
   try {
-    const response = await productService.show(uuid)
-    
-    product.value = response.data || response
+    const response = await productService.show(uuid);
+
+    product.value = response.data || response;
   } catch (err: any) {
-    error.value = err
-    console.error('Error fetching product:', err)
+    error.value = err;
+    console.error("Error fetching product:", err);
   } finally {
-    pending.value = false
+    pending.value = false;
   }
-}
+};
 
 onMounted(() => {
   if (uuid) {
-    fetchProductDetails()
+    fetchProductDetails();
   }
-})
+});
 </script>
