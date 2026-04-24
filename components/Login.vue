@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { AuthService } from '~/api/Auth/AuthService';
+import { AuthService } from '~/api/auth/AuthService';
 
 const email = ref('');
 const password = ref('');
