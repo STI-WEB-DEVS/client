@@ -79,6 +79,7 @@
             </div>
           </div>
 
+          <p v-if="unauthMessage" class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{{ unauthMessage }}</p>
           <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
 
           <div>
@@ -103,15 +104,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { AuthService } from '~/api/auth/AuthService';
 
 const email = ref('');
 const password = ref('');
 const error = ref('');
+const unauthMessage = ref('');
 const isLoading = ref(false);
 
 const authService = new AuthService();
+
+onMounted(() => {
+  const params = new URLSearchParams(window.location.search);
+  const msg = params.get('message');
+  if (msg) {
+    unauthMessage.value = msg;
+  }
+});
 
 const handleSubmit = async () => {
   error.value = '';
@@ -121,7 +131,7 @@ const handleSubmit = async () => {
     const response = await authService.login(email.value, password.value);
 
     if (response?.token) {
-      localStorage.setItem('_token', response.token);
+      authService.setToken(response.token);
     }
 
     await navigateTo('/dashboard');

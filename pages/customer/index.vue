@@ -33,13 +33,13 @@
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  ID
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Name
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Email
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Created At
                 </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
@@ -54,13 +54,13 @@
                 class="transition hover:bg-gray-50"
               >
                 <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ customer.id }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   {{ customer.name }}
                 </td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   {{ customer.email }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  {{ customer.created_at?.split('T')[0] }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
@@ -116,6 +116,31 @@
         </div>
       </div>
 
+      <!-- Create / Edit Modal -->
+      <CrudFormModal
+        :open="showFormModal"
+        :entityName="'Customer'"
+        :fields="fields"
+        :service="customerService"
+        :initialData="editingEntity"
+        :isEdit="!!editingEntity"
+        :uuid="editingEntity?.uuid"
+        @close="closeFormModal"
+        @success="onFormSuccess"
+        @error="onFormError"
+      />
+
+      <!-- Delete Confirm Modal -->
+      <ConfirmModal
+        :open="showConfirmModal"
+        :title="'Delete Customer'"
+        :message="`Are you sure you want to delete ${deletingEntity?.name || 'this customer'}? This action cannot be undone.`"
+        :loading="deleteLoading"
+        @close="closeConfirmModal"
+        @confirm="confirmDelete"
+      />
+
+      <!-- Feedback Modal -->
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
@@ -137,6 +162,8 @@ import {
 } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
 import FeedbackModal from '~/components/FeedbackModal.vue';
+import CrudFormModal from '~/components/CrudFormModal.vue';
+import ConfirmModal from '~/components/ConfirmModal.vue';
 
 const router = useRouter();
 
@@ -144,9 +171,24 @@ const customers = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 
+// Form modal state
+const showFormModal = ref(false);
+const editingEntity = ref<any>(null);
+
+// Confirm modal state
+const showConfirmModal = ref(false);
+const deletingEntity = ref<any>(null);
+const deleteLoading = ref(false);
+
+// Feedback modal state
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
 const feedbackType = ref<'success' | 'error' | 'info'>('info');
+
+const fields = [
+  { name: 'name', label: 'Full Name', placeholder: 'e.g. John Doe', required: true },
+  { name: 'email', label: 'Email Address', type: 'email', placeholder: 'john@example.com', required: true },
+];
 
 const fetchCustomers = async () => {
   pending.value = true;
@@ -173,27 +215,61 @@ const closeFeedbackModal = () => {
   feedbackMessage.value = '';
 };
 
+// --- Create ---
 const handleCreate = () => {
-  router.push('/customer/create');
+  editingEntity.value = null;
+  showFormModal.value = true;
 };
 
+// --- View (navigates to detail page) ---
 const handleView = (customer: any) => {
-  router.push(`/customer/${customer.uuid}?mode=view`);
-};
-
-const handleEdit = (customer: any) => {
   router.push(`/customer/${customer.uuid}`);
 };
 
-const handleDelete = async (customer: any) => {
-  if (confirm(`Are you sure you want to delete ${customer.name}?`)) {
-    try {
-      await customerService.delete(customer.uuid);
-      openFeedbackModal('Customer deleted successfully!', 'success');
-      fetchCustomers();
-    } catch (err: any) {
-      openFeedbackModal(err.message || 'Failed to delete customer', 'error');
-    }
+// --- Edit ---
+const handleEdit = (customer: any) => {
+  editingEntity.value = { ...customer };
+  showFormModal.value = true;
+};
+
+const closeFormModal = () => {
+  showFormModal.value = false;
+  editingEntity.value = null;
+};
+
+const onFormSuccess = (message: string) => {
+  openFeedbackModal(message, 'success');
+  fetchCustomers();
+};
+
+const onFormError = (message: string) => {
+  openFeedbackModal(message, 'error');
+};
+
+// --- Delete ---
+const handleDelete = (customer: any) => {
+  deletingEntity.value = customer;
+  showConfirmModal.value = true;
+};
+
+const closeConfirmModal = () => {
+  showConfirmModal.value = false;
+  deletingEntity.value = null;
+};
+
+const confirmDelete = async () => {
+  if (!deletingEntity.value) return;
+  deleteLoading.value = true;
+  try {
+    await customerService.delete(deletingEntity.value.uuid);
+    closeConfirmModal();
+    openFeedbackModal('Customer deleted successfully!', 'success');
+    fetchCustomers();
+  } catch (err: any) {
+    closeConfirmModal();
+    openFeedbackModal(err.message || 'Failed to delete customer', 'error');
+  } finally {
+    deleteLoading.value = false;
   }
 };
 </script>

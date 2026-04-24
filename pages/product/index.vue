@@ -38,6 +38,9 @@
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Price
                 </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Created At
+                </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
                 </th>
@@ -55,6 +58,9 @@
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   ${{ product.price }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  {{ product.created_at?.split('T')[0] }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
@@ -89,7 +95,7 @@
               </tr>
 
               <tr v-if="!products?.data?.length">
-                <td colspan="3" class="px-6 py-10 text-center text-sm text-gray-500">
+                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
                   No products found.
                 </td>
               </tr>
@@ -110,6 +116,31 @@
         </div>
       </div>
 
+      <!-- Create / Edit Modal -->
+      <CrudFormModal
+        :open="showFormModal"
+        :entityName="'Product'"
+        :fields="fields"
+        :service="productService"
+        :initialData="editingEntity"
+        :isEdit="!!editingEntity"
+        :uuid="editingEntity?.uuid"
+        @close="closeFormModal"
+        @success="onFormSuccess"
+        @error="onFormError"
+      />
+
+      <!-- Delete Confirm Modal -->
+      <ConfirmModal
+        :open="showConfirmModal"
+        :title="'Delete Product'"
+        :message="`Are you sure you want to delete ${deletingEntity?.name || 'this product'}? This action cannot be undone.`"
+        :loading="deleteLoading"
+        @close="closeConfirmModal"
+        @confirm="confirmDelete"
+      />
+
+      <!-- Feedback Modal -->
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
@@ -131,6 +162,8 @@ import {
 } from '@heroicons/vue/24/outline';
 import { productService } from '~/api/product/ProductService';
 import FeedbackModal from '~/components/FeedbackModal.vue';
+import CrudFormModal from '~/components/CrudFormModal.vue';
+import ConfirmModal from '~/components/ConfirmModal.vue';
 
 const router = useRouter();
 
@@ -138,9 +171,24 @@ const products = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 
+// Form modal state
+const showFormModal = ref(false);
+const editingEntity = ref<any>(null);
+
+// Confirm modal state
+const showConfirmModal = ref(false);
+const deletingEntity = ref<any>(null);
+const deleteLoading = ref(false);
+
+// Feedback modal state
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
 const feedbackType = ref<'success' | 'error' | 'info'>('info');
+
+const fields = [
+  { name: 'name', label: 'Product Name', placeholder: 'e.g. Premium Widget', required: true },
+  { name: 'price', label: 'Price', type: 'number', placeholder: '0.00', required: true },
+];
 
 const fetchProducts = async () => {
   pending.value = true;
@@ -167,27 +215,61 @@ const closeFeedbackModal = () => {
   feedbackMessage.value = '';
 };
 
+// --- Create ---
 const handleCreate = () => {
-  router.push('/product/create');
+  editingEntity.value = null;
+  showFormModal.value = true;
 };
 
+// --- View (navigates to detail page) ---
 const handleView = (product: any) => {
-  router.push(`/product/${product.uuid}?mode=view`);
-};
-
-const handleEdit = (product: any) => {
   router.push(`/product/${product.uuid}`);
 };
 
-const handleDelete = async (product: any) => {
-  if (confirm(`Are you sure you want to delete ${product.name}?`)) {
-    try {
-      await productService.delete(product.uuid);
-      openFeedbackModal('Product deleted successfully!', 'success');
-      fetchProducts();
-    } catch (err: any) {
-      openFeedbackModal(err.message || 'Failed to delete product', 'error');
-    }
+// --- Edit ---
+const handleEdit = (product: any) => {
+  editingEntity.value = { ...product };
+  showFormModal.value = true;
+};
+
+const closeFormModal = () => {
+  showFormModal.value = false;
+  editingEntity.value = null;
+};
+
+const onFormSuccess = (message: string) => {
+  openFeedbackModal(message, 'success');
+  fetchProducts();
+};
+
+const onFormError = (message: string) => {
+  openFeedbackModal(message, 'error');
+};
+
+// --- Delete ---
+const handleDelete = (product: any) => {
+  deletingEntity.value = product;
+  showConfirmModal.value = true;
+};
+
+const closeConfirmModal = () => {
+  showConfirmModal.value = false;
+  deletingEntity.value = null;
+};
+
+const confirmDelete = async () => {
+  if (!deletingEntity.value) return;
+  deleteLoading.value = true;
+  try {
+    await productService.delete(deletingEntity.value.uuid);
+    closeConfirmModal();
+    openFeedbackModal('Product deleted successfully!', 'success');
+    fetchProducts();
+  } catch (err: any) {
+    closeConfirmModal();
+    openFeedbackModal(err.message || 'Failed to delete product', 'error');
+  } finally {
+    deleteLoading.value = false;
   }
 };
 </script>
