@@ -194,9 +194,10 @@ const openFeedbackModal = (message: string) => {
 
 const showSuccess = (message: string) => {
   feedbackMessage.value = message;
-  setTimeout(() => {
-    feedbackMessage.value = '';
-  }, 3000);
+}
+
+const closeFeedbackModal = () => {
+  feedbackMessage.value = '';
 }
 
 const handleCreate = () => {
