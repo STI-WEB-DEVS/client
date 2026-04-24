@@ -293,9 +293,9 @@ const logout = async () => {
 };
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
-  { name: "Customers", href: "/customer", icon: UserGroupIcon },
-  { name: "Products", href: "/product", icon: GiftIcon },
+  { name: "Dashboard", href: "/admin/dashboard", icon: HomeIcon },
+  { name: "Customers", href: "/admin/customer", icon: UserGroupIcon },
+  { name: "Products", href: "/admin/product", icon: GiftIcon },
   // { name: 'Calendar', href: '#', icon: CalendarIcon },
   // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
   // { name: 'Reports', href: '#', icon: ChartPieIcon },
