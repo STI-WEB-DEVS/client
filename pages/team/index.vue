@@ -1,0 +1,73 @@
+<template>
+  <NuxtLayout>
+    <div class="sm:flex sm:items-center">
+      <div class="sm:flex-auto">
+        <h1 class="text-base font-semibold text-gray-900">Customers</h1>
+        <p class="mt-2 text-sm text-gray-700">
+          A list of all the customers in your account including their name and email.
+        </p>
+      </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div v-if="pending" class="mt-8 flex justify-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+    </div>
+
+    <!-- Error message -->
+    <div v-else-if="error" class="mt-8 rounded-md bg-red-50 p-4">
+      <p class="text-sm text-red-700">{{ error.message }}</p>
+    </div>
+
+    <!-- Table -->
+    <div v-else class="mt-8 flow-root">
+      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+            <table class="min-w-full divide-y divide-gray-300">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">UUID</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Created At</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 bg-white">
+                <tr v-for="customer in customers" :key="customer.id">
+                  <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                    {{ customer.name }}
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {{ customer.email }}
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {{ customer.uuid }}
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {{ new Date(customer.created_at).toLocaleString() }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </NuxtLayout>
+</template>
+
+<script setup lang="ts">
+import { TeamService } from '~/api/Team/TeamService';
+import { computed } from 'vue';
+
+const teamService = new TeamService();
+
+// Fetch customers
+const { data: response, pending, error } = await useAsyncData('customers', () =>
+  teamService.getCustomers()
+);
+
+// Unwrap the array of customers from response.data
+const customers = computed(() => response.value?.data ?? []);
+</script>

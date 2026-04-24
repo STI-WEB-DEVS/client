@@ -39,4 +39,36 @@ export class AuthService {
       }
     }
   }
+
+  async logout(): Promise<boolean> {
+    const runtimeConfig = useRuntimeConfig();
+
+    try {
+      const token = localStorage.getItem('_token');
+      if (!token) return false;
+
+      const response = await $fetch('/logout', {
+        baseURL: runtimeConfig.public.apiBaseURL,
+        method: 'DELETE', // <--- Change this from 'POST' to 'DELETE'
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // If backend confirms deletion
+      localStorage.removeItem('_token');
+      return true;
+    } catch (error: any) {
+      const status = error?.response?.status;
+      const message =
+        error?.response?._data?.message ||
+        error?.data?.message ||
+        error?.message;
+
+      console.error('Logout failed:', message);
+
+      return false;
+    }
+  }
 }

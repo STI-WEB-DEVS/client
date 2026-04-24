@@ -1,34 +1,70 @@
 <template>
   <NuxtLayout>
     <div class="space-y-6">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-xl font-semibold tracking-tight text-gray-900">Products</h1>
-          <p class="mt-1 text-sm text-gray-500">
-            Displaying Products records from your API.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          @click="handleCreate"
-          class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
-        >
-          <PlusIcon class="h-4 w-4" />
-          <span>Create Customer</span>
+      <div class="flex justify-between items-center">
+        <h1 class="text-xl font-semibold">Products</h1>
+        <button @click="handleCreate" class="bg-gray-900 text-white px-4 py-2 rounded">
+          Create Product
         </button>
       </div>
 
-      <div v-if="pending" class="flex justify-center py-16">
-        <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
+      <!-- Loading -->
+      <div v-if="pending" class="py-10 text-center">Loading...</div>
+
+      <!-- Error -->
+      <div v-else-if="error" class="text-red-600">{{ error.message }}</div>
+
+      <!-- Table -->
+      <div v-else class="overflow-hidden rounded border border-gray-200 bg-white shadow-sm">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500">ID</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500">Name</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500">Price</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr v-for="product in products?.data" :key="product.id">
+              <td class="px-6 py-4">{{ product.id }}</td>
+              <td class="px-6 py-4">{{ product.name }}</td>
+              <td class="px-6 py-4">{{ product.price }}</td>
+              <td class="px-6 py-4 text-right">
+                <button @click="handleView(product)" class="px-3 py-1 border rounded">View</button>
+                <button @click="handleEdit(product)" class="px-3 py-1 border rounded">Edit</button>
+                <button @click="handleDelete(product)" class="px-3 py-1 border rounded text-red-600">Delete</button>
+              </td>
+            </tr>
+            <tr v-if="!products?.data?.length">
+              <td colspan="4" class="px-6 py-10 text-center text-gray-500">No products found.</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div v-else-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4">
-        <p class="text-sm text-red-700">{{ error.message }}</p>
-      </div>
+      <!-- Modals -->
+      <ProductCreateModal
+        :open="isCreateModalOpen"
+        @close="isCreateModalOpen=false"
+        @created="onCreated"
+      />
 
-      
+      <ProductEditModal
+        :open="isEditModalOpen"
+        :product="selectedProduct"
+        @close="isEditModalOpen=false"
+        @updated="onUpdated"
+      />
 
+      <ProductDeleteModal
+        :open="isDeleteModalOpen"
+        :product="selectedProduct"
+        @close="isDeleteModalOpen=false"
+        @deleted="onDeleted"
+      />
+
+      <!-- Feedback Modal -->
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
@@ -39,61 +75,90 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import {
-  PlusIcon,
-  EyeIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from '@heroicons/vue/24/outline';
-import { ProductService } from '~/api/product/ProductService';
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { productService } from '~/api/product/ProductService'
 
-const router = useRouter();
+// Import modals
+import ProductCreateModal from '~/components/ProductCreateModal.vue'
+import ProductEditModal from '~/components/ProductEditModal.vue'
+import ProductDeleteModal from '~/components/ProductDeleteModal.vue'
+import FeedbackModal from '~/components/FeedbackModal.vue'
 
-const customers = ref<any>(null);
-const pending = ref(true);
-const error = ref<any>(null);
+const router = useRouter()
 
-const isFeedbackModalOpen = ref(false);
-const feedbackMessage = ref('');
+const products = ref<any>(null)
+const pending = ref(true)
+const error = ref<any>(null)
+
+// Modal states
+const isCreateModalOpen = ref(false)
+const isEditModalOpen = ref(false)
+const isDeleteModalOpen = ref(false)
+const selectedProduct = ref<any>(null)
+
+// Feedback modal state
+const isFeedbackModalOpen = ref(false)
+const feedbackMessage = ref('')
 
 onMounted(async () => {
-  pending.value = true;
-  error.value = null;
+  await refreshList()
+})
 
+const refreshList = async () => {
+  pending.value = true
+  error.value = null
   try {
-    customers.value = await customerService.list();
+    products.value = await productService.list()
   } catch (err: any) {
-    error.value = err;
+    error.value = err
   } finally {
-    pending.value = false;
+    pending.value = false
   }
-});
-
-const openFeedbackModal = (message: string) => {
-  feedbackMessage.value = message;
-  isFeedbackModalOpen.value = true;
-};
-
-const closeFeedbackModal = () => {
-  isFeedbackModalOpen.value = false;
-  feedbackMessage.value = '';
-};
+}
 
 const handleCreate = () => {
-  openFeedbackModal('Create button clicked');
-};
+  isCreateModalOpen.value = true
+}
 
-const handleView = (customer: any) => {
-  router.push(`/customer/${customer.uuid}`);
-};
+const handleView = (product: any) => {
+  router.push(`/product/${product.uuid}`)
+}
 
-const handleEdit = (customer: any) => {
-  openFeedbackModal(`Edit customer: ${customer.name}`);
-};
+const handleEdit = (product: any) => {
+  selectedProduct.value = product
+  isEditModalOpen.value = true
+}
 
-const handleDelete = (customer: any) => {
-  openFeedbackModal(`Delete customer: ${customer.name}`);
-};
+const handleDelete = (product: any) => {
+  selectedProduct.value = product
+  isDeleteModalOpen.value = true
+}
+
+// Feedback modal helpers
+const openFeedbackModal = (message: string) => {
+  feedbackMessage.value = message
+  isFeedbackModalOpen.value = true
+}
+
+const closeFeedbackModal = () => {
+  isFeedbackModalOpen.value = false
+  feedbackMessage.value = ''
+}
+
+// CRUD event handlers from modals
+const onCreated = async () => {
+  await refreshList()
+  openFeedbackModal('Product created successfully!')
+}
+
+const onUpdated = async () => {
+  await refreshList()
+  openFeedbackModal('Product updated successfully!')
+}
+
+const onDeleted = async () => {
+  await refreshList()
+  openFeedbackModal('Product deleted successfully!')
+}
 </script>
