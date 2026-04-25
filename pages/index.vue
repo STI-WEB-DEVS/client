@@ -104,6 +104,11 @@
 
 
 <script setup lang="ts">
+
+definePageMeta({
+  layout: false
+})
+
 import { ref } from 'vue'
 import { AuthService } from '~/api/auth/AuthService'
 
@@ -138,7 +143,7 @@ const handleSubmit = async () => {
       }
     }
 
-    await navigateTo('/dashboard')
+    await navigateTo('/admin/dashboard')       
   } catch (err: any) {
     console.log('LOGIN ERROR:', err)
     error.value = err?.message || 'Login failed'
