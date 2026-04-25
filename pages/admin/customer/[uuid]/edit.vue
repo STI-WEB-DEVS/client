@@ -1,13 +1,12 @@
 <template>
-  <NuxtLayout>
-    <div class="space-y-6">
+  <div class="space-y-6">
       <div>
-        <h1 class="text-xl font-semibold tracking-tight text-gray-900">Edit Product</h1>
-        <p class="mt-1 text-sm text-gray-500">Update product details and save your changes.</p>
+        <h1 class="text-xl font-semibold tracking-tight text-gray-900">Edit Customer</h1>
+        <p class="mt-1 text-sm text-gray-500">Update customer details and save your changes.</p>
       </div>
 
       <form @submit.prevent="handleSubmit" class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <div v-if="pending" class="text-sm text-gray-500">Loading product…</div>
+        <div v-if="pending" class="text-sm text-gray-500">Loading customer…</div>
 
         <div v-else class="grid gap-6">
           <div>
@@ -16,23 +15,22 @@
               v-model="name"
               type="text"
               class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
-              placeholder="Product name"
+              placeholder="Customer name"
               required
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700">Price</label>
+            <label class="block text-sm font-medium text-gray-700">Email</label>
             <input
-              v-model="price"
-              type="number"
-              step="0.01"
-              min="0"
+              v-model="email"
+              type="email"
               class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
-              placeholder="0.00"
+              placeholder="customer@example.com"
               required
             />
           </div>
+
 
           <div v-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {{ error.message ?? error }}
@@ -42,7 +40,7 @@
             <button
               type="button"
               class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-              @click="router.push('/product')"
+              @click="router.push('/admin/customer')"
             >
               Cancel
             </button>
@@ -56,34 +54,33 @@
           </div>
         </div>
       </form>
-    </div>
-  </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { productService } from '~/api/product/ProductService';
+import { customerService } from '~/api/customer/CustomerService';
 
 const route = useRoute();
 const router = useRouter();
 const uuid = computed(() => String(route.params.uuid ?? ''));
 
 const name = ref('');
-const price = ref('');
+const email = ref('');
 const pending = ref(true);
 const saving = ref(false);
 const error = ref<any>(null);
 
-const loadProduct = async () => {
+const loadCustomer = async () => {
   pending.value = true;
   error.value = null;
 
   try {
-    const response: any = await productService.show(uuid.value);
-    const product = response?.data ?? response;
-    name.value = product.name;
-    price.value = product.price?.toString();
+    const response: any = await customerService.show(uuid.value);
+    const customer = response?.data ?? response;
+    name.value = customer.name;
+    email.value = customer.email;
   } catch (err: any) {
     error.value = err;
   } finally {
@@ -91,18 +88,18 @@ const loadProduct = async () => {
   }
 };
 
-onMounted(loadProduct);
+onMounted(loadCustomer);
 
 const handleSubmit = async () => {
   error.value = null;
   saving.value = true;
 
   try {
-    await productService.update(uuid.value, {
+    await customerService.update(uuid.value, {
       name: name.value,
-      price: parseFloat(price.value),
+      email: email.value,
     });
-    router.push('/product');
+    router.push('/admin/customer');
   } catch (err: any) {
     error.value = err;
   } finally {

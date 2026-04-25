@@ -1,6 +1,5 @@
 <template>
-  <NuxtLayout>
-    <div class="space-y-6">
+  <div class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-xl font-semibold tracking-tight text-gray-900">View Customer</h1>
@@ -49,8 +48,7 @@
           </div>
         </div>
       </div>
-    </div>
-  </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -83,6 +81,6 @@ const loadCustomer = async () => {
 onMounted(loadCustomer);
 
 const handleEdit = () => {
-  router.push(`/customer/${uuid.value}/edit`);
+  router.push(`/admin/customer/${uuid.value}/edit`);
 };
 </script>

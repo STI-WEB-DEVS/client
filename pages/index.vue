@@ -106,6 +106,10 @@
 import { ref } from 'vue';
 import { AuthService } from '~/api/auth/AuthService';
 
+definePageMeta({
+  layout: false
+})
+
 const email = ref('');
 const password = ref('');
 const error = ref('');
@@ -124,7 +128,7 @@ const handleSubmit = async () => {
       localStorage.setItem('_token', response.token);
     }
 
-    await navigateTo('/dashboard');
+    await navigateTo('/admin/dashboard');
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {

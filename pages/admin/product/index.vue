@@ -1,6 +1,5 @@
 <template>
-  <NuxtLayout>
-    <div class="space-y-6">
+  <div class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-xl font-semibold tracking-tight text-gray-900">Products</h1>
@@ -138,8 +137,7 @@
         @close="closeDeleteModal"
         @confirm="confirmDelete"
       />
-    </div>
-  </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -202,7 +200,7 @@ const handleCreate = () => {
 };
 
 const handleView = (product: any) => {
-  router.push(`/product/${product.uuid}`);
+  router.push(`/admin/product/${product.uuid}`);
 };
 
 const handleEdit = (product: any) => {

@@ -158,9 +158,9 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/product', icon: CubeIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
+  { name: 'Products', href: '/admin/product', icon: CubeIcon },
   // { name: 'Projects', href: '#', icon: FolderIcon },
   // { name: 'Calendar', href: '#', icon: CalendarIcon },
   // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
@@ -182,10 +182,11 @@ const authService = new AuthService()
 const handleSignOut = async () => {
   try {
     await authService.logout()
-    localStorage.removeItem('_token')
-    await navigateTo('/')
   } catch (error) {
     console.error('Logout failed:', error)
+  } finally {
+    localStorage.removeItem('_token')
+    await navigateTo('/')
   }
 }
 </script>

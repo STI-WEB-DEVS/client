@@ -1,6 +1,5 @@
 <template>
-  <NuxtLayout>
-    <div class="space-y-6">
+  <div class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-xl font-semibold tracking-tight text-gray-900">View Product</h1>
@@ -11,7 +10,7 @@
           <button
             type="button"
             class="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-            @click="router.push('/product')"
+            @click="router.push('/admin/product')"
           >
             Back
           </button>
@@ -53,8 +52,7 @@
           </div>
         </div>
       </div>
-    </div>
-  </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -87,6 +85,6 @@ const loadProduct = async () => {
 onMounted(loadProduct);
 
 const handleEdit = () => {
-  router.push(`/product/${uuid.value}/edit`);
+  router.push(`/admin/product/${uuid.value}/edit`);
 };
 </script>
