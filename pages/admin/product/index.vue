@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout>
+
     <div class="space-y-6">
       <div class="flex justify-between items-center">
         <h1 class="text-xl font-semibold">Products</h1>
@@ -71,7 +71,7 @@
         @close="closeFeedbackModal"
       />
     </div>
-  </NuxtLayout>
+
 </template>
 
 <script setup lang="ts">

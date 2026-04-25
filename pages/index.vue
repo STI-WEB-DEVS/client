@@ -116,7 +116,7 @@ const authService = new AuthService();
 const handleSubmit = async () => {
   error.value = '';
   isLoading.value = true;
-
+  
   try {
     const response = await authService.login(email.value, password.value);
 
@@ -124,11 +124,16 @@ const handleSubmit = async () => {
       localStorage.setItem('_token', response.token);
     }
 
-    await navigateTo('/dashboard');
+    await navigateTo('admin/dashboard');
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {
     isLoading.value = false;
   }
 };
+
+definePageMeta({
+  layout: false
+})
+
 </script>
