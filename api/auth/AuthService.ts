@@ -56,6 +56,8 @@ export class AuthService {
         },
       });
       localStorage.removeItem("_token");
+      localStorage.removeItem("uuid");
+      localStorage.removeItem("role");
       return true;
     } catch (error: any) {
       console.error("Logout failed:", error);

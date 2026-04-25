@@ -103,12 +103,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { AuthService } from '~/api/auth/AuthService';
-
 definePageMeta({
   layout: false
 })
+
+import { ref } from 'vue';
+import { AuthService } from '~/api/auth/AuthService';
 
 const email = ref('');
 const password = ref('');
@@ -124,16 +124,27 @@ const handleSubmit = async () => {
   try {
     const response = await authService.login(email.value, password.value);
 
+    console.log("LOGIN RESPONSE:", response); 
+
     if (response?.token) {
       localStorage.setItem('_token', response.token);
+
+      const user = (response as any).user;
+
+      localStorage.setItem("uuid", user?.uuid);
+      localStorage.setItem("role", user?.role);
+
+      if (user?.role === 'admin') {
+        await navigateTo('/admin/dashboard');
+      } else {
+        await navigateTo('/customer/order');
+      }
     }
 
-    await navigateTo('/admin/dashboard');
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {
     isLoading.value = false;
   }
 };
-
 </script>

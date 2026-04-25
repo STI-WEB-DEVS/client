@@ -388,10 +388,10 @@ const confirmLogout = () => {
   showLogoutModal.value = true;
 };
 const handleLogout = async () => {
-  showLogoutModal.value = false; // close modal
+  showLogoutModal.value = false; 
   const success = await authService.logout();
   if (success) {
-    router.push("/"); // Redirect to your login/home page
+    router.push("/"); 
   } else {
     alert("Logout failed.");
   }
