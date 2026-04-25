@@ -1,10 +1,9 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <PageHeader 
-        title="Products" 
-        description="Displaying product records from your API."
-        entity-name="Product"
+        title="Customers" 
+        description="Displaying customer records from your API."
+        entity-name="Customer"
         :show-create-button="true"
         @create="openCreateModal"
       />
@@ -13,12 +12,12 @@
         <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
       </div>
 
-      <ProductTable 
+      <CustomerTable 
         v-else
-        :products="products"
+        :customers="customers"
         :meta="meta"
         @edit="openEditModal"
-        @delete="deleteProduct"
+        @delete="deleteCustomer"
       />
 
       <!-- Create/Edit Modal -->
@@ -26,11 +25,11 @@
         <div class="flex min-h-screen items-center justify-center p-4">
           <div class="fixed inset-0 bg-gray-500 bg-opacity-75" @click="closeModal"></div>
           <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-semibold mb-4">{{ isEditing ? 'Edit Product' : 'Create Product' }}</h3>
-            <ProductForm 
+            <h3 class="text-lg font-semibold mb-4">{{ isEditing ? 'Edit Customer' : 'Create Customer' }}</h3>
+            <CustomerForm 
               :initial-data="form" 
               :is-edit="isEditing"
-              @submit="saveProduct"
+              @submit="saveCustomer"
               @cancel="closeModal"
             />
           </div>
@@ -39,49 +38,48 @@
 
       <DeleteModal 
         :show="showDeleteModal"
-        item-type="Product"
-        :item-name="productToDelete?.name"
+        item-type="Customer"
+        :item-name="customerToDelete?.name"
         @close="showDeleteModal = false"
         @confirm="confirmDelete"
       />
 
       <FeedbackModal :open="isFeedbackModalOpen" :message="feedbackMessage" @close="closeFeedbackModal" />
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { productService } from '~/api/product/ProductService'
+import { customerService } from '~/api/customer/CustomerService'
 import PageHeader from '~/components/PageHeader.vue'
-import ProductTable from '~/components/ProductTable.vue'
-import ProductForm from '~/components/ProductForm.vue'
+import CustomerTable from '~/components/CustomerTable.vue'
+import CustomerForm from '~/components/CustomerForm.vue'
 import DeleteModal from '~/components/DeleteModal.vue'
 
 definePageMeta({
   middleware: 'auth'
 })
 
-const products = ref([])
+const customers = ref([])
 const meta = ref({})
 const pending = ref(true)
 const showModal = ref(false)
 const showDeleteModal = ref(false)
 const isEditing = ref(false)
 const editingUuid = ref(null)
-const productToDelete = ref(null)
-const form = ref({ name: '', price: 0 })
+const customerToDelete = ref(null)
+const form = ref({ name: '', email: '' })
 const isFeedbackModalOpen = ref(false)
 const feedbackMessage = ref('')
 
-const fetchProducts = async () => {
+const fetchCustomers = async () => {
   pending.value = true
   try {
-    const response = await productService.list()
-    products.value = response.data || []
+    const response = await customerService.list()
+    customers.value = response.data || []
     meta.value = response.meta || {}
   } catch (error: any) {
-    console.error('Error fetching products:', error)
+    console.error('Error fetching customers:', error)
   } finally {
     pending.value = false
   }
@@ -90,58 +88,58 @@ const fetchProducts = async () => {
 const openCreateModal = () => {
   isEditing.value = false
   editingUuid.value = null
-  form.value = { name: '', price: 0 }
+  form.value = { name: '', email: '' }
   showModal.value = true
 }
 
-const openEditModal = (product: any) => {
+const openEditModal = (customer: any) => {
   isEditing.value = true
-  editingUuid.value = product.uuid
-  form.value = { name: product.name, price: product.price }
+  editingUuid.value = customer.uuid
+  form.value = { name: customer.name, email: customer.email }
   showModal.value = true
 }
 
-const saveProduct = async (data: any) => {
+const saveCustomer = async (data: any) => {
   try {
     if (isEditing.value) {
-      await productService.update(editingUuid.value, data)
-      feedbackMessage.value = 'Product updated successfully!'
+      await customerService.update(editingUuid.value, data)
+      feedbackMessage.value = 'Customer updated successfully!'
     } else {
-      await productService.create(data)
-      feedbackMessage.value = 'Product created successfully!'
+      await customerService.create(data)
+      feedbackMessage.value = 'Customer created successfully!'
     }
     closeModal()
-    await fetchProducts()
+    await fetchCustomers()
     isFeedbackModalOpen.value = true
     setTimeout(() => { isFeedbackModalOpen.value = false }, 3000)
   } catch (error: any) {
-    feedbackMessage.value = error.message || 'Error saving product'
+    feedbackMessage.value = error.message || 'Error saving customer'
     isFeedbackModalOpen.value = true
   }
 }
 
-const deleteProduct = (product: any) => {
-  productToDelete.value = product
+const deleteCustomer = (customer: any) => {
+  customerToDelete.value = customer
   showDeleteModal.value = true
 }
 
 const confirmDelete = async () => {
   try {
-    await productService.delete(productToDelete.value.uuid)
-    feedbackMessage.value = 'Product deleted successfully!'
+    await customerService.delete(customerToDelete.value.uuid)
+    feedbackMessage.value = 'Customer deleted successfully!'
     showDeleteModal.value = false
-    await fetchProducts()
+    await fetchCustomers()
     isFeedbackModalOpen.value = true
     setTimeout(() => { isFeedbackModalOpen.value = false }, 3000)
   } catch (error: any) {
-    feedbackMessage.value = error.message || 'Error deleting product'
+    feedbackMessage.value = error.message || 'Error deleting customer'
     isFeedbackModalOpen.value = true
   }
 }
 
 const closeModal = () => {
   showModal.value = false
-  form.value = { name: '', price: 0 }
+  form.value = { name: '', email: '' }
   editingUuid.value = null
   isEditing.value = false
 }
@@ -151,6 +149,6 @@ const closeFeedbackModal = () => {
 }
 
 onMounted(() => {
-  fetchProducts()
+  fetchCustomers()
 })
 </script>
