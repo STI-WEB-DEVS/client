@@ -103,6 +103,9 @@
 </template>
 
 <script setup lang="ts">
+
+
+
 import { ref } from 'vue';
 import { AuthService } from '~/api/auth/AuthService';
 
@@ -124,11 +127,16 @@ const handleSubmit = async () => {
       localStorage.setItem('_token', response.token);
     }
 
-    await navigateTo('/dashboard');
+    await navigateTo('/admin/dashboard');
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {
     isLoading.value = false;
   }
 };
+
+definePageMeta({
+  layout: false
+})
+
 </script>
