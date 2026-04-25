@@ -1,5 +1,10 @@
 export interface LoginResponse {
 	token: string;
+	user: {
+		uuid: string;
+		role: string;
+		[key: string]: any;
+	};
 }
 
 export class AuthService {
@@ -63,6 +68,8 @@ export class AuthService {
 
 			if (response.ok) {
 				localStorage.removeItem("_token");
+				localStorage.removeItem("_uuid");
+				localStorage.removeItem("_role");
 				return true;
 			}
 			return false;

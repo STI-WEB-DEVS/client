@@ -109,6 +109,12 @@ const handleSubmit = async () => {
       const response = await authService.login(email.value, password.value);
       if (response?.token) {
         localStorage.setItem('_token', response.token);
+        localStorage.setItem('_uuid', response.user.uuid);
+        localStorage.setItem('_role', response.user.role);
+
+        if (response.user.role === 'customer') {
+          return await navigateTo('/customer/order');
+        }
       }
     }
     await navigateTo('/dashboard');

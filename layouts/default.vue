@@ -149,15 +149,9 @@
     </div>
 
     <!-- Logout Confirmation Modal -->
-    <FeedbackModal
-      :open="isLogoutModalOpen"
-      title="Confirm Logout"
-      message="Are you sure you want to log out of your account?"
-      show-cancel
-      confirm-text="Logout"
-      @close="isLogoutModalOpen = false"
-      @confirm="confirmLogout"
-    />
+    <FeedbackModal :open="isLogoutModalOpen" title="Confirm Logout"
+      message="Are you sure you want to log out of your account?" show-cancel confirm-text="Logout"
+      @close="isLogoutModalOpen = false" @confirm="confirmLogout" />
   </div>
 </template>
 
@@ -194,7 +188,7 @@ const route = useRoute()
 const router = useRouter()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
   { name: 'Products', href: '/admin/products', icon: FolderIcon },
   // { name: 'Calendar', href: '#', icon: CalendarIcon },
