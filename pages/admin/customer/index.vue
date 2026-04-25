@@ -1,10 +1,9 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <Heading
-        title="Products"
-        description="Displaying product records from your API."
-        button-text="Create Product"
+        title="Customers"
+        description="Displaying customer records from your API."
+        button-text="Create Customer"
         @click="handleCreate"
       />
 
@@ -24,18 +23,14 @@
       <Table
         v-else
         :columns="tableColumns"
-        :rows="products?.data || []"
-        empty-message="No products found."
+        :rows="customers?.data || []"
+        empty-message="No customers found."
       >
-        <template #cell(price)="{ value }">
-          <span class="font-medium text-gray-900">${{ value }}</span>
-        </template>
-
-        <template #cell(actions)="{ row: product }">
+        <template #cell(actions)="{ row: customer }">
           <div class="flex items-center justify-end gap-2">
             <button
               type="button"
-              @click="handleView(product)"
+              @click="handleView(customer)"
               class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               <EyeIcon class="h-4 w-4" />
@@ -44,7 +39,7 @@
 
             <button
               type="button"
-              @click="handleEdit(product)"
+              @click="handleEdit(customer)"
               class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               <PencilSquareIcon class="h-4 w-4" />
@@ -53,7 +48,7 @@
 
             <button
               type="button"
-              @click="handleDelete(product)"
+              @click="handleDelete(customer)"
               class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
             >
               <TrashIcon class="h-4 w-4" />
@@ -66,17 +61,17 @@
           <p class="text-sm text-gray-500">
             Showing
             <span class="font-medium text-gray-900">{{
-              products?.meta?.from ?? 0
+              customers?.meta?.from ?? 0
             }}</span>
             to
             <span class="font-medium text-gray-900">{{
-              products?.meta?.to ?? 0
+              customers?.meta?.to ?? 0
             }}</span>
             of
             <span class="font-medium text-gray-900">{{
-              products?.meta?.total ?? 0
+              customers?.meta?.total ?? 0
             }}</span>
-            products
+            customers
           </p>
         </template>
       </Table>
@@ -95,32 +90,32 @@
           <p>
             Are you sure you want to delete
             <span class="font-semibold text-gray-900">{{
-              selectedProduct?.name
+              selectedCustomer?.name
             }}</span>? This action cannot be undone.
           </p>
         </div>
 
         <div v-else-if="mainModalMode === 'edit' || mainModalMode === 'create'">
-          <ProductForm v-model="form" :disabled="submitting" />
+          <CustomerForm v-model="form" :disabled="submitting" />
         </div>
 
         <div v-else-if="mainModalMode === 'view'" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
               <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</p>
-              <p class="mt-1 text-sm text-gray-900 font-medium">{{ selectedProduct?.id }}</p>
+              <p class="mt-1 text-sm text-gray-900 font-medium">{{ selectedCustomer?.id }}</p>
             </div>
             <div>
               <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">UUID</p>
-              <p class="mt-1 text-xs text-gray-600 truncate">{{ selectedProduct?.uuid }}</p>
+              <p class="mt-1 text-xs text-gray-600 truncate">{{ selectedCustomer?.uuid }}</p>
             </div>
             <div class="col-span-2">
-              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Product Name</p>
-              <p class="mt-1 text-sm text-gray-900">{{ selectedProduct?.name }}</p>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</p>
+              <p class="mt-1 text-sm text-gray-900">{{ selectedCustomer?.name }}</p>
             </div>
             <div class="col-span-2">
-              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</p>
-              <p class="mt-1 text-sm text-gray-900 font-medium">${{ selectedProduct?.price }}</p>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</p>
+              <p class="mt-1 text-sm text-gray-900">{{ selectedCustomer?.email }}</p>
             </div>
           </div>
         </div>
@@ -134,7 +129,6 @@
         @close="feedback.open = false"
       />
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
@@ -145,18 +139,18 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from "@heroicons/vue/24/outline";
-import { productService } from "~/api/product/ProductService";
+import { customerService } from "~/api/customer/CustomerService";
 
 const router = useRouter();
 
 const tableColumns = [
   { key: "id", label: "ID" },
   { key: "name", label: "Name" },
-  { key: "price", label: "Price" },
+  { key: "email", label: "Email" },
   { key: "actions", label: "Actions", align: "right" as const },
 ];
 
-const products = ref<any>(null);
+const customers = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 const submitting = ref(false);
@@ -175,22 +169,22 @@ const feedback = ref<{
   message: "",
 });
 
-const selectedProduct = ref<any>(null);
+const selectedCustomer = ref<any>(null);
 const form = ref({
   name: "",
-  price: "",
+  email: "",
 });
 
 const mainModalTitle = computed(() => {
   switch (mainModalMode.value) {
     case "create":
-      return "Create Product";
+      return "Create Customer";
     case "edit":
-      return "Edit Product";
+      return "Edit Customer";
     case "delete":
-      return "Delete Product";
+      return "Delete Customer";
     case "view":
-      return "Product Details";
+      return "Customer Details";
     default:
       return "Notification";
   }
@@ -211,11 +205,11 @@ const mainConfirmText = computed(() => {
   }
 });
 
-const loadProducts = async () => {
+const loadCustomers = async () => {
   pending.value = true;
   error.value = null;
   try {
-    products.value = await productService.list();
+    customers.value = await customerService.list();
   } catch (err: any) {
     error.value = err;
   } finally {
@@ -223,11 +217,11 @@ const loadProducts = async () => {
   }
 };
 
-onMounted(loadProducts);
+onMounted(loadCustomers);
 
 const closeMainModal = () => {
   isMainModalOpen.value = false;
-  selectedProduct.value = null;
+  selectedCustomer.value = null;
   submitting.value = false;
 };
 
@@ -245,17 +239,17 @@ const handleMainModalConfirm = async () => {
   try {
     let successMessage = "";
     if (mainModalMode.value === "delete") {
-      await productService.delete(selectedProduct.value.uuid);
-      successMessage = "Product has been deleted successfully.";
+      await customerService.delete(selectedCustomer.value.uuid);
+      successMessage = "Customer has been deleted successfully.";
     } else if (mainModalMode.value === "edit") {
-      await productService.update(selectedProduct.value.uuid, form.value);
-      successMessage = "Product details updated successfully.";
+      await customerService.update(selectedCustomer.value.uuid, form.value);
+      successMessage = "Customer details updated successfully.";
     } else if (mainModalMode.value === "create") {
-      await productService.create(form.value);
-      successMessage = "New product created successfully.";
+      await customerService.create(form.value);
+      successMessage = "New customer created successfully.";
     }
     
-    await loadProducts();
+    await loadCustomers();
     closeMainModal();
     showFeedback("success", "Success", successMessage);
   } catch (err: any) {
@@ -267,24 +261,24 @@ const handleMainModalConfirm = async () => {
 
 const handleCreate = () => {
   mainModalMode.value = "create";
-  form.value = { name: "", price: "" };
+  form.value = { name: "", email: "" };
   isMainModalOpen.value = true;
 };
 
-const handleView = (product: any) => {
-  router.push(`/product/${product.uuid}`);
+const handleView = (customer: any) => {
+  router.push(`/customer/${customer.uuid}`);
 };
 
-const handleEdit = (product: any) => {
+const handleEdit = (customer: any) => {
   mainModalMode.value = "edit";
-  selectedProduct.value = product;
-  form.value = { name: product.name, price: product.price };
+  selectedCustomer.value = customer;
+  form.value = { name: customer.name, email: customer.email };
   isMainModalOpen.value = true;
 };
 
-const handleDelete = (product: any) => {
+const handleDelete = (customer: any) => {
   mainModalMode.value = "delete";
-  selectedProduct.value = product;
+  selectedCustomer.value = customer;
   isMainModalOpen.value = true;
 };
 </script>
