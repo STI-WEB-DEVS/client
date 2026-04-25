@@ -158,7 +158,7 @@ const authService = new AuthService()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
+  { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
   { name: 'Products', href: '/product', icon: FolderIcon },
 ]
 

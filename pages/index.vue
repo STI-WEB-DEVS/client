@@ -131,4 +131,7 @@ const handleSubmit = async () => {
     isLoading.value = false;
   }
 };
+definePageMeta({
+  layout: false
+})
 </script>
