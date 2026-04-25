@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout>
+
     <div class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -87,8 +87,7 @@
         :message="feedbackMessage"
         @close="closeFeedbackModal"
       />
-    </div>
-  </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -126,7 +125,7 @@ const fetchProducts = async () => {
 onMounted(fetchProducts)
 
 const handleCreate = () => { selectedProduct.value = null; isCreateModalOpen.value = true }
-const handleView = (product: any) => { router.push(`/products/${product.uuid}`) }
+const handleView = (product: any) => { router.push(`/admin/products/${product.uuid}`) }
 const handleEdit = (product: any) => { selectedProduct.value = product; isCreateModalOpen.value = true }
 const handleDelete = (product: any) => {
   selectedProduct.value = product

@@ -179,13 +179,10 @@ const handleSignOut = async () => {
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/products', icon: FolderIcon },
-  // { name: 'Projects', href: '#', icon: FolderIcon },
-  // { name: 'Calendar', href: '#', icon: CalendarIcon },
-  // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  // { name: 'Reports', href: '#', icon: ChartPieIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customers', href: '/admin/customers', icon: UserGroupIcon },
+  { name: 'Products', href: '/admin/products', icon: FolderIcon },
+
 ]
 
 const userNavigation = [
