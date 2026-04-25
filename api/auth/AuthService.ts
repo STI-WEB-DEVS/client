@@ -40,15 +40,12 @@ export class AuthService {
     }
   }
 
-  // Inside your AuthService class
 async logout(): Promise<void> {
   const runtimeConfig = useRuntimeConfig();
   
-  // 1. Kunin ang token mula sa storage (siguraduhin na 'token' ang key na ginamit mo)
-  const token = localStorage.getItem('_token'); 
+const token = localStorage.getItem('_token'); 
 
   try {
-    // 2. Tawagin ang backend API
     await $fetch('/logout', {
       baseURL: runtimeConfig.public.apiBaseURL,
       method: 'DELETE',
@@ -61,9 +58,7 @@ async logout(): Promise<void> {
   } catch (error) {
     console.error('Database deletion failed:', error);
   } finally {
-    // 3. Kahit anong mangyari, burahin ang token sa browser 
-    // para hindi na maka-access ang user sa UI.
-    localStorage.removeItem('_token');
+   localStorage.removeItem('_token');
   }
 }
 

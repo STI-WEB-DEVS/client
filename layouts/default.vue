@@ -165,16 +165,20 @@ import { useRoute, useRouter } from 'vue-router'
 import { AuthService } from '~/api/auth/AuthService'
 
 const route = useRoute()
-const router = useRouter()
+const router = useRouter()  
 const authService = new AuthService()
 
 const sidebarOpen = ref(false)
 const showLogoutModal = ref(false)
 
+definePageMeta({
+  layout: false
+})
+
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/products', icon: ShoppingBagIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
+  { name: 'Products', href: '/admin/products', icon: ShoppingBagIcon },
 ]
 
 const userNavigation = [
