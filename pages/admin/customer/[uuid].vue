@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       
       <!-- Header -->
@@ -49,7 +48,6 @@
 
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

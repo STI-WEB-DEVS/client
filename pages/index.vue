@@ -106,10 +106,12 @@
 import { ref } from 'vue';
 import { AuthService } from '~/api/auth/AuthService';
 
+
 const email = ref('');
 const password = ref('');
 const error = ref('');
 const isLoading = ref(false);
+
 
 const authService = new AuthService();
 
@@ -117,18 +119,27 @@ const handleSubmit = async () => {
   error.value = '';
   isLoading.value = true;
 
+  definePageMeta({
+  layout: false
+})
+
+
   try {
     const response = await authService.login(email.value, password.value);
+  
 
     if (response?.token) {
       localStorage.setItem('_token', response.token);
     }
 
-    await navigateTo('/dashboard');
+    await navigateTo('/admin/dashboard');
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {
     isLoading.value = false;
   }
 };
+
+
+
 </script>

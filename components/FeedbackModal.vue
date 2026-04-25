@@ -1,38 +1,28 @@
 <template>
   <teleport to="body">
     <transition name="fade">
-      <div
-        v-if="open"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-        role="dialog"
-        aria-modal="true"
-      >
-        <div
-          class="absolute inset-0 bg-black/30 backdrop-blur-sm"
-          @click="$emit('close')"
-        />
+      <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="$emit('close')" />
 
-        <div
-          class="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
-        >
+        <div class="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
           <div class="flex items-start justify-between gap-4">
             <div>
-              <h2 class="text-lg font-semibold text-gray-900">Feedback</h2>
-              <p class="mt-2 text-sm text-gray-600">
-                {{ message }}
-              </p>
+              <h2 :class="['text-lg font-semibold', variant === 'danger' ? 'text-red-600' : 'text-gray-900']">
+                {{ title }}
+              </h2>
+              
+              <p v-if="message" class="mt-2 text-sm text-gray-600">{{ message }}</p>
+              
+              <div class="mt-4">
+                <slot /> </div>
             </div>
 
-            <button
-              type="button"
-              class="rounded-md p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
-              @click="$emit('close')"
-            >
+            <button type="button" class="rounded-md p-2 text-gray-400 hover:bg-gray-100" @click="$emit('close')">
               ✕
             </button>
           </div>
 
-          <div class="mt-6 flex justify-end">
+          <div v-if="!hideFooter" class="mt-6 flex justify-end">
             <button
               type="button"
               class="inline-flex items-center justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
@@ -50,22 +40,16 @@
 <script setup lang="ts">
 defineProps<{
   open: boolean
-  message: string
+  title?: string
+  message?: string
+  variant?: 'default' | 'danger'
+  hideFooter?: boolean // Set to true when you want to use custom form buttons
 }>()
 
-defineEmits<{
-  (e: 'close'): void
-}>()
+defineEmits<{ (e: 'close'): void }>()
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>
