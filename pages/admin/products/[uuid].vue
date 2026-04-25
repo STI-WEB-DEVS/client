@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <div class="flex items-center justify-between">
         <div>
@@ -10,7 +9,7 @@
             Viewing detailed information for product.
           </p>
         </div>
-        <NuxtLink to="/products" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+        <NuxtLink to="/admin/products" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
           Back to List
         </NuxtLink>
       </div>
@@ -48,7 +47,6 @@
         </div>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

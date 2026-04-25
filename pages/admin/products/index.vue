@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -38,6 +37,9 @@
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Price
                 </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Created At
+                </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
                 </th>
@@ -54,6 +56,9 @@
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                   ${{ product.price }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  {{ product.created_at ? new Date(product.created_at).toLocaleString() : 'N/A' }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
@@ -124,7 +129,6 @@
         @confirm="confirmDelete"
       />
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
@@ -215,7 +219,7 @@ const handleSave = async (formData: any) => {
 };
 
 const handleView = (product: any) => {
-  router.push(`/products/${product.uuid}`);
+  router.push(`/admin/products/${product.uuid}`);
 };
 
 const handleDelete = (product: any) => {

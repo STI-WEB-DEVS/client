@@ -71,6 +71,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: false
+})
+
 import { ref } from 'vue';
 import { AuthService } from '~/api/auth/AuthService';
 
