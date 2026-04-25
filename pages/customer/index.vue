@@ -1,7 +1,6 @@
 <template>
   <NuxtLayout>
     <div class="space-y-6">
-      <!-- Header -->
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-xl font-semibold tracking-tight text-gray-900">Customers</h1>
@@ -20,25 +19,20 @@
         </button>
       </div>
 
-      <!-- Loading -->
       <div v-if="pending" class="flex justify-center py-16">
         <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
       </div>
 
-      <!-- Error -->
       <div v-else-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4">
         <p class="text-sm text-red-700">{{ error.message }}</p>
       </div>
 
-      <!-- Table -->
       <div v-else class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  ID
-                </th>
+               
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Name
                 </th>
@@ -57,9 +51,7 @@
                 :key="customer.id"
                 class="transition hover:bg-gray-50"
               >
-                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ customer.id }}
-                </td>
+                
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   {{ customer.name }}
                 </td>
@@ -123,6 +115,7 @@
       <FeedbackModal
         :open="isFeedbackModalOpen"
         :message="feedbackMessage"
+        :type="feedbackType"
         @close="closeFeedbackModal"
       />
     </div>
@@ -130,70 +123,73 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   PlusIcon,
   EyeIcon,
   PencilSquareIcon,
   TrashIcon,
-} from '@heroicons/vue/24/outline'
-import { customerService } from '~/api/customer/CustomerService'
+} from '@heroicons/vue/24/outline';
+import { customerService } from '~/api/customer/CustomerService';
+import FeedbackModal from '~/components/FeedbackModal.vue';
 
-const router = useRouter()
+const router = useRouter();
 
-const customers = ref<any>(null)
-const pending = ref(true)
-const error = ref<any>(null)
+const customers = ref<any>(null);
+const pending = ref(true);
+const error = ref<any>(null);
 
-const isFeedbackModalOpen = ref(false)
-const feedbackMessage = ref('')
-
-onMounted(async () => {
-  await fetchCustomers()
-})
+const isFeedbackModalOpen = ref(false);
+const feedbackMessage = ref('');
+const feedbackType = ref<'success' | 'error' | 'info'>('info');
 
 const fetchCustomers = async () => {
-  pending.value = true
-  error.value = null
+  pending.value = true;
+  error.value = null;
   try {
-    customers.value = await customerService.list()
+    customers.value = await customerService.list();
   } catch (err: any) {
-    error.value = err
+    error.value = err;
   } finally {
-    pending.value = false
+    pending.value = false;
   }
-}
+};
 
-const openFeedbackModal = (message: string) => {
-  feedbackMessage.value = message
-  isFeedbackModalOpen.value = true
-}
+onMounted(fetchCustomers);
+
+const openFeedbackModal = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  feedbackMessage.value = message;
+  feedbackType.value = type;
+  isFeedbackModalOpen.value = true;
+};
 
 const closeFeedbackModal = () => {
-  isFeedbackModalOpen.value = false
-  feedbackMessage.value = ''
-}
+  isFeedbackModalOpen.value = false;
+  feedbackMessage.value = '';
+};
 
 const handleCreate = () => {
-  router.push('/customer/create')
-}
+  router.push('/customer/create');
+};
 
 const handleView = (customer: any) => {
-  router.push(`/customer/${customer.uuid}`)
-}
+  router.push(`/customer/${customer.uuid}?mode=view`);
+};
 
 const handleEdit = (customer: any) => {
-  router.push(`/customer/${customer.uuid}/edit`)
-}
+  router.push(`/customer/${customer.uuid}`);
+};
 
 const handleDelete = async (customer: any) => {
-  try {
-    await customerService.delete(customer.uuid)
-    openFeedbackModal(`Deleted customer: ${customer.name}`)
-    await fetchCustomers() // refresh list
-  } catch (err: any) {
-    openFeedbackModal(`Failed to delete: ${err.message}`)
+  if (confirm(`Are you sure you want to delete ${customer.name}?`)) {
+    try {
+      await customerService.delete(customer.uuid);
+      openFeedbackModal('Customer deleted successfully!', 'success');
+      fetchCustomers();
+    } catch (err: any) {
+      openFeedbackModal(err.message || 'Failed to delete customer', 'error');
+    }
   }
-}
+};
 </script>

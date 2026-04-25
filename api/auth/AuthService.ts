@@ -39,4 +39,22 @@ export class AuthService {
       }
     }
   }
+
+  async logout(): Promise<void> {
+    const runtimeConfig = useRuntimeConfig();
+    const token = localStorage.getItem('_token');
+
+    try {
+      await $fetch('/logout', {
+        baseURL: runtimeConfig.public.apiBaseURL,
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+    } catch (error: any) {
+      throw error;
+    }
+  }
 }
