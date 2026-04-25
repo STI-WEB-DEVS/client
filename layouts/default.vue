@@ -161,9 +161,9 @@ const sidebarOpen = ref(false)
 const logoutModalOpen = ref(false)
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/product', icon: FolderIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
+  { name: 'Products', href: '/admin/product', icon: FolderIcon },
 ]
 
 const userNavigation = [
