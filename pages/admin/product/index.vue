@@ -1,11 +1,10 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-xl font-semibold tracking-tight text-gray-900">Customers</h1>
+          <h1 class="text-xl font-semibold tracking-tight text-gray-900">Products</h1>
           <p class="mt-1 text-sm text-gray-500">
-            Displaying customer records from your API.
+            Displaying product records from your API.
           </p>
         </div>
 
@@ -15,7 +14,7 @@
           class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
         >
           <PlusIcon class="h-4 w-4" />
-          <span>Create Customer</span>
+          <span>Create Product</span>
         </button>
       </div>
 
@@ -36,7 +35,7 @@
                   Name
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Email
+                  Price
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Created_At
@@ -49,24 +48,24 @@
 
             <tbody class="divide-y divide-gray-100 bg-white">
               <tr
-                v-for="customer in customers?.data"
-                :key="customer.uuid"
+                v-for="product in products?.data"
+                :key="product.uuid"
                 class="transition hover:bg-gray-50"
               >
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                  {{ customer.name }}
+                  {{ product.name }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ customer.email }}
+                  ${{ product.price }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ formatDate(customer.created_at) }}
+                  {{ formatDate(product.created_at) }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
                     <button
                       type="button"
-                      @click="handleView(customer)"
+                      @click="handleView(product)"
                       class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                       <EyeIcon class="h-4 w-4" />
@@ -75,7 +74,7 @@
 
                     <button
                       type="button"
-                      @click="handleEdit(customer)"
+                      @click="handleEdit(product)"
                       class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                       <PencilSquareIcon class="h-4 w-4" />
@@ -84,7 +83,7 @@
 
                     <button
                       type="button"
-                      @click="handleDelete(customer)"
+                      @click="handleDelete(product)"
                       class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
                     >
                       <TrashIcon class="h-4 w-4" />
@@ -94,9 +93,9 @@
                 </td>
               </tr>
 
-              <tr v-if="!customers?.data?.length">
-                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
-                  No customers found.
+              <tr v-if="!products?.data?.length">
+                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
+                  No products found.
                 </td>
               </tr>
             </tbody>
@@ -106,12 +105,12 @@
         <div class="border-t border-gray-200 bg-gray-50 px-6 py-4">
           <p class="text-sm text-gray-500">
             Showing
-            <span class="font-medium text-gray-900">{{ customers?.meta?.from ?? 0 }}</span>
+            <span class="font-medium text-gray-900">{{ products?.meta?.from ?? 0 }}</span>
             to
-            <span class="font-medium text-gray-900">{{ customers?.meta?.to ?? 0 }}</span>
+            <span class="font-medium text-gray-900">{{ products?.meta?.to ?? 0 }}</span>
             of
-            <span class="font-medium text-gray-900">{{ customers?.meta?.total ?? 0 }}</span>
-            customers
+            <span class="font-medium text-gray-900">{{ products?.meta?.total ?? 0 }}</span>
+            products
           </p>
         </div>
       </div>
@@ -122,7 +121,7 @@
         @close="closeFeedbackModal"
       />
 
-      <CustomerFormModal
+      <ProductFormModal
         :open="isFormModalOpen"
         :title="modalTitle"
         :initialData="formData"
@@ -130,12 +129,12 @@
         :submitting="submitting"
         :error="formError"
         @close="closeFormModal"
-        @submit="handleSubmitCustomer"
+        @submit="handleSubmitProduct"
       />
 
       <ConfirmModal
         :open="isConfirmModalOpen"
-        title="Delete customer"
+        title="Delete product"
         :message="confirmMessage"
         confirmLabel="Delete"
         :submitting="submitting"
@@ -143,7 +142,6 @@
         @confirm="handleConfirmDelete"
       />
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
@@ -155,13 +153,13 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline';
-import { customerService } from '~/api/customer/CustomerService';
-import CustomerFormModal from '~/components/CustomerFormModal.vue';
+import { productService } from '~/api/product/ProductService';
+import ProductFormModal from '~/components/ProductFormModal.vue';
 import ConfirmModal from '~/components/ConfirmModal.vue';
 
 const router = useRouter();
 
-const customers = ref<any>(null);
+const products = ref<any>(null);
 const pending = ref(false);
 const submitting = ref(false);
 const error = ref<any>(null);
@@ -172,13 +170,13 @@ const feedbackMessage = ref('');
 const isFormModalOpen = ref(false);
 const isConfirmModalOpen = ref(false);
 const modalMode = ref<'create' | 'edit'>('create');
-const selectedCustomer = ref<any>(null);
-const formData = reactive({ name: '', email: '' });
+const selectedProduct = ref<any>(null);
+const formData = reactive({ name: '', price: 0 });
 const formError = ref('');
 const confirmMessage = ref('');
 
-const modalTitle = computed(() => (modalMode.value === 'create' ? 'Create customer' : 'Edit customer'));
-const submitLabel = computed(() => (modalMode.value === 'create' ? 'Create customer' : 'Save changes'));
+const modalTitle = computed(() => (modalMode.value === 'create' ? 'Create product' : 'Edit product'));
+const submitLabel = computed(() => (modalMode.value === 'create' ? 'Create product' : 'Save changes'));
 
 const formatDate = (value: string | null | undefined) => {
   if (!value) return '—';
@@ -193,12 +191,12 @@ const formatDate = (value: string | null | undefined) => {
   });
 };
 
-const loadCustomers = async () => {
+const loadProducts = async () => {
   pending.value = true;
   error.value = null;
 
   try {
-    customers.value = await customerService.list();
+    products.value = await productService.list();
   } catch (err: any) {
     error.value = err;
   } finally {
@@ -206,7 +204,7 @@ const loadCustomers = async () => {
   }
 };
 
-onMounted(loadCustomers);
+onMounted(loadProducts);
 
 const openFeedbackModal = (message: string) => {
   feedbackMessage.value = message;
@@ -220,19 +218,19 @@ const closeFeedbackModal = () => {
 
 const openCreateModal = () => {
   modalMode.value = 'create';
-  selectedCustomer.value = null;
+  selectedProduct.value = null;
   formError.value = '';
   formData.name = '';
-  formData.email = '';
+  formData.price = 0;
   isFormModalOpen.value = true;
 };
 
-const openEditModal = (customer: any) => {
+const openEditModal = (product: any) => {
   modalMode.value = 'edit';
-  selectedCustomer.value = customer;
+  selectedProduct.value = product;
   formError.value = '';
-  formData.name = customer.name ?? '';
-  formData.email = customer.email ?? '';
+  formData.name = product.name ?? '';
+  formData.price = product.price ?? 0;
   isFormModalOpen.value = true;
 };
 
@@ -241,20 +239,20 @@ const closeFormModal = () => {
   formError.value = '';
 };
 
-const openConfirmDeleteModal = (customer: any) => {
-  selectedCustomer.value = customer;
-  confirmMessage.value = `Delete ${customer.name}? This action cannot be undone.`;
+const openConfirmDeleteModal = (product: any) => {
+  selectedProduct.value = product;
+  confirmMessage.value = `Delete ${product.name}? This action cannot be undone.`;
   isConfirmModalOpen.value = true;
 };
 
 const closeConfirmModal = () => {
   isConfirmModalOpen.value = false;
-  selectedCustomer.value = null;
+  selectedProduct.value = null;
 };
 
-const handleSubmitCustomer = async (payload: { name: string; email: string }) => {
-  if (!payload.name || !payload.email) {
-    formError.value = 'Name and email are required.';
+const handleSubmitProduct = async (payload: { name: string; description: string; price: number }) => {
+  if (!payload.name || payload.price < 0) {
+    formError.value = 'Name valid price are required.';
     return;
   }
 
@@ -263,52 +261,52 @@ const handleSubmitCustomer = async (payload: { name: string; email: string }) =>
 
   try {
     if (modalMode.value === 'create') {
-      await customerService.create(payload);
-      openFeedbackModal('Customer created successfully.');
-    } else if (selectedCustomer.value) {
-      await customerService.update(selectedCustomer.value.uuid, payload);
-      openFeedbackModal('Customer updated successfully.');
+      await productService.create(payload);
+      openFeedbackModal('Product created successfully.');
+    } else if (selectedProduct.value) {
+      await productService.update(selectedProduct.value.uuid, payload);
+      openFeedbackModal('Product updated successfully.');
     }
 
     isFormModalOpen.value = false;
-    await loadCustomers();
+    await loadProducts();
   } catch (err: any) {
-    formError.value = err?.message || 'Unable to save customer.';
+    formError.value = err?.message || 'Unable to save product.';
   } finally {
     submitting.value = false;
   }
 };
 
-const handleView = (customer: any) => {
-  router.push(`/customer/${customer.uuid}`);
+const handleView = (product: any) => {
+  router.push(`/product/${product.uuid}`);
 };
 
 const handleCreate = () => {
   openCreateModal();
 };
 
-const handleEdit = (customer: any) => {
-  openEditModal(customer);
+const handleEdit = (product: any) => {
+  openEditModal(product);
 };
 
-const handleDelete = (customer: any) => {
-  openConfirmDeleteModal(customer);
+const handleDelete = (product: any) => {
+  openConfirmDeleteModal(product);
 };
 
 const handleConfirmDelete = async () => {
-  if (!selectedCustomer.value) {
+  if (!selectedProduct.value) {
     return;
   }
 
   submitting.value = true;
 
   try {
-    await customerService.delete(selectedCustomer.value.uuid);
+    await productService.delete(selectedProduct.value.uuid);
     isConfirmModalOpen.value = false;
-    openFeedbackModal('Customer deleted successfully.');
-    await loadCustomers();
+    openFeedbackModal('Product deleted successfully.');
+    await loadProducts();
   } catch (err: any) {
-    openFeedbackModal(err?.message || 'Unable to delete customer.');
+    openFeedbackModal(err?.message || 'Unable to delete product.');
   } finally {
     submitting.value = false;
   }
