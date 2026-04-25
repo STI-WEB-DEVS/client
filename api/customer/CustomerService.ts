@@ -1,17 +1,5 @@
 import { BaseService } from "../BaseService"; 
 
-<<<<<<< HEAD
-export class CustomerService extends BaseService {
-  async getCustomers() {
-    return this.request('/customers', 'GET');
-  }
-
-  async createCustomer(customerData: object) {
-    return this.request('/customers', 'POST', customerData);
-  }
-  
-}
-=======
 class CustomerService extends BaseService {
   private static instance: CustomerService;
 
@@ -50,4 +38,3 @@ class CustomerService extends BaseService {
 }
 
 export const customerService = CustomerService.getInstance();
->>>>>>> 0134aa442a3ac0cc4abb1e494ff43d2e01e0b54c
