@@ -241,25 +241,23 @@ const router = useRouter();
 const sidebarOpen = ref(false);
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
-  { name: "Customers", href: "/customer", icon: UserGroupIcon },
-  { name: "Products", href: "/products", icon: ShoppingBagIcon },
+  { name: "Dashboard", href: "/admin/dashboard", icon: HomeIcon },
+  { name: "Customers", href: "/admin/customer", icon: UserGroupIcon },
+  { name: "Products", href: "/admin/products", icon: ShoppingBagIcon },
 ];
 
 const handleUserAction = async () => {
   try {
     await authService.logout();
-
-    localStorage.removeItem("_token");
-
-    await router.replace("/");
   } catch (err) {
-    // force cleanup even if backend fails
+    console.error(err);
+  } finally {
+    // ✅ REMOVE ONLY THE 3 KEYS
     localStorage.removeItem("_token");
+    localStorage.removeItem("uuid");
+    localStorage.removeItem("role");
 
     await router.replace("/");
-
-    console.error(err);
   }
 };
 </script>

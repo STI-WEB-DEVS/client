@@ -124,6 +124,10 @@
 import { ref } from "vue";
 import { AuthService } from "~/api/auth/AuthService";
 
+definePageMeta({
+  layout: false,
+});
+
 const email = ref("");
 const password = ref("");
 const error = ref("");
@@ -138,13 +142,24 @@ const handleSubmit = async () => {
   try {
     const response = await authService.login(email.value, password.value);
 
-    if (response?.token) {
-      localStorage.setItem("_token", response.token);
+    // VALIDATE RESPONSE
+    if (!response?.token || !response?.user) {
+      throw new Error("Invalid login response");
     }
 
-    await navigateTo("/dashboard");
+    // ✅ STORE ONLY WHAT YOU NEED
+    localStorage.setItem("_token", response.token);
+    localStorage.setItem("uuid", response.user.uuid);
+    localStorage.setItem("role", response.user.role);
+
+    // ROLE-BASED REDIRECT
+    if (response.user.role === "admin") {
+      await navigateTo("/admin/dashboard");
+    } else {
+      await navigateTo("/customer/order");
+    }
   } catch (err: any) {
-    error.value = err?.message || "";
+    error.value = err?.message || "Login failed";
   } finally {
     isLoading.value = false;
   }
