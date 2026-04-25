@@ -32,63 +32,29 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  ID
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Name
-                </th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Email
-                </th>
-                <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Actions
-                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Name</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Email</th>
+                <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
             </thead>
 
             <tbody class="divide-y divide-gray-100 bg-white">
-              <tr
-                v-for="customer in customers?.data"
-                :key="customer.id"
-                class="transition hover:bg-gray-50"
-              >
-                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                  {{ customer.id }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                  {{ customer.name }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ customer.email }}
-                </td>
+              <tr v-for="customer in customers?.data" :key="customer.id" class="transition hover:bg-gray-50">
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ customer.id }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ customer.name }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ customer.email }}</td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
-                    <button
-                      type="button"
-                      @click="handleView(customer)"
-                      class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
+                    <button @click="handleView(customer)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
                       <EyeIcon class="h-4 w-4" />
                       <span>View</span>
                     </button>
-
-                    <button
-                      type="button"
-                      @click="handleEdit(customer)"
-                      class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
+                    <button @click="handleEdit(customer)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
                       <PencilSquareIcon class="h-4 w-4" />
-                      <span>Edit</span>
                     </button>
-
-                    <button
-                      type="button"
-                      @click="handleDelete(customer)"
-                      class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
-                    >
+                    <button @click="handleDelete(customer)" class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50">
                       <TrashIcon class="h-4 w-4" />
-                      <span>Delete</span>
                     </button>
                   </div>
                 </td>
@@ -99,30 +65,42 @@
                   No customers found.
                 </td>
               </tr>
+
             </tbody>
           </table>
-        </div>
+          </div>
 
-        <div class="border-t border-gray-200 bg-gray-50 px-6 py-4">
-          <p class="text-sm text-gray-500">
-            Showing
-            <span class="font-medium text-gray-900">{{ customers?.meta?.from ?? 0 }}</span>
-            to
-            <span class="font-medium text-gray-900">{{ customers?.meta?.to ?? 0 }}</span>
-            of
-            <span class="font-medium text-gray-900">{{ customers?.meta?.total ?? 0 }}</span>
-            customers
-          </p>
-        </div>
+        <!--  FOOTER -->
+       <!--  FOOTER -->
+<div class="border-t px-6 py-4 text-sm text-gray-500">
+  Showing 
+  <span class="font-bold text-black">{{ customers?.meta?.from ?? 0 }}</span>
+  to 
+  <span class="font-bold text-black">{{ customers?.meta?.to ?? 0 }}</span>
+  of 
+  <span class="font-bold text-black">{{ customers?.meta?.total ?? 0 }}</span> 
+  customers
+</div>
       </div>
+          
 
-      <CustomerForm @submitted="refreshCustomers" />
-
-      <FeedbackModal
-        :open="isFeedbackModalOpen"
-        :message="feedbackMessage"
-        @close="closeFeedbackModal"
+      <CustomerForm
+        :open="isModalOpen"
+        :loading="isSaving"
+        :customer="selectedCustomer"
+        @close="isModalOpen = false"
+        @submit="handleFormSubmit"
       />
+
+      <DeleteModal
+        :open="isDeleteModalOpen"
+        :loading="isSaving"
+        :title="customerToDelete?.name || 'this customer'"
+        @close="isDeleteModalOpen = false"
+        @confirm="confirmDelete"
+      />  
+
+      <FeedbackModal :open="isFeedbackModalOpen" :message="feedbackMessage" @close="closeFeedbackModal" />
     </div>
   </NuxtLayout>
 </template>
@@ -130,29 +108,28 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import {
-  PlusIcon,
-  EyeIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from '@heroicons/vue/24/outline';
+import { PlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
-import CustomerForm from '~/components/forms/CustomerForm.vue'
-
+import DeleteModal from '~/components/DeleteModal.vue';
 
 const router = useRouter();
 
-const customers = ref<any>(null);
+const customers = ref<any>(null);   
 const pending = ref(true);
 const error = ref<any>(null);
+const isSaving = ref(false);
+
+const isModalOpen = ref(false);
+const selectedCustomer = ref<any>(null);
+
+const isDeleteModalOpen = ref(false);
+const customerToDelete = ref<any>(null);
 
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
 
-onMounted(async () => {
+const fetchCustomers = async () => {
   pending.value = true;
-  error.value = null;
-
   try {
     customers.value = await customerService.list();
   } catch (err: any) {
@@ -160,7 +137,59 @@ onMounted(async () => {
   } finally {
     pending.value = false;
   }
-});
+};
+
+onMounted(fetchCustomers);
+
+const handleCreate = () => {
+  selectedCustomer.value = null; 
+  isModalOpen.value = true;
+};
+
+const handleEdit = (customer: any) => {
+  selectedCustomer.value = customer;
+  isModalOpen.value = true;
+};
+
+const handleFormSubmit = async (formData: any) => {
+  isSaving.value = true;
+  try {
+    if (selectedCustomer.value) {
+      await customerService.update(selectedCustomer.value.uuid, formData);
+      openFeedbackModal('Customer updated successfully!');
+    } else {
+      await customerService.create(formData);
+      openFeedbackModal('Customer created successfully!');
+    }
+    isModalOpen.value = false;
+    await fetchCustomers();
+  } catch (err: any) {
+    alert('Error: ' + err.message);
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+const handleDelete = (customer: any) => {
+  customerToDelete.value = customer;
+  isDeleteModalOpen.value = true;
+};
+
+const confirmDelete = async () => {
+  if (!customerToDelete.value) return;
+  isSaving.value = true;
+  try {
+    await customerService.delete(customerToDelete.value.uuid);
+    isDeleteModalOpen.value = false;
+    customerToDelete.value = null;
+    await fetchCustomers();
+    openFeedbackModal('Customer deleted successfully!');
+  } catch (err: any) {
+    alert('Error: ' + err.message);
+  } finally {
+    isSaving.value = false;
+  }
+};
 
 const openFeedbackModal = (message: string) => {
   feedbackMessage.value = message;
@@ -172,23 +201,7 @@ const closeFeedbackModal = () => {
   feedbackMessage.value = '';
 };
 
-const handleCreate = () => {
-  isFeedbackModalOpen.value = true
-}
-
 const handleView = (customer: any) => {
   router.push(`/customer/${customer.uuid}`);
 };
-
-const handleEdit = (customer: any) => {
-  openFeedbackModal(`Edit customer: ${customer.name}`);
-};
-
-const handleDelete = (customer: any) => {
-  openFeedbackModal(`Delete customer: ${customer.name}`);
-};
-const refreshCustomers = async () => {
-  customers.value = await customerService.list()
-}
-
 </script>
