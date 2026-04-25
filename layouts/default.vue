@@ -174,6 +174,8 @@
 
 <script setup>
 import { ref } from 'vue'
+
+
 import {
   Dialog,
   DialogPanel,
@@ -205,10 +207,11 @@ const authService = new AuthService()
 const sidebarOpen = ref(false)
 const signOutModalOpen = ref(false)
 
+
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/product', icon: UserGroupIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
+  { name: 'Products', href: '/admin/product', icon: UserGroupIcon },
 ]
 
 const userNavigation = [
@@ -220,6 +223,8 @@ const userNavigation = [
 const handleSignOut = () => {
   signOutModalOpen.value = true
 }
+
+
 
 // Executes the logout logic
 const confirmSignOut = async () => {
@@ -240,4 +245,7 @@ const confirmSignOut = async () => {
     await navigateTo('/')
   }
 }
+
+
+
 </script>
