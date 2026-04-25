@@ -58,7 +58,10 @@ const token = localStorage.getItem('_token');
   } catch (error) {
     console.error('Database deletion failed:', error);
   } finally {
-   localStorage.removeItem('_token');
+  //  localStorage.removeItem('_token');
+  //  localStorage.removeItem('uuid');
+  //  localStorage.removeItem('role');
+   localStorage.clear();
   }
 }
 

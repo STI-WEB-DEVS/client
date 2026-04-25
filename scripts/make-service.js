@@ -1,27 +1,28 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const name = process.argv[2]; 
+const name = process.argv[2];
 
 if (!name) {
-    console.error('❌ Usage: npm run make:service <ResourceName>');
-    process.exit(1);
+  console.error("❌ Usage: npm run make:service <ResourceName>");
+  process.exit(1);
 }
 
 const pascalCase = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 const camelCase = (str) => str.charAt(0).toLowerCase() + str.slice(1);
-const kebabCase = (str) => str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+const kebabCase = (str) =>
+  str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 
-const resourceName = pascalCase(name); 
-const folderName = kebabCase(name);   
-const endpointName = kebabCase(name) + 's'; 
-const variableName = camelCase(name); 
+const resourceName = pascalCase(name);
+const folderName = kebabCase(name);
+const endpointName = kebabCase(name) + "s";
+const variableName = camelCase(name);
 
-const targetDir = path.join(__dirname, '..', 'api', folderName);
+const targetDir = path.join(__dirname, "..", "api", folderName);
 const targetFile = path.join(targetDir, `${resourceName}Service.ts`);
 
 const fileContent = `import BaseService from '~/api/BaseService';
@@ -66,13 +67,15 @@ class ${resourceName}Service extends BaseService {
 export const ${variableName}Service = ${resourceName}Service.getInstance();
 `;
 
-if (!fs.existsSync(targetDir)){
-    fs.mkdirSync(targetDir, { recursive: true });
+if (!fs.existsSync(targetDir)) {
+  fs.mkdirSync(targetDir, { recursive: true });
 }
 
 if (fs.existsSync(targetFile)) {
-    console.error(`❌ File already exists: ${targetFile}`);
+  console.error(`❌ File already exists: ${targetFile}`);
 } else {
-    fs.writeFileSync(targetFile, fileContent);
-    console.log(`✅ Created Service: api/${folderName}/${resourceName}Service.ts`);
+  fs.writeFileSync(targetFile, fileContent);
+  console.log(
+    `✅ Created Service: api/${folderName}/${resourceName}Service.ts`,
+  );
 }

@@ -131,6 +131,16 @@ const isLoading = ref(false);
 
 const authService = new AuthService();
 
+definePageMeta({
+  layout: false
+});
+
+// Role → Route mapping (no if-else)
+const roleRoutes: Record<string, string> = {
+  admin: "/admin/dashboard",
+  customer: "/customer/order"
+};
+
 const handleSubmit = async () => {
   error.value = "";
   isLoading.value = true;
@@ -138,13 +148,20 @@ const handleSubmit = async () => {
   try {
     const response = await authService.login(email.value, password.value);
 
-    if (response?.token) {
+    // Save token and user info
+    if (response?.token && response?.user) {
       localStorage.setItem("_token", response.token);
+      localStorage.setItem("uuid", response.user.uuid);
+      localStorage.setItem("role", response.user.role);
     }
 
-    await navigateTo("/admin/dashboard");
+    // Resolve route based on role
+    const route = roleRoutes[response?.user?.role] ?? "/";
+
+    await navigateTo(route);
+
   } catch (err: any) {
-    error.value = err?.message || "";
+    error.value = err?.message || "Login failed";
   } finally {
     isLoading.value = false;
   }
