@@ -126,3 +126,4 @@ const goBack = () => {
   router.push("/products");
 };
 </script>
+  
