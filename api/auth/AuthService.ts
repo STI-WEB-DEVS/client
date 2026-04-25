@@ -2,6 +2,11 @@ export interface LoginResponse {
   token: string;
 }
 
+/**
+ * Export both a named class and a default export so consumers can import either:
+ *  - `import AuthService from '~/api/auth/AuthService'`
+ *  - `import { AuthService } from '~/api/auth/AuthService'`
+ */
 export class AuthService {
   async login(email: string, password: string): Promise<LoginResponse> {
     const runtimeConfig = useRuntimeConfig();
@@ -42,7 +47,12 @@ export class AuthService {
 
   async logout(): Promise<void> {
     const runtimeConfig = useRuntimeConfig();
-    const token = localStorage.getItem('_token');
+
+    // localStorage is only available on the client
+    let token: string | null = null;
+    if (process.client) {
+      token = localStorage.getItem('_token');
+    }
 
     try {
       await $fetch('/logout', {
@@ -50,12 +60,18 @@ export class AuthService {
         method: 'POST',
         headers: {
           Accept: 'application/json',
-          Authorization: `Bearer ${token}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
     } catch (error: any) {
       // Even if the server request fails, we still want to clear local storage
       console.error('Logout server request failed:', error);
+    } finally {
+      if (process.client) {
+        localStorage.removeItem('_token');
+      }
     }
   }
 }
+
+export default AuthService;

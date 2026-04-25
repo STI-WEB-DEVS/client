@@ -154,14 +154,14 @@ import {
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import { useRoute, useRouter } from 'vue-router'
-import { authService } from '~/api/auth/AuthService'
+import { AuthService } from '~/api/auth/AuthService';
 
 const route = useRoute()
 const router = useRouter()
 
 const handleSignOut = async () => {
   // Call the API to invalidate the token on the server
-  await authService.logout()
+  await AuthService.logout()
   // Remove the token from localStorage
   localStorage.removeItem('_token')
   // Redirect to login page (index)
@@ -170,8 +170,8 @@ const handleSignOut = async () => {
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/product', icon: ShoppingBagIcon},
+  { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
+  { name: 'Products', href: '/admin/product', icon: ShoppingBagIcon},
   // { name: 'Calendar', href: '#', icon: CalendarIcon },
   // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
   // { name: 'Reports', href: '#', icon: ChartPieIcon },
