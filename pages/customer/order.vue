@@ -1,8 +1,8 @@
-<script setup>
+<!-- <script setup>
 definePageMeta({
   layout: 'customer'
 })
-</script>
+</script> -->
  
 <template>
  

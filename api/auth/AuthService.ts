@@ -1,6 +1,9 @@
 // api/auth/AuthService.ts
 import { useRuntimeConfig } from '#app'
 
+// api/auth/AuthService.ts
+import { useRuntimeConfig } from '#app'
+
 export interface LoginResponse {
   token: string;
 }
@@ -22,9 +25,11 @@ export class AuthService {
       });
 
       if (response.token && process.client) {
-        // Save only one key: "token"
-        localStorage.setItem('token', response.token);
+        localStorage.setItem('uuid', response.uuid);
+        localStorage.setItem('role', response.role);
       }
+
+      return response; 
 
     } catch (error: any) {
       throw error;
@@ -50,7 +55,6 @@ export class AuthService {
       console.error('Logout failed:', error.message);
     } finally {
       if (process.client) {
-        localStorage.removeItem('token');
         localStorage.clear();
         console.log('Local storage fully cleared.');
       }

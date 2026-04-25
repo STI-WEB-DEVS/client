@@ -30,9 +30,29 @@
               <td class="px-6 py-4 text-sm text-gray-700">{{ customer.name }}</td>
               <td class="px-6 py-4 text-sm text-gray-500">{{ customer.email }}</td>
               <td class="px-6 py-4 text-right space-x-2">
-                <button @click="router.push(`/customer/${customer.uuid}`)" class="text-gray-600 hover:text-gray-900">View</button>
-                <button @click="openModal('edit', customer)" class="text-blue-600 hover:text-blue-800">Edit</button>
-                <button @click="openModal('delete', customer)" class="text-red-600 hover:text-red-800">Delete</button>
+                <button 
+                @click="router.push(`/admin/customer/${customer.uuid}`)" 
+                class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <EyeIcon class="h-4 w-4" />
+                <span>View</span>
+              </button>
+
+              <button 
+                @click="openModal('edit', customer)" 
+                class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <PencilSquareIcon class="h-4 w-4" />
+                <span>Edit</span>
+              </button>
+
+              <button 
+                @click="openModal('delete', customer)" 
+                class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+              >
+                <TrashIcon class="h-4 w-4" />
+                <span>Delete</span>
+              </button>
               </td>
             </tr>
           </tbody>
@@ -52,9 +72,9 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
-import { PlusIcon } from '@heroicons/vue/24/outline';
+import { PlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { customerService } from '~/api/customer/CustomerService';
-import CustomerModal from '~/components/customer/CustomerModal.vue';
+import CustomerModal from '~/components/Customer/CustomerModal.vue';
 
 const router = useRouter();
 const customers = ref<any>(null);

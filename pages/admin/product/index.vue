@@ -39,9 +39,29 @@
                 <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ product.name || product.title }}</td>
                 <td class="px-6 py-4 text-sm text-gray-700">₱{{ Number(product.price || 0).toFixed(2) }}</td>
                 <td class="px-6 py-4 text-right space-x-2">
-                  <button @click="router.push(`/product/${product.uuid}`)" class="text-gray-600 hover:text-gray-900 text-sm font-medium">View</button>
-                  <button @click="openModal('edit', product)" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit</button>
-                  <button @click="openModal('delete', product)" class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</button>
+                  <button 
+                @click="router.push(`/admin/product/${product.uuid}`)" 
+                class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <EyeIcon class="h-4 w-4" />
+                <span>View</span>
+              </button>
+
+              <button 
+                @click="openModal('edit', product)" 
+                class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <PencilSquareIcon class="h-4 w-4" />
+                <span>Edit</span>
+              </button>
+
+              <button 
+                @click="openModal('delete', product)" 
+                class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+              >
+                <TrashIcon class="h-4 w-4" />
+                <span>Delete</span>
+              </button>
                 </td>
               </tr>
             </tbody>
@@ -70,7 +90,9 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { productService } from '~/api/product/ProductService'
+import { PlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import ProductModal from '~/components/product/ProductModal.vue'
+
 
 const router = useRouter()
 const products = ref<any[]>([])

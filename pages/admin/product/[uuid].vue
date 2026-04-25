@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       
       <!-- Header -->
@@ -49,8 +48,48 @@
 
       </div>
     </div>
-  </NuxtLayout>
 </template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { productService } from '~/api/product/ProductService'
+
+const route = useRoute()
+
+const product = ref<any>(null)
+const pending = ref(true)
+const error = ref<any>(null)
+
+const uuid = ref(String(route.params.uuid ?? ''))
+
+onMounted(async () => {
+  if (!uuid.value) {
+    error.value = { message: 'Product UUID is missing from the URL.' }
+    pending.value = false
+    return
+  }
+
+  pending.value = true
+  error.value = null
+
+  try {
+    const res = await productService.show(uuid.value)
+
+    // ✅ SAME AS CUSTOMER STYLE
+    product.value = res.data ?? res
+
+    console.log('Product:', product.value)
+
+  } catch (err: any) {
+    console.error(err)
+    error.value = { message: 'Failed to load product data. Please check the UUID.' }
+  } finally {
+    pending.value = false
+  }
+})
+</script>
+
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
