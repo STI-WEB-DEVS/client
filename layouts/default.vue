@@ -204,9 +204,9 @@ import { authService } from '~/api/auth/AuthService'
 const route = useRoute()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/product', icon: ShoppingBagIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
+  { name: 'Products', href: '/admin/product', icon: ShoppingBagIcon },
 ]
 
 const sidebarOpen = ref(false)
