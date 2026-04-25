@@ -103,6 +103,9 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: false
+})
 import { ref } from 'vue';
 import { AuthService } from '~/api/auth/AuthService';
 
@@ -124,7 +127,7 @@ const handleSubmit = async () => {
       localStorage.setItem('_token', response.token);
     }
 
-    await navigateTo('/dashboard');
+    await navigateTo('admin/dashboard');
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {
