@@ -168,11 +168,11 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline';
-import { productService } from '~/api/Product/ProductService'; // ✅ changed
+import { productService } from '~/api/product/ProductService';
 
 const router = useRouter();
 
-const products = ref<any>(null); // ✅ renamed
+const products = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 
@@ -186,8 +186,9 @@ const selectedItem = ref<any>(null);
 onMounted(async () => {
   pending.value = true;
   error.value = null;
+
   try {
-    products.value = await productService.list(); // ✅ changed
+    products.value = await productService.list();
   } catch (err: any) {
     error.value = err;
   } finally {
@@ -200,7 +201,7 @@ const handleCreate = () => {
 };
 
 const handleView = (product: any) => {
-  router.push(`/product/${product.uuid}`); // ✅ changed route
+  router.push(`/products/${product.uuid}`);
 };
 
 const handleEdit = (product: any) => {
@@ -215,14 +216,14 @@ const handleDelete = (product: any) => {
 
 const handleSave = async (form: Record<string, any>) => {
   if (isCreateModalOpen.value) {
-    return await productService.create(form); // ✅ changed
+    return await productService.create(form);
   } else {
-    return await productService.update(selectedItem.value.uuid, form); // ✅ changed
+    return await productService.update(selectedItem.value.uuid, form);
   }
 };
 
 const handleDeleteConfirm = async () => {
-  await productService.delete(selectedItem.value.uuid); // ✅ changed
+  await productService.delete(selectedItem.value.uuid);
 };
 
 const onCreated = (created: any) => {
@@ -231,7 +232,7 @@ const onCreated = (created: any) => {
   products.value.data = [newProduct, ...products.value.data];
   products.value.meta.total += 1;
 
-  openFeedbackModal('Product created successfully!'); // ✅ message
+  openFeedbackModal('Product created successfully!');
 };
 
 const onSaved = (updated: any) => {
@@ -252,6 +253,7 @@ const onDeleted = () => {
   products.value.data = products.value.data.filter(
     (p: any) => p.uuid !== selectedItem.value.uuid
   );
+
   products.value.meta.total -= 1;
 
   openFeedbackModal('Product deleted successfully!');
