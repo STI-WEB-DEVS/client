@@ -169,7 +169,7 @@ const authService = new AuthService()
 const isSigningOut = ref(false)
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
   { name: 'Product', href: '/admin/product', icon: FolderIcon },
 ]

@@ -1,10 +1,16 @@
+export interface LoginUser {
+  uuid: string
+  role: string
+}
+
 export interface LoginResponse {
-  token: string;
+  user: LoginUser
+  token: string
 }
 
 export class AuthService {
   async login(email: string, password: string): Promise<LoginResponse> {
-    const runtimeConfig = useRuntimeConfig();
+    const runtimeConfig = useRuntimeConfig()
 
     try {
       return await $fetch<LoginResponse>('/login', {
@@ -13,17 +19,14 @@ export class AuthService {
         headers: {
           Accept: 'application/json',
         },
-        body: {
-          email,
-          password,
-        },
-      });
+        body: { email, password },
+      }) as LoginResponse
     } catch (error: any) {
-      const status = error?.response?.status;
+      const status = error?.response?.status
       const message =
         error?.response?._data?.message ||
         error?.data?.message ||
-        error?.message;
+        error?.message
 
       switch (status) {
         case 400:
@@ -31,32 +34,32 @@ export class AuthService {
         case 404:
         case 422:
         case 429:
-          throw new Error(message || 'Validation or Request Error');
+          throw new Error(message || 'Validation or Request Error')
         case 500:
-          throw new Error('Server error. Please try again or contact the administrator.');
+          throw new Error('Server error. Please try again or contact the administrator.')
         default:
-          throw new Error(message || 'Something went wrong. Please try again.');
+          throw new Error(message || 'Something went wrong. Please try again.')
       }
     }
   }
 
   async logout(): Promise<void> {
-    const runtimeConfig = useRuntimeConfig();
-    const token = localStorage.getItem('_token');
+    const runtimeConfig = useRuntimeConfig()
+    const token = localStorage.getItem('_token')
 
-    try {
-      await $fetch('/logout', {
-        baseURL: runtimeConfig.public.apiBaseURL,
-        method: 'DELETE',
-        headers: {
-          Accept: 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-      });
-    } catch {
-      // Silently ignore — we still clear the token locally regardless
-    } finally {
-      localStorage.removeItem('_token');
-    }
+    if (!token) return
+
+    await $fetch('/logout', {
+      baseURL: runtimeConfig.public.apiBaseURL,
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    localStorage.removeItem('_token')
+    localStorage.removeItem('_uuid')
+    localStorage.removeItem('_role')
   }
 }

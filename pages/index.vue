@@ -103,34 +103,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { AuthService } from '~/api/auth/AuthService';
+import { ref } from 'vue'
+import { AuthService } from '~/api/auth/AuthService'
 
-const email = ref('');
-const password = ref('');
-const error = ref('');
-const isLoading = ref(false);
+const email = ref('')
+const password = ref('')
+const error = ref('')
+const isLoading = ref(false)
 
-const authService = new AuthService();
+const authService = new AuthService()
 
 const handleSubmit = async () => {
-  error.value = '';
-  isLoading.value = true;
+  error.value = ''
+  isLoading.value = true
 
   try {
-    const response = await authService.login(email.value, password.value);
+    const response = await authService.login(email.value, password.value)
 
     if (response?.token) {
-      localStorage.setItem('_token', response.token);
+      localStorage.setItem('_token', response.token)
+    }
+    if (response?.user?.uuid) {
+      localStorage.setItem('_uuid', response.user.uuid)
+    }
+    if (response?.user?.role) {
+      localStorage.setItem('_role', response.user.role)
     }
 
-    await navigateTo('/admin/dashboard');
+    await navigateTo('/admin/dashboard')
   } catch (err: any) {
-    error.value = err?.message || '';
+    error.value = err?.message || ''
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
 definePageMeta({
   layout: false
