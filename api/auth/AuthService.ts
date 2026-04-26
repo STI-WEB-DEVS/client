@@ -2,6 +2,10 @@ import { BaseService } from "../BaseService";
 
 export interface LoginResponse {
   token: string;
+  user: {
+    uuid: string;
+    role: string;
+  };
 }
 
 export class AuthService extends BaseService {

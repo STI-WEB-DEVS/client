@@ -285,6 +285,8 @@ const logout = async () => {
   try {
     await authService.logout();
     localStorage.removeItem("_token");
+    localStorage.removeItem("_uuid");
+    localStorage.removeItem("_role");
     await navigateTo("/");
   } catch (error) {
     console.error("Logout failed:", error);

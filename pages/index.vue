@@ -122,8 +122,8 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: false
-})
+  layout: false,
+});
 
 import { ref } from "vue";
 import { AuthService } from "~/api/auth/AuthService";
@@ -146,7 +146,19 @@ const handleSubmit = async () => {
       localStorage.setItem("_token", response.token);
     }
 
+    if (response?.user.uuid) {
+      localStorage.setItem("_uuid", response.user.uuid);
+    }
+
+    if (response?.user.role) {
+      localStorage.setItem("_role", response.user.role);
+    }
+
     await navigateTo("/admin/dashboard");
+
+    // await navigateTo(
+    //   response.role === "admin" ? "/admin/dashboard" : "/customer",
+    // );
   } catch (err: any) {
     error.value = err?.message || "";
   } finally {
