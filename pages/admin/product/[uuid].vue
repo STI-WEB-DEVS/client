@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <main class="flex-1 p-6">
       <!-- View mode stays inline -->
       <div v-if="isViewMode && product" class="mx-auto max-w-2xl space-y-6">
@@ -68,7 +67,6 @@
         <Feedback v-if="feedbackMessage" :message="feedbackMessage" :type="feedbackType" />
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
@@ -114,7 +112,7 @@ const feedbackType = ref<'success' | 'error'>('success');
 const showModal = ref(true);
 const closeModal = () => {
   showModal.value = false;
-  router.push('/product'); // navigate away when closing
+  router.push('/admin/product'); // navigate away when closing
 };
 
 onMounted(async () => {

@@ -1,10 +1,9 @@
 <template>
-  <NuxtLayout>
     <div class="mx-auto max-w-2xl space-y-6">
       <!-- Header -->
       <div class="flex items-center gap-4">
         <button
-          @click="router.push('/customer')"
+          @click="router.push('/admin/customer')"
           class="rounded-lg border border-gray-200 p-2 transition hover:bg-gray-50"
         >
           <ArrowLeftIcon class="h-5 w-5 text-gray-500" />
@@ -55,7 +54,6 @@
         @close="feedbackMessage = ''"
       />
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
@@ -118,7 +116,7 @@ const handleSuccess = () => {
   feedbackType.value = 'success'
   setTimeout(() => {
     feedbackMessage.value = '' // auto-close modal
-    router.push('/customer')
+    router.push('/admin/customer')
   }, 1500)
 }
 

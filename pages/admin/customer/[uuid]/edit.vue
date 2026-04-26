@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div v-if="customer" class="max-w-lg mx-auto space-y-6">
       <h1 class="text-xl font-semibold">Edit Customer</h1>
       <form @submit.prevent="handleSubmit" class="space-y-4">
@@ -9,7 +8,6 @@
       </form>
     </div>
     <div v-else class="text-gray-500">Loading...</div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
@@ -27,6 +25,6 @@ onMounted(async () => {
 
 const handleSubmit = async () => {
   await customerService.update(route.params.uuid as string, customer.value)
-  router.push('/customer') // back to list
+  router.push('/admin/customer') // back to list
 }
 </script>
