@@ -1,5 +1,9 @@
 export interface LoginResponse {
   token: string;
+  user: {
+    uuid: string;
+    role: string;
+  };
 }
 
 export class AuthService {
@@ -37,6 +41,28 @@ export class AuthService {
         default:
           throw new Error(message || 'Something went wrong. Please try again.');
       }
+    }
+  }
+
+  async logout(): Promise<void> {
+    const runtimeConfig = useRuntimeConfig()
+    const token = localStorage.getItem('_token')
+
+    try {
+      if (token) {
+        await $fetch('/logout', {
+          baseURL: runtimeConfig.public.apiBaseURL,
+          method: 'DELETE',
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        })
+      }
+    } catch (error) {
+      console.error('Logout API failed (ignored):', error)
+    } finally {
+      localStorage.removeItem('_token')
     }
   }
 }

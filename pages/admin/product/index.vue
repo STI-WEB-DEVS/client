@@ -1,11 +1,10 @@
 <template>
-
     <div class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-xl font-semibold tracking-tight text-gray-900">Customers</h1>
+          <h1 class="text-xl font-semibold tracking-tight text-gray-900">Products</h1>
           <p class="mt-1 text-sm text-gray-500">
-            Displaying customer records from your API.
+            Displaying product records from your API.
           </p>
         </div>
 
@@ -15,11 +14,18 @@
           class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
         >
           <PlusIcon class="h-4 w-4" />
-          <span>Create Customer</span>
+          <span>Create Product</span>
         </button>
       </div>
 
-      <div v-if="pending" class="flex justify-center py-16">
+      <!-- Unauthorized -->
+      <div v-if="!token" class="rounded-xl border border-red-200 bg-red-50 p-4">
+        <p class="text-sm text-red-700 font-medium">
+          Unauthorized. Please login to view customers.
+        </p>
+      </div>
+
+      <div v-else-if="pending" class="flex justify-center py-16">
         <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
       </div>
 
@@ -141,7 +147,6 @@
       />
 
     </div>
-
 </template>
 
 <script setup lang="ts">
@@ -165,6 +170,10 @@ const selectedProduct = ref<any>(null)
 
 const feedbackOpen = ref(false)
 const feedbackMessage = ref('')
+
+const token = typeof window !== 'undefined'
+  ? localStorage.getItem('_token')
+  : null
 
 const showFeedback = (message: string) => {
   feedbackMessage.value = message

@@ -1,7 +1,11 @@
 <template>
-  <main class="flex h-screen flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <main
+    class="flex h-screen flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8"
+  >
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <h2 class="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+      <h2
+        class="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900"
+      >
         Sign in to your account
       </h2>
     </div>
@@ -10,7 +14,9 @@
       <div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
         <form class="space-y-6" method="POST" @submit.prevent="handleSubmit">
           <div>
-            <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
+            <label for="email" class="block text-sm/6 font-medium text-gray-900"
+              >Email address</label
+            >
             <div class="mt-2">
               <input
                 v-model="email"
@@ -25,7 +31,11 @@
           </div>
 
           <div>
-            <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
+            <label
+              for="password"
+              class="block text-sm/6 font-medium text-gray-900"
+              >Password</label
+            >
             <div class="mt-2">
               <input
                 v-model="password"
@@ -71,11 +81,17 @@
                   </svg>
                 </div>
               </div>
-              <label for="remember-me" class="block text-sm/6 text-gray-900">Remember me</label>
+              <label for="remember-me" class="block text-sm/6 text-gray-900"
+                >Remember me</label
+              >
             </div>
 
             <div class="text-sm/6">
-              <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+              <a
+                href="#"
+                class="font-semibold text-indigo-600 hover:text-indigo-500"
+                >Forgot password?</a
+              >
             </div>
           </div>
 
@@ -87,7 +103,7 @@
               :disabled="isLoading"
               class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {{ isLoading ? 'Signing in...' : 'Sign in' }}
+              {{ isLoading ? "Signing in..." : "Sign in" }}
             </button>
           </div>
         </form>
@@ -95,60 +111,50 @@
 
       <p class="mt-10 text-center text-sm/6 text-gray-500">
         Not a member?
-        {{ ' ' }}
-        <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Register here</a>
+        {{ " " }}
+        <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500"
+          >Register here</a
+        >
       </p>
     </div>
   </main>
 </template>
 
-
 <script setup lang="ts">
 
 definePageMeta({
-  layout: false
+ layout: false
 })
 
-import { ref } from 'vue'
-import { AuthService } from '~/api/auth/AuthService'
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
 
-const email = ref('')
-const password = ref('')
-const error = ref('')
-const isLoading = ref(false)
+const email = ref("");
+const password = ref("");
+const error = ref("");
+const isLoading = ref(false);
 
-const authService = new AuthService()
+const authService = new AuthService();
 
 const handleSubmit = async () => {
-  error.value = ''
-  isLoading.value = true
+  error.value = "";
+  isLoading.value = true;
 
   try {
-    const response = await authService.login(email.value, password.value)
+    const response = await authService.login(email.value, password.value);
 
-    console.log('LOGIN RESPONSE:', response)
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
+      localStorage.setItem("uuid", response.user.uuid);
+      localStorage.setItem("role", response.user.role);
 
-    // ✅ safely extract token from different API formats
-    const token =
-      response?.token ||
-      response?.access_token ||
-      response?.data?.token
-
-    if (process.client) {
-      if (token) {
-        localStorage.setItem('token', token)
-        console.log('TOKEN SAVED:', token)
-      } else {
-        console.log('NO TOKEN FOUND IN RESPONSE')
-      }
     }
 
-    await navigateTo('/admin/dashboard')       
+    await navigateTo("/admin/dashboard");
   } catch (err: any) {
-    console.log('LOGIN ERROR:', err)
-    error.value = err?.message || 'Login failed'
+    error.value = err?.message || "";
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 </script>

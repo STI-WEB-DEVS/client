@@ -1,5 +1,4 @@
 <template>
-
     <div class="space-y-6">
 
       <!-- HEADER -->
@@ -21,8 +20,15 @@
         </button>
       </div>
 
+      <!-- Unauthorized -->
+      <div v-if="!token" class="rounded-xl border border-red-200 bg-red-50 p-4">
+        <p class="text-sm text-red-700 font-medium">
+          Unauthorized. Please login to view customers.
+        </p>
+      </div>
+
       <!-- LOADING -->
-      <div v-if="pending" class="flex justify-center py-16">
+      <div v-else-if="pending" class="flex justify-center py-16">
         <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
       </div>
 
@@ -145,7 +151,6 @@
       />
 
     </div>
-
 </template>
 
 <script setup lang="ts">
@@ -169,6 +174,10 @@ const selectedCustomer = ref<any>(null)
 
 const feedbackOpen = ref(false)
 const feedbackMessage = ref('')
+
+const token = typeof window !== 'undefined'
+  ? localStorage.getItem('_token')
+  : null
 
 const showFeedback = (message: string) => {
   feedbackMessage.value = message
