@@ -107,14 +107,12 @@
 
 
 import { ref } from 'vue';
-import { AuthService } from '~/api/auth/AuthService';
+import { authService } from '~/api/auth/AuthService';
 
 const email = ref('');
 const password = ref('');
 const error = ref('');
 const isLoading = ref(false);
-
-const authService = new AuthService();
 
 const handleSubmit = async () => {
   error.value = '';

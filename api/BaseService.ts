@@ -1,3 +1,5 @@
+import { showError } from '#app';
+
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
@@ -31,6 +33,15 @@ export class BaseService {
         error?.response?._data?.message ||
         error?.data?.message ||
         error?.message;
+
+      if (status === 401) {
+        showError({
+          statusCode: 401,
+          statusMessage: 'Unauthenticated',
+          message: 'Unauthenticated.',
+          fatal: true
+        });
+      }
 
       switch (status) {
         case 400:

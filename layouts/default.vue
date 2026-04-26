@@ -154,18 +154,23 @@ import {
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import { useRoute, useRouter } from 'vue-router'
-import { AuthService } from '~/api/auth/AuthService';
+import { authService } from '~/api/auth/AuthService';
 
 const route = useRoute()
 const router = useRouter()
 
 const handleSignOut = async () => {
-  // Call the API to invalidate the token on the server
-  await AuthService.logout()
-  // Remove the token from localStorage
-  localStorage.removeItem('_token')
-  // Redirect to login page (index)
-  router.push('/')
+  try {
+    await authService.logout()
+    
+    localStorage.removeItem('_token')
+    localStorage.removeItem('user')
+    localStorage.removeItem('mock_customers')
+    
+    router.push('/')
+  } catch (error) {
+    console.error('Error logging out from server:', error)
+  }
 }
 
 const navigation = [
