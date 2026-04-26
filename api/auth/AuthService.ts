@@ -63,6 +63,8 @@ export class AuthService {
       console.error('Logout API failed (ignored):', error)
     } finally {
       localStorage.removeItem('_token')
+      localStorage.removeItem('uuid')
+      localStorage.removeItem('role')
     }
   }
 }
