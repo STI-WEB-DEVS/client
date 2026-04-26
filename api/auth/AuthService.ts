@@ -20,6 +20,12 @@ export class AuthService {
         
         if (response.ok && data.token) {
             localStorage.setItem('_token', data.token);
+            
+            if (data.user) {
+                localStorage.setItem('user_uuid', data.user.uuid);
+                localStorage.setItem('user_role', data.user.role || 'customer');
+            }
+            
             return { success: true, data };
         }
         
@@ -31,12 +37,14 @@ export class AuthService {
         
         if (!token) {
             localStorage.removeItem('_token');
+            localStorage.removeItem('user_uuid');  
+            localStorage.removeItem('user_role');  
             return { success: true };
         }
         
         try {
             const response = await fetch(`${this.apiBase}/logout`, {
-                method: 'DELETE',  // Changed from POST to DELETE
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -46,17 +54,29 @@ export class AuthService {
             
             if (response.ok) {
                 localStorage.removeItem('_token');
+                localStorage.removeItem('user_uuid');   
+                localStorage.removeItem('user_role');   
                 return { success: true };
             } else {
-                // If server returns error, still clear local token
                 localStorage.removeItem('_token');
+                localStorage.removeItem('user_uuid');  
+                localStorage.removeItem('user_role');   
                 throw new Error('Logout failed on server');
             }
         } catch (error) {
-            // If network error, still clear local token
             localStorage.removeItem('_token');
+            localStorage.removeItem('user_uuid');   
+            localStorage.removeItem('user_role');    
             throw error;
         }
+    }
+
+    getUserUuid(): string | null {
+        return localStorage.getItem('user_uuid');
+    }
+
+    getUserRole(): string | null {
+        return localStorage.getItem('user_role');
     }
 
     isAuthenticated(): boolean {
