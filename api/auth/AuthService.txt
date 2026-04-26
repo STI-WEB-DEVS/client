@@ -1,9 +1,5 @@
 export interface LoginResponse {
   token: string;
-  user?: {
-    uuid?: string;
-    role?: string | null;
-  };
 }
 
 export interface LogoutResponse {
@@ -63,3 +59,8 @@ export class AuthService {
     }
   }
 }
+
+
+
+
+gi copy lang nako sir kay mahimong video format kung iupload nako

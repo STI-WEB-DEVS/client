@@ -124,6 +124,18 @@ const handleSubmit = async () => {
       localStorage.setItem('_token', response.token);
     }
 
+    if (response?.user?.uuid) {
+      localStorage.setItem('uuid', response.user.uuid);
+    } else {
+      localStorage.removeItem('uuid');
+    }
+
+    if (response?.user?.role) {
+      localStorage.setItem('role', response.user.role);
+    } else {
+      localStorage.removeItem('role');
+    }
+
     await navigateTo('/dashboard');
   } catch (err: any) {
     error.value = err?.message || '';
