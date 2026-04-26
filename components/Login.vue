@@ -1,7 +1,9 @@
 <template>
-  <div class="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <main class="flex h-screen flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <h2 class="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Sign in to your account</h2>
+      <h2 class="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+        Sign in to your account
+      </h2>
     </div>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
@@ -21,24 +23,6 @@
               <input v-model="password" type="password" name="password" id="password" autocomplete="current-password"
                 :required="!token"
                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-            </div>
-          </div>
-
-          <div class="relative">
-            <div class="absolute inset-0 flex items-center" aria-hidden="true">
-              <div class="w-full border-t border-gray-200"></div>
-            </div>
-            <div class="relative flex justify-center text-sm/6 font-medium">
-              <span class="bg-white px-6 text-gray-900">Or use token</span>
-            </div>
-          </div>
-
-          <div>
-            <label for="token" class="block text-sm/6 font-medium text-gray-900">Access Token</label>
-            <div class="mt-2">
-              <input v-model="token" type="text" name="token" id="token"
-                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                placeholder="Paste your token here" />
             </div>
           </div>
 
@@ -83,7 +67,7 @@
         <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Register here</a>
       </p>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -117,7 +101,7 @@ const handleSubmit = async () => {
         }
       }
     }
-    await navigateTo('/dashboard');
+    await navigateTo('/admin/dashboard');
   } catch (err: any) {
     error.value = err.message;
   } finally {
