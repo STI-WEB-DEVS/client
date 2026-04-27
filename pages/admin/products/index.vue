@@ -173,7 +173,7 @@ const confirmDelete = async () => {
 };
 
 const handleView = (product: any) => {
-  router.push(`/products/${product.uuid}`);
+  router.push(`/admin/products/${product.uuid}`);
 };
 
 const openFeedbackModal = (message: string) => {

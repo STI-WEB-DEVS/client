@@ -1,12 +1,11 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <div>
         <h1 class="text-xl font-semibold tracking-tight text-gray-900">
           View Product
         </h1>
         <p class="mt-1 text-sm text-gray-500">
-          Details for product record: {{ uuid }}
+          Details for product record: {{ uuid }} - {{ product.name }}
         </p>
       </div>
 
@@ -36,7 +35,6 @@
         
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

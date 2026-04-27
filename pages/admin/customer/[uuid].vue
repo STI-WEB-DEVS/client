@@ -5,7 +5,7 @@
           View Customer
         </h1>
         <p class="mt-1 text-sm text-gray-500">
-          Details for customer record: {{ uuid }}
+          Details for customer record: {{ uuid }} - {{ customer.name }}
         </p>
       </div>
 
