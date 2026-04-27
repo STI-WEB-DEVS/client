@@ -44,6 +44,8 @@ export class BaseService {
       if (status === 401) {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('_token');
+          localStorage.removeItem('_uuid');
+          localStorage.removeItem('_role');
         }
         throw new Error("Unauthenticated");
       }
