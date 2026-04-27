@@ -1,9 +1,8 @@
 <template>
-  <NuxtLayout>
     <div class="mx-auto max-w-2xl space-y-6">
       <div class="flex items-center gap-4">
         <button
-          @click="router.push('/product')"
+          @click="router.push('/admin/product')"
           class="rounded-lg border border-gray-200 p-2 transition hover:bg-gray-50"
         >
           <ArrowLeftIcon class="h-5 w-5 text-gray-500" />
@@ -51,7 +50,6 @@
         <p class="text-sm text-red-700">Product not found.</p>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

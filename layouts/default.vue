@@ -167,9 +167,9 @@ const route = useRoute()
 const router = useRouter()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/product', icon: FolderIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
+  { name: 'Products', href: '/admin/product', icon: FolderIcon },
 ]
 
 const sidebarOpen = ref(false)
@@ -181,6 +181,8 @@ const handleLogout = async () => {
     await authService.logout()
     // Only clear token if the backend successfully deleted it
     authService.clearToken()
+    localStorage.removeItem('_role')
+    localStorage.removeItem('_uuid')
     await navigateTo('/')
   } catch (err) {
     console.error('Logout failed:', err)

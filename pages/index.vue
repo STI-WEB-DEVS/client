@@ -107,6 +107,10 @@
 import { ref, onMounted } from 'vue';
 import { AuthService } from '~/api/auth/AuthService';
 
+definePageMeta({
+  layout: false
+})
+
 const email = ref('');
 const password = ref('');
 const error = ref('');
@@ -134,7 +138,17 @@ const handleSubmit = async () => {
       authService.setToken(response.token);
     }
 
-    await navigateTo('/dashboard');
+    const role = response?.user?.role;
+    const uuid = response?.user?.uuid;
+
+    if (role) localStorage.setItem('_role', role);
+    if (uuid) localStorage.setItem('_uuid', uuid);
+
+    if (role === 'customer') {
+      await navigateTo('/customer/order');
+    } else {
+      await navigateTo('/admin/dashboard');
+    }
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {
