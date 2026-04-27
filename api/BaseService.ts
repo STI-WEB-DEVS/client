@@ -1,7 +1,5 @@
-// ~/api/BaseService.ts
-export default class BaseService {
+export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
-
     const runtimeConfig = useRuntimeConfig();
     const token = localStorage.getItem('_token');
 
@@ -19,38 +17,22 @@ export default class BaseService {
       headers,
     };
 
-
-
-    if (method.toUpperCase() === "GET") {
-
+    if (method.toUpperCase() === 'GET') {
       config.params = params;
-
     } else {
-
       config.body = params;
-
     }
 
-
-
     try {
-
       const response = await $fetch<T>(url, config);
 
-
-
-      // If the response contains a token, save it
-
-      if ((response as any)?.token) {
-
-        localStorage.setItem("token", (response as any).token);
-
+      // 3. Automatically save the token if this was a login/auth request
+      // Assuming your API returns the token in a field called 'token' or 'access_token'
+      if ((url.includes('login') || url.includes('register')) && (response as any).token) {
+        localStorage.setItem('auth_token', (response as any).token);
       }
 
-
-
       return response;
-
     } catch (error: any) {
       const status = error?.response?.status;
       const message =
@@ -58,16 +40,21 @@ export default class BaseService {
         error?.data?.message ||
         error?.message;
 
-
+      // 4. Automatically clear the key if the token is expired/unauthorized (401)
+      if (status === 401) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('_token');
+          localStorage.removeItem('_uuid');
+          localStorage.removeItem('_role');
+        }
+        throw new Error("Unauthenticated");
+      }
 
       switch (status) {
-
         case 400:
         case 401:
         case 404:
-
         case 422:
-
         case 429:
           throw new Error(message || 'Validation or Request Error');
         case 500:
@@ -75,8 +62,8 @@ export default class BaseService {
         default:
           throw new Error(message || 'Something went wrong. Please try again.');
       }
-
     }
-
   }
 }
+
+export default BaseService;

@@ -186,6 +186,8 @@ const handleSignOut = async () => {
     console.error('Logout failed:', error)
   } finally {
     localStorage.removeItem('_token')
+    localStorage.removeItem('_uuid')
+    localStorage.removeItem('_role')
     await navigateTo('/')
   }
 }

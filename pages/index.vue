@@ -121,11 +121,15 @@ const handleSubmit = async () => {
   error.value = '';
   isLoading.value = true;
 
-  try {
+   try {
     const response = await authService.login(email.value, password.value);
 
     if (response?.token) {
-      localStorage.setItem('_token', response.token);
+      localStorage.setItem('token', response.token);
+      if (response.user) {
+        localStorage.setItem('uuid', response.user.uuid);
+        localStorage.setItem('role', response.user.role);
+      }
     }
 
      if (response.user.role === "admin") {
