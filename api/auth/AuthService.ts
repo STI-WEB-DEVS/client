@@ -1,5 +1,14 @@
+export interface User {
+  uuid: string;
+  role: string;
+  name: string;
+  email: string;
+  [key: string]: any;
+}
+
 export interface LoginResponse {
   token: string;
+  user: User;
 }
 
 export class AuthService {
@@ -60,6 +69,8 @@ export class AuthService {
     } finally {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('_token');
+        localStorage.removeItem('_role');
+        localStorage.removeItem('_uuid');
       }
     }
   }

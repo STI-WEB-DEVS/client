@@ -124,6 +124,11 @@ const handleSubmit = async () => {
       localStorage.setItem('_token', response.token);
     }
 
+    if (response?.user) {
+      localStorage.setItem('_role', response.user.role);
+      localStorage.setItem('_uuid', response.user.uuid);
+    }
+
     await navigateTo('/admin/dashboard');
   } catch (err: any) {
     error.value = err?.message || '';
