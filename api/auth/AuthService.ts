@@ -1,5 +1,11 @@
 export interface LoginResponse {
   token: string;
+  user: {
+    uuid: string;
+    role: string; // This comes from your getRoleNames()->first() in Laravel
+    name: string;
+    email: string;
+  };
 }
 
 export class AuthService {
@@ -19,8 +25,14 @@ export class AuthService {
         body: { email, password },
       });
       
-      // Assuming you store it here after login
+      // Save everything to local storage here
       localStorage.setItem(AuthService.TOKEN_KEY, response.token);
+
+      if (response.user) {
+      localStorage.setItem('user_uuid', response.user.uuid);
+      localStorage.setItem('user_role', response.user.role);
+    }
+
       return response;
     } catch (error: any) {
       this.handleError(error);
@@ -41,8 +53,10 @@ export class AuthService {
         },
       });
 
-      // Clear token IF AND ONLY IF request succeeded
+      // Clear everything
       localStorage.removeItem(AuthService.TOKEN_KEY);
+      localStorage.removeItem('user_uuid');
+      localStorage.removeItem('user_role');
       return true;
     } catch (error) {
       console.error('Logout failed:', error);

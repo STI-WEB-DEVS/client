@@ -93,11 +93,14 @@
         </div>
       </div>
 
-      <FeedbackModal
-        :open="isFeedbackModalOpen"
-        :message="feedbackMessage"
-        @close="closeFeedbackModal"
-      />
+        <FeedbackModal
+          :open="isFeedbackModalOpen"
+          :title="feedbackTitle"
+          :message="feedbackMessage"
+          :confirm-text="feedbackConfirmText"
+          @close="closeFeedbackModal"
+          @confirm="handleConfirmAction"
+        />
     </div>
 </template>
 
@@ -109,23 +112,28 @@ import { customerService } from '~/api/customer/CustomerService';
 
 const router = useRouter();
 
-// API State
+// --- API State ---
 const customers = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 
-// Form & Modal State
+// --- Form & Modal State ---
 const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
+const feedbackTitle = ref('Success');
+const feedbackConfirmText = ref('Close');
+
 const isFormModalOpen = ref(false);
 const selectedCustomer = ref<any>(null);
+const pendingDeleteUuid = ref<string | null>(null);
 
-// Configuration for the Universal Form
+// --- Configuration for the Universal Form ---
 const customerFormConfig = [
   { key: 'name', label: 'Full Name', placeholder: 'Enter name' },
   { key: 'email', label: 'Email Address', type: 'email', placeholder: 'Enter email' },
 ];
 
+// --- Fetch Data ---
 const fetchCustomers = async () => {
   pending.value = true;
   try {
@@ -139,18 +147,37 @@ const fetchCustomers = async () => {
 
 onMounted(fetchCustomers);
 
-// Feedback Logic
-const openFeedbackModal = (message: string) => {
+// --- Feedback Logic ---
+const openFeedbackModal = (title: string, message: string) => {
+  feedbackTitle.value = title;
   feedbackMessage.value = message;
+  feedbackConfirmText.value = 'Close'; 
   isFeedbackModalOpen.value = true;
 };
 
 const closeFeedbackModal = () => {
   isFeedbackModalOpen.value = false;
   feedbackMessage.value = '';
+  pendingDeleteUuid.value = null;
 };
 
-// Form Logic
+const handleConfirmAction = async () => {
+  if (feedbackTitle.value === 'Confirmation' && pendingDeleteUuid.value) {
+    try {
+      await customerService.delete(pendingDeleteUuid.value);
+      pendingDeleteUuid.value = null;
+      // Use the new helper here
+      openFeedbackModal('Success', 'Customer deleted successfully.');
+      fetchCustomers();
+    } catch (err) {
+      openFeedbackModal('Error', 'Failed to delete customer.');
+    }
+  } else {
+    closeFeedbackModal();
+  }
+};
+
+// --- Form Logic ---
 const handleCreate = () => {
   selectedCustomer.value = null;
   isFormModalOpen.value = true;
@@ -170,31 +197,30 @@ const handleFormSubmit = async (formData: any) => {
   try {
     if (selectedCustomer.value) {
       await customerService.update(selectedCustomer.value.uuid, formData);
-      openFeedbackModal('Customer updated successfully!');
+      openFeedbackModal('Success', 'Customer updated successfully!');
     } else {
       await customerService.create(formData);
-      openFeedbackModal('Customer created successfully!');
+      openFeedbackModal('Success', 'Customer created successfully!');
     }
     closeFormModal();
-    fetchCustomers(); // Refresh the list
+    fetchCustomers();
   } catch (err: any) {
-    openFeedbackModal('Error saving customer: ' + (err.message || 'Unknown error'));
+    // This catches the "Email already taken" error and shows the "Error" title
+    const errorMessage = err.response?.data?.message || err.message || 'Unknown error';
+    openFeedbackModal('Error', errorMessage);
   }
 };
 
+// --- Action Logic ---
 const handleView = (customer: any) => {
-  router.push(`/customer/${customer.uuid}`);
+  router.push(`/admin/customer/${customer.uuid}`);
 };
 
-const handleDelete = async (customer: any) => {
-  if (confirm(`Are you sure you want to delete ${customer.name}?`)) {
-    try {
-      await customerService.delete(customer.uuid);
-      openFeedbackModal('Customer deleted successfully.');
-      fetchCustomers();
-    } catch (err) {
-      openFeedbackModal('Failed to delete customer.');
-    }
-  }
+const handleDelete = (customer: any) => {
+  pendingDeleteUuid.value = customer.uuid;
+  feedbackTitle.value = 'Confirmation';
+  feedbackConfirmText.value = 'Delete';
+  feedbackMessage.value = `Are you sure you want to delete ${customer.name}?`;
+  isFeedbackModalOpen.value = true;
 };
 </script>

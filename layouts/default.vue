@@ -130,9 +130,11 @@
       </main>
     </div>
 
-    <FeedbackModal
+   <FeedbackModal
       :open="isLogoutModalOpen"
+      title="Confirmation"
       message="Are you sure you want to sign out?"
+      confirm-text="Sign out"
       @close="isLogoutModalOpen = false"
       @confirm="confirmLogout"
     />
@@ -178,21 +180,20 @@ const handleLogout = () => {
 // Logic that actually runs once confirmed
 const confirmLogout = async () => {
   try {
-    const success = await authService.logout()
-    
-    // Always clear the local state to trigger the login view in index.vue
-    localStorage.removeItem('_token')
-    isLogoutModalOpen.value = false
-    
-    // Redirect to "/" to avoid the 404 error we saw in your console
-    await router.push('/')
-    
-    // Hard reload to reset all states
-    window.location.reload()
+    await authService.logout();
+
+    // Clear everything from local storage
+    localStorage.removeItem('_token');
+    localStorage.removeItem('user_uuid');
+    localStorage.removeItem('user_role');
+
+    isLogoutModalOpen.value = false;
+    await router.push('/');
+    window.location.reload();
   } catch (err) {
-    console.error('Logout error:', err)
-    localStorage.removeItem('_token')
-    router.push('/')
+    console.error('Logout error:', err);
+    localStorage.removeItem('auth_token'); // Clean up anyway
+    router.push('/');
   }
-}
+};
 </script>

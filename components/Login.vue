@@ -106,6 +106,12 @@ const handleSubmit = async () => {
     if (response && response.token) {
       localStorage.setItem('auth_token', response.token);
     }
+
+    // Save the UUID and Role from your UserResource
+    if (response?.user) {
+      localStorage.setItem('user_uuid', response.user.uuid);
+      localStorage.setItem('user_role', response.user.role);
+    }
     
     await navigateTo('/dashboard');
   } catch (err: any) {

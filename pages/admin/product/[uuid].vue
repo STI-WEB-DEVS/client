@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <div class="flex items-center justify-between">
         <h1 class="text-xl font-semibold text-gray-900">Product Details</h1>
@@ -15,7 +14,6 @@
         </div>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
