@@ -144,7 +144,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline';
-import { customerService } from '~/api/customer/CustomerService';
+import { customerService } from '~/api/Customer/CustomerService';
 import CustomerFormModal from '~/components/CustomerFormModal.vue';
 import ConfirmModal from '~/components/ConfirmModal.vue';
 import FeedbackModal from '~/components/FeedbackModal.vue';
@@ -192,7 +192,7 @@ const closeFeedbackModal = () => {
 
 // --- Navigation ---
 const handleView = (customer: any) => {
-  router.push(`/customer/${customer.uuid}`);
+  router.push(`admin/customer/${customer.uuid}`);
 };
 
 // --- Form Logic ---

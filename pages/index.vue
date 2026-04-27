@@ -1,3 +1,4 @@
+
 <template>
   <main class="flex h-screen flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
@@ -106,6 +107,10 @@
 import { ref } from 'vue';
 import { AuthService } from '~/api/auth/AuthService';
 
+definePageMeta({
+  layout: false,
+});
+
 const email = ref('');
 const password = ref('');
 const error = ref('');
@@ -130,13 +135,30 @@ const handleSubmit = async () => {
       localStorage.removeItem('uuid');
     }
 
-    if (response?.user?.role) {
-      localStorage.setItem('role', response.user.role);
+    const role = response?.user?.role ?? null;
+
+    if (role) {
+      localStorage.setItem('role', role);
     } else {
       localStorage.removeItem('role');
     }
 
-    await navigateTo('/dashboard');
+    if (role === 'admin') {
+      await navigateTo('/admin/dashboard');
+      return;
+    }
+    
+    if (role === 'customer') {
+      await navigateTo('/admin/dashboard');
+      return;
+    }
+
+    // if (role === 'customer') {
+    //   await navigateTo('/customer/order');
+    //   return;
+    // }
+
+    await navigateTo('/');
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {

@@ -214,6 +214,9 @@ const confirmLogout = async () => {
   try {
     await authService.logout()         // DELETE /logout — throws if not 2xx
     localStorage.removeItem('_token') // only reached on success
+    localStorage.removeItem('uuid') 
+    localStorage.removeItem('role')     
+
     router.push('/')
   } catch (error) {
     console.error('Logout failed:', error)
@@ -227,9 +230,9 @@ const confirmLogout = async () => {
  * NAVIGATION
  * --------------------------------------*/
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UserGroupIcon }, // ✅ fixed route
-  { name: 'Products', href: '/product', icon: FolderIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
+  { name: 'Products', href: '/admin/product', icon: FolderIcon },
   // { name: 'Calendar', href: '#', icon: CalendarIcon },
   // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
   // { name: 'Reports', href: '#', icon: ChartPieIcon },
