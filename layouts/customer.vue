@@ -10,16 +10,17 @@
           class="hidden items-center gap-8 text-sm font-medium text-gray-600 md:flex"
         >
           <NuxtLink to="/customer/shop">Shop</NuxtLink>
-          <NuxtLink to="/customer/categories">Categories</NuxtLink>
-          <NuxtLink to="/customer/orders">Orders</NuxtLink>
-          <NuxtLink to="/customer/account">Account</NuxtLink>
+          <NuxtLink to="#">Categories</NuxtLink>
+          <NuxtLink to="/customer/order">Orders</NuxtLink>
+          <NuxtLink to="#">Account</NuxtLink>
         </div>
 
-        <div
-          class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700"
+        <NuxtLink
+          to="/customer/cart"
+          class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
           Cart
-        </div>
+        </NuxtLink>
       </div>
     </header>
 
