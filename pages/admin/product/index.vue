@@ -200,6 +200,6 @@ const closeFeedbackModal = () => {
 };
 
 const handleView = (product: any) => {
-  router.push(`/product/${product.uuid}`);
+  router.push(`/admin/product/${product.uuid}`);
 };
 </script>
