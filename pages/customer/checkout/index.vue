@@ -9,6 +9,7 @@ import { ChevronLeftIcon } from "@heroicons/vue/24/outline";
 
 const router = useRouter();
 const checkoutData = ref(null);
+const showSuccessModal = ref(false);
 
 const loadCheckoutData = () => {
   if (process.client) {
@@ -40,8 +41,29 @@ const formatPrice = (price) => {
 };
 
 const placeOrder = () => {
-  // Mock order placement
-  alert("Order placed successfully! Thank you for your purchase.");
+  if (!checkoutData.value) return;
+
+  // Retrieve current logged-in customer UUID from localStorage
+  const customerUuid = localStorage.getItem("_uuid") || "GUEST-USER-UUID";
+
+  // Construct JSON Payload for backend
+  const orderPayload = {
+    customer_uuid: customerUuid,
+    products: checkoutData.value.items.map((item) => ({
+      product_uuid: item.uuid,
+      quantity: item.quantity,
+    })),
+  };
+
+  // Log to console for development verification
+  console.log("Final Order JSON:", JSON.stringify(orderPayload, null, 2));
+
+  // Show visual feedback
+  showSuccessModal.value = true;
+};
+
+const handleOrderSuccess = () => {
+  showSuccessModal.value = false;
   localStorage.removeItem("checkout_data");
   if (checkoutData.value && !checkoutData.value.isBuyNow) {
     localStorage.removeItem("cart");
@@ -147,5 +169,14 @@ onMounted(loadCheckoutData);
         </div>
       </div>
     </div>
-  </div>
-</template>
+ 
+     <!-- Success Feedback Modal -->
+     <FeedbackModal
+       :open="showSuccessModal"
+       type="success"
+       title="Order Placed Successfully!"
+       message="Thank you for your purchase. Your order has been received and is being processed."
+       @close="handleOrderSuccess"
+     />
+   </div>
+ </template>
