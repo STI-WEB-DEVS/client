@@ -27,7 +27,7 @@
       empty-message="No products found."
     >
       <template #cell(price)="{ value }">
-        <span class="font-medium text-gray-900">${{ value }}</span>
+        <span class="font-medium text-gray-900">{{ formatPrice(value) }}</span>
       </template>
 
       <template #cell(actions)="{ row: product }">
@@ -143,7 +143,7 @@
               Price
             </p>
             <p class="mt-1 text-sm text-gray-900 font-medium">
-              ${{ selectedProduct?.price }}
+              {{ formatPrice(selectedProduct?.price) }}
             </p>
           </div>
         </div>
@@ -169,6 +169,8 @@ import {
   TrashIcon,
 } from "@heroicons/vue/24/outline";
 import { productService } from "~/api/product/ProductService";
+
+const { formatPrice } = useCurrency();
 
 const router = useRouter();
 

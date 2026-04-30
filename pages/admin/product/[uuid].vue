@@ -60,7 +60,7 @@
                 Price
               </p>
               <p class="mt-1 text-xl font-bold text-gray-900">
-                ${{ product.price }}
+                {{ formatPrice(product.price) }}
               </p>
             </div>
           </div>
@@ -129,6 +129,8 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ArrowLeftIcon } from "@heroicons/vue/24/outline";
 import { productService } from "~/api/product/ProductService";
+
+const { formatPrice } = useCurrency();
 
 const route = useRoute();
 const router = useRouter();

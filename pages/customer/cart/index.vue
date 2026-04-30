@@ -72,12 +72,7 @@ const shipping = ref(0); // Free shipping for demo
 const tax = computed(() => subtotal.value * 0.12); // 12% VAT
 const total = computed(() => subtotal.value + shipping.value + tax.value);
 
-const formatPrice = (price) => {
-  return new Intl.NumberFormat("en-PH", {
-    style: "currency",
-    currency: "PHP",
-  }).format(price);
-};
+const { formatPrice } = useCurrency();
 
 onMounted(loadCart);
 </script>

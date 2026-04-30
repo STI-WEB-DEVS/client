@@ -26,12 +26,7 @@ const loadProducts = async () => {
   }
 };
 
-const formatPrice = (price) => {
-  return new Intl.NumberFormat("en-PH", {
-    style: "currency",
-    currency: "PHP",
-  }).format(price);
-};
+const { formatPrice } = useCurrency();
 
 onMounted(loadProducts);
 </script>

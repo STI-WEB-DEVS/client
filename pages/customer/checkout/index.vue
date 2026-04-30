@@ -33,12 +33,7 @@ const shipping = ref(0);
 const tax = computed(() => subtotal.value * 0.12);
 const total = computed(() => subtotal.value + shipping.value + tax.value);
 
-const formatPrice = (price) => {
-  return new Intl.NumberFormat("en-PH", {
-    style: "currency",
-    currency: "PHP",
-  }).format(price);
-};
+const { formatPrice } = useCurrency();
 
 const placeOrder = () => {
   if (!checkoutData.value) return;

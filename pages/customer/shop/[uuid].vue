@@ -86,12 +86,7 @@ const buyNow = () => {
   router.push("/customer/checkout");
 };
 
-const formatPrice = (price) => {
-  return new Intl.NumberFormat("en-PH", {
-    style: "currency",
-    currency: "PHP",
-  }).format(price);
-};
+const { formatPrice } = useCurrency();
 
 onMounted(loadProduct);
 </script>
