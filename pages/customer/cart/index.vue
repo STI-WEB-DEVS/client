@@ -4,6 +4,7 @@ definePageMeta({
 });
 
 import { ref, onMounted, computed } from "vue";
+import { useRouter } from "vue-router";
 import {
   TrashIcon,
   MinusIcon,
@@ -12,6 +13,7 @@ import {
   ShoppingBagIcon,
 } from "@heroicons/vue/24/outline";
 
+const router = useRouter();
 const cartItems = ref([]);
 
 const loadCart = () => {
@@ -32,6 +34,15 @@ const saveCart = () => {
   if (process.client) {
     localStorage.setItem("cart", JSON.stringify(cartItems.value));
   }
+};
+
+const goToCheckout = () => {
+  const checkoutData = {
+    isBuyNow: false,
+    items: cartItems.value,
+  };
+  localStorage.setItem("checkout_data", JSON.stringify(checkoutData));
+  router.push("/customer/checkout");
 };
 
 const updateQuantity = (uuid, delta) => {
@@ -231,6 +242,7 @@ onMounted(loadCart);
 
         <div class="mt-6">
           <button
+            @click="goToCheckout"
             type="button"
             class="flex w-full items-center justify-center rounded-xl border border-transparent bg-indigo-600 px-4 py-4 text-base font-bold text-white shadow-lg shadow-indigo-100 transition-all active:scale-[0.98] hover:bg-indigo-700"
           >

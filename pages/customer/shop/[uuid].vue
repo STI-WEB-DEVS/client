@@ -62,6 +62,25 @@ const addToCart = () => {
   }, 2000);
 };
 
+const buyNow = () => {
+  if (!product.value) return;
+
+  const checkoutData = {
+    isBuyNow: true,
+    items: [
+      {
+        uuid: product.value.uuid,
+        name: product.value.name,
+        price: product.value.price,
+        quantity: 1,
+      },
+    ],
+  };
+
+  localStorage.setItem("checkout_data", JSON.stringify(checkoutData));
+  router.push("/customer/checkout");
+};
+
 const formatPrice = (price) => {
   return new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -180,6 +199,7 @@ onMounted(loadProduct);
             <span v-else>Add to Cart</span>
           </button>
           <button
+            @click="buyNow"
             type="button"
             class="flex flex-1 items-center justify-center rounded-xl border-2 border-gray-900 bg-transparent px-8 py-4 text-base font-bold text-gray-900 transition-all active:scale-[0.98] hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
           >
