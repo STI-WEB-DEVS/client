@@ -10,6 +10,8 @@ import {
   ChevronLeftIcon,
   ShoppingCartIcon,
   BoltIcon,
+  MinusIcon,
+  PlusIcon,
 } from "@heroicons/vue/24/outline";
 
 const route = useRoute();
@@ -20,6 +22,8 @@ const product = ref(null);
 const pending = ref(true);
 const error = ref(null);
 const addedToCart = ref(false);
+const showModal = ref(false);
+const quantity = ref(1);
 
 const loadProduct = async () => {
   pending.value = true;
@@ -36,6 +40,10 @@ const loadProduct = async () => {
   }
 };
 
+const updateQuantity = (delta) => {
+  quantity.value = Math.max(1, quantity.value + delta);
+};
+
 const addToCart = () => {
   if (!product.value) return;
 
@@ -43,23 +51,20 @@ const addToCart = () => {
   const existingItem = cart.find((item) => item.uuid === product.value.uuid);
 
   if (existingItem) {
-    existingItem.quantity += 1;
+    existingItem.quantity += quantity.value;
   } else {
     cart.push({
       uuid: product.value.uuid,
       name: product.value.name,
       price: product.value.price,
-      quantity: 1,
+      quantity: quantity.value,
     });
   }
 
   localStorage.setItem("cart", JSON.stringify(cart));
 
-  // Show visual feedback
-  addedToCart.value = true;
-  setTimeout(() => {
-    addedToCart.value = false;
-  }, 2000);
+  // Show modal feedback
+  showModal.value = true;
 };
 
 const buyNow = () => {
@@ -72,7 +77,7 @@ const buyNow = () => {
         uuid: product.value.uuid,
         name: product.value.name,
         price: product.value.price,
-        quantity: 1,
+        quantity: quantity.value,
       },
     ],
   };
@@ -182,21 +187,45 @@ onMounted(loadProduct);
           </div>
         </div>
 
+        <!-- Quantity Selector -->
+        <div class="mt-8 border-t border-gray-100 pt-8">
+          <h3 class="text-sm font-bold text-gray-900">Quantity</h3>
+          <div class="mt-4 flex items-center space-x-6">
+            <div class="flex items-center rounded-xl border border-gray-200 p-1">
+              <button
+                @click="updateQuantity(-1)"
+                class="p-2 text-gray-400 transition-colors hover:text-indigo-600"
+              >
+                <MinusIcon class="h-5 w-5" />
+              </button>
+              <span class="w-12 text-center text-lg font-black text-gray-900">{{
+                quantity
+              }}</span>
+              <button
+                @click="updateQuantity(1)"
+                class="p-2 text-gray-400 transition-colors hover:text-indigo-600"
+              >
+                <PlusIcon class="h-5 w-5" />
+              </button>
+            </div>
+            <div class="text-sm">
+              <p class="text-gray-500">Subtotal</p>
+              <p class="text-lg font-bold text-gray-900">
+                {{ formatPrice(product.price * quantity) }}
+              </p>
+            </div>
+          </div>
+        </div>
+
         <!-- CTA Buttons -->
         <div class="mt-10 flex flex-col gap-4 sm:flex-row">
           <button
             @click="addToCart"
             type="button"
-            class="flex flex-1 items-center justify-center rounded-xl border border-transparent px-8 py-4 text-base font-bold text-white shadow-lg transition-all active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            :class="
-              addedToCart
-                ? 'bg-green-600 shadow-green-200'
-                : 'bg-indigo-600 shadow-indigo-200 hover:bg-indigo-700'
-            "
+            class="flex flex-1 items-center justify-center rounded-xl border border-transparent bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
-            <ShoppingCartIcon v-if="!addedToCart" class="mr-2 h-5 w-5" />
-            <span v-if="addedToCart">Added to Cart!</span>
-            <span v-else>Add to Cart</span>
+            <ShoppingCartIcon class="mr-2 h-5 w-5" />
+            Add to Cart
           </button>
           <button
             @click="buyNow"
@@ -210,4 +239,30 @@ onMounted(loadProduct);
       </div>
     </div>
   </div>
+
+  <!-- Success Modal using common FeedbackModal component -->
+  <FeedbackModal
+    :open="showModal"
+    type="success"
+    title="Added to Cart Successfully!"
+    message="Your item is now in your cart. Would you like to check out now or continue shopping?"
+    @close="showModal = false"
+  >
+    <template #actions>
+      <div class="mt-8 flex w-full flex-col space-y-3">
+        <button
+          @click="router.push('/customer/cart')"
+          class="w-full rounded-xl bg-indigo-600 py-4 font-bold text-white transition-colors hover:bg-indigo-700"
+        >
+          Go to Cart
+        </button>
+        <button
+          @click="router.push('/customer/shop')"
+          class="w-full rounded-xl bg-gray-100 py-4 font-bold text-gray-700 transition-colors hover:bg-gray-200"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    </template>
+  </FeedbackModal>
 </template>

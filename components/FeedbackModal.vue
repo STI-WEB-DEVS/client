@@ -34,18 +34,20 @@
               {{ message }}
             </p>
 
-            <button
-              type="button"
-              class="mt-8 w-full rounded-xl py-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2"
-              :class="[
-                type === 'success' 
-                  ? 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500' 
-                  : 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
-              ]"
-              @click="$emit('close')"
-            >
-              Okay
-            </button>
+            <slot name="actions">
+              <button
+                type="button"
+                class="mt-8 w-full rounded-xl py-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2"
+                :class="[
+                  type === 'success'
+                    ? 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
+                    : 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+                ]"
+                @click="$emit('close')"
+              >
+                Okay
+              </button>
+            </slot>
           </div>
         </div>
       </div>
