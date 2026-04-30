@@ -154,11 +154,11 @@ const handleSubmit = async () => {
       localStorage.setItem("_role", response.user.role);
     }
 
-    await navigateTo("/admin/dashboard");
+    // await navigateTo("/admin/dashboard");
 
-    // await navigateTo(
-    //   response.role === "admin" ? "/admin/dashboard" : "/customer",
-    // );
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/customer",
+    );
   } catch (err: any) {
     error.value = err?.message || "";
   } finally {
