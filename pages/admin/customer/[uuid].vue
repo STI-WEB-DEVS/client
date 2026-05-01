@@ -1,127 +1,120 @@
 <template>
-    <div class="mx-auto max-w-2xl space-y-6">
-      <!-- Header -->
-      <div class="flex items-center gap-4">
-        <button
-          @click="router.push('/admin/customer')"
-          class="rounded-lg border border-gray-200 p-2 transition hover:bg-gray-50"
-        >
-          <ArrowLeftIcon class="h-5 w-5 text-gray-500" />
-        </button>
-        <div>
-          <h1 class="text-xl font-semibold tracking-tight text-gray-900">
-            {{ pageTitle }}
-          </h1>
-          <p class="mt-1 text-sm text-gray-500">{{ pageSubtitle }}</p>
-        </div>
+  <div class="space-y-6">
+    <!-- HEADER -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-semibold tracking-tight text-gray-900">
+          View Customer
+        </h1>
+        <p class="mt-1 text-sm text-gray-500">
+          Details for customer record: {{ uuid }}
+        </p>
       </div>
 
-      <!-- Loading spinner -->
-      <div v-if="loading && !isCreate" class="flex justify-center py-16">
-        <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
-      </div>
-
-      <!-- Read-only view mode -->
-      <div v-else-if="isViewMode && customer" class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <p class="text-sm font-medium text-gray-500">UUID</p>
-        <p class="mt-1 text-sm text-gray-900 font-mono bg-gray-50 rounded-lg px-4 py-2">{{ customer.uuid }}</p>
-
-        <p class="text-sm font-medium text-gray-500 mt-4">Name</p>
-        <p class="mt-1 text-sm text-gray-900">{{ customer.name }}</p>
-
-        <p class="text-sm font-medium text-gray-500 mt-4">Email</p>
-        <p class="mt-1 text-sm text-gray-900">{{ customer.email }}</p>
-      </div>
-
-      <!-- Create / Edit form -->
-      <EntityForm
-        v-else
-        :entityName="'Customer'"
-        :fields="fields"
-        :service="customerService"
-        :initialData="customer"
-        :isEdit="!isCreate"
-        :uuid="uuid"
-        @success="handleSuccess"
-        @error="handleError"
-      />
-
-      <!-- Feedback modal -->
-      <FeedbackModal
-        :open="!!feedbackMessage"
-        :message="feedbackMessage"
-        :type="feedbackType"
-        @close="feedbackMessage = ''"
-      />
+      <!-- ✅ BACK BUTTON (FIXED UX) -->
+      <button
+        @click="goBack"
+        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition"
+      >
+        ← Back
+      </button>
     </div>
+
+    <!-- LOADING -->
+    <div v-if="pending" class="flex justify-center py-12">
+      <div
+        class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"
+      ></div>
+    </div>
+
+    <!-- ERROR -->
+    <div
+      v-else-if="error"
+      class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700"
+    >
+      {{ error.message || "Failed to load customer data." }}
+    </div>
+
+    <!-- DATA -->
+    <div
+      v-else-if="customer"
+      class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4"
+    >
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Full Name
+        </p>
+        <p class="mt-1 text-lg font-medium text-gray-900">
+          {{ customer.name }}
+        </p>
+      </div>
+
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Email Address
+        </p>
+        <p class="mt-1 text-lg font-medium text-gray-900">
+          {{ customer.email }}
+        </p>
+      </div>
+
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Created At
+        </p>
+        <!-- ✅ FORMATTED DATE -->
+        <p class="mt-1 text-lg font-medium text-gray-900">
+          {{ formattedDate }}
+        </p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeftIcon } from '@heroicons/vue/24/outline'
-import { customerService } from '~/api/customer/CustomerService'
-import EntityForm from '~/components/EntityForm.vue'
-import FeedbackModal from '~/components/FeedbackModal.vue' // modal version
+import { ref, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { customerService } from "~/api/customer/CustomerService";
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const uuid = computed(() => String(route.params.uuid ?? ''))
-const isCreate = computed(() => uuid.value === 'create')
-const isViewMode = computed(() => route.query.mode === 'view')
+const uuid = String(route.params.uuid ?? "");
 
-const pageTitle = computed(() => {
-  if (isCreate.value) return 'Create Customer'
-  if (isViewMode.value) return 'Customer Details'
-  return 'Edit Customer'
-})
+// STATE
+const customer = ref<any>(null);
+const pending = ref(true);
+const error = ref<any>(null);
 
-const pageSubtitle = computed(() => {
-  if (isCreate.value) return 'Fill in the information below to add a new customer.'
-  if (isViewMode.value) return `Viewing customer: ${uuid.value}`
-  return `Editing customer: ${uuid.value}`
-})
+// ✅ FETCH USING useAsyncData (FIX HYDRATION)
+const { data, error: fetchError } = await useAsyncData(`customer-${uuid}`, () =>
+  customerService.show(uuid),
+);
 
-const customer = ref<any>(null)
-const loading = ref(false)
-
-const fields = [
-  { name: 'name', label: 'Full Name', placeholder: 'e.g. John Doe', required: true },
-  { name: 'email', label: 'Email Address', type: 'email', placeholder: 'john@example.com', required: true },
-]
-
-const feedbackMessage = ref('')
-const feedbackType = ref<'success' | 'error'>('success')
-
-onMounted(async () => {
-  if (!isCreate.value) {
-    loading.value = true
-    try {
-      const response = await customerService.show(uuid.value)
-      customer.value = response.data || response
-    } catch (err) {
-      feedbackMessage.value = 'Failed to fetch customer'
-      feedbackType.value = 'error'
-    } finally {
-      loading.value = false
-    }
-  }
-})
-
-const handleSuccess = () => {
-  feedbackMessage.value = isCreate.value
-    ? 'Customer created successfully!'
-    : 'Customer updated successfully!'
-  feedbackType.value = 'success'
-  setTimeout(() => {
-    feedbackMessage.value = '' // auto-close modal
-    router.push('/admin/customer')
-  }, 1500)
+// HANDLE RESULT
+if (data.value) {
+  customer.value = data.value.data || data.value;
 }
-
-const handleError = (err: any) => {
-  feedbackMessage.value = err?.message || 'Error saving customer.'
-  feedbackType.value = 'error'
+if (fetchError.value) {
+  error.value = fetchError.value;
 }
+pending.value = false;
+
+// ✅ FORMAT DATE CLEANLY
+const formattedDate = computed(() => {
+  if (!customer.value?.created_at) return "-";
+
+  return new Date(customer.value.created_at).toLocaleString("en-PH", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+});
+
+// ✅ BACK BUTTON LOGIC
+const goBack = () => {
+  router.push("/admin/customer");
+};
 </script>

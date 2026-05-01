@@ -43,9 +43,9 @@ export class BaseService {
       // 4. Automatically clear the key if the token is expired/unauthorized (401)
       if (status === 401) {
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('_token');
-          localStorage.removeItem('_uuid');
-          localStorage.removeItem('_role');
+          localStorage.removeItem('token');
+          localStorage.removeItem('uuid');
+          localStorage.removeItem('role');
         }
         throw new Error("Unauthenticated");
       }
