@@ -53,12 +53,32 @@ const handlePlaceOrder = () => {
         : [{ product_uuid: product.value?.uuid || product.value?.id, quantity: quantity.value }]
 
     const payload = {
+        id: Math.random().toString(36).substring(2, 10),
+        date: new Date().toISOString(),
+        total_amount: totalPrice.value,
         customer_uuid: typeof window !== 'undefined' ? localStorage.getItem('_uuid') : null,
         items: items
     }
 
     console.log('BUILD PAYLOAD:', JSON.stringify(payload, null, 2));
-    alert('Order payload has been logged to the console!');
+    
+    // sample order placement
+    if (typeof window !== 'undefined') {
+        const existingOrders = JSON.parse(localStorage.getItem('_fake_orders') || '[]');
+        existingOrders.push(payload);
+        localStorage.setItem('_fake_orders', JSON.stringify(existingOrders));
+        
+        if (checkoutItems.value.length > 0) {
+            checkoutItems.value.forEach(item => {
+                cartService.remove(item.uuid || item.id);
+            });
+        }
+        
+        alert('Order payload has been logged to the console!');
+
+        const router = useRouter();
+        router.push('/customer/order');
+    }
 }
 </script>
 
