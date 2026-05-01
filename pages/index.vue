@@ -129,7 +129,7 @@ const handleSubmit = async () => {
       localStorage.setItem('_uuid', response.user.uuid);
     }
 
-    await navigateTo('/admin/dashboard');
+    await navigateTo('/customer/shop');
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {
