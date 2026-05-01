@@ -224,7 +224,7 @@ const handleCreate = () => {
 };
 
 const handleView = (product: any) => {
-  router.push(`/product/${product.uuid}`);
+  router.push(`/admin/product/${product.uuid}`);
 };
 
 const handleEdit = (product: any) => {

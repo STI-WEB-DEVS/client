@@ -107,14 +107,12 @@ definePageMeta({
   layout: false
 })
 import { ref } from 'vue';
-import { AuthService } from '~/api/auth/AuthService';
+import { authService } from '~/api/auth/AuthService';
 
 const email = ref('');
 const password = ref('');
 const error = ref('');
 const isLoading = ref(false);
-
-const authService = new AuthService();
 
 const handleSubmit = async () => {
   error.value = '';
@@ -126,6 +124,20 @@ const handleSubmit = async () => {
     if (response?.token) {
       localStorage.setItem('_token', response.token);
     }
+
+    // Extract and save role/uuid from login response (user object structure)
+    const role = response?.role || response?.user?.role;
+    const uuid = response?.uuid || response?.user?.uuid;
+
+    if (role) {
+      localStorage.setItem('_role', role);
+    }
+    if (uuid) {
+      localStorage.setItem('_uuid', uuid);
+    }
+
+    // Note: AuthService.persistTokenFromResponse() is also called automatically
+    // which extracts role/uuid from the login response
 
     await navigateTo('admin/dashboard');
   } catch (err: any) {

@@ -22,6 +22,7 @@ class ProductService extends BaseService {
   }
 
   async show(uuid: string): Promise<any> {
+    console.log('[ProductService.show] Requesting product with uuid:', uuid);
     return await this.request(`${this.resource}/${uuid}`, 'GET');
   }
 

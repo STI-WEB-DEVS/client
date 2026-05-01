@@ -21,7 +21,8 @@ class CustomerService extends BaseService {
     }
 
     async show(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'GET');
+      console.log('[CustomerService.show] Requesting customer with uuid:', uuid);
+      return await this.request(`${this.resource}/${uuid}`, 'GET');
     }
 
     async update(uuid: string, payload: object): Promise<any> {

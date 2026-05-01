@@ -1,5 +1,13 @@
+import { BaseService } from '~/api/BaseService';
+
 export interface LoginResponse {
   token: string;
+  role?: string;
+  uuid?: string;
+  user?: {
+    uuid?: string;
+    role?: string;
+  };
 }
 
 export interface LogoutResponse {
@@ -8,13 +16,13 @@ export interface LogoutResponse {
   message?: string;
 }
 
-export class AuthService {
+export class AuthService extends BaseService {
   async login(email: string, password: string): Promise<LoginResponse> {
-    const runtimeConfig = useRuntimeConfig();
-
     try {
-      return await $fetch<LoginResponse>('/login', {
-        baseURL: runtimeConfig.public.apiBaseURL,
+      const baseURL = this.getApiBaseUrl();
+      console.log('[AuthService.login] baseURL:', baseURL);
+      const response = await $fetch<LoginResponse>('/login', {
+        baseURL,
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -24,6 +32,18 @@ export class AuthService {
           password,
         },
       });
+
+      console.log('[AuthService.login] response:', JSON.stringify(response));
+
+      // Persist token, role, and uuid to localStorage
+      this.persistTokenFromResponse(response);
+      console.log('[AuthService.login] localStorage after persist:', {
+        token: localStorage.getItem('_token'),
+        role: localStorage.getItem('_role'),
+        uuid: localStorage.getItem('_uuid')
+      });
+
+      return response;
     } catch (error: any) {
       const status = error?.response?.status;
       const message =
@@ -47,12 +67,12 @@ export class AuthService {
   }
 
   async logout(): Promise<LogoutResponse> {
-    const runtimeConfig = useRuntimeConfig();
     const token = typeof window !== 'undefined' ? localStorage.getItem('_token') || '' : '';
 
     try {
+      const baseURL = this.getApiBaseUrl();
       const response = await $fetch.raw('/logout', {
-        baseURL: runtimeConfig.public.apiBaseURL,
+        baseURL,
         method: 'DELETE',
         headers: {
           Accept: 'application/json',
@@ -87,3 +107,5 @@ export class AuthService {
     }
   }
 }
+
+export const authService = new AuthService();

@@ -116,7 +116,8 @@
         <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
 
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <div class="flex flex-1"></div> <div class="flex items-center gap-x-4 lg:gap-x-6">
+          <div class="flex flex-1"></div>
+          <div class="flex items-center gap-x-4 lg:gap-x-6">
             <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
               <span class="sr-only">View notifications</span>
               <BellIcon class="size-6" aria-hidden="true" />
@@ -196,7 +197,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import { useRoute, useRouter } from 'vue-router'
-import { AuthService } from '~/api/auth/AuthService'
+import { authService } from '~/api/auth/AuthService'
 
 const route = useRoute()
 const router = useRouter()
@@ -218,7 +219,6 @@ const userNavigation = [
 const sidebarOpen = ref(false)
 const showLogoutConfirm = ref(false)
 const isLoggingOut = ref(false)
-const authService = new AuthService()
 
 const confirmLogout = async () => {
   isLoggingOut.value = true
@@ -239,6 +239,8 @@ const confirmLogout = async () => {
 
     if (response.success) {
       localStorage.removeItem('_token')
+      localStorage.removeItem('_role')
+      localStorage.removeItem('_uuid')
       await router.replace('/')
     }
   } catch (error) {

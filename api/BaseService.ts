@@ -1,7 +1,7 @@
 export class BaseService {
   private tokenStorageKey = '_token';
 
-  private getApiBaseUrl(): string {
+  protected getApiBaseUrl(): string {
     if (typeof window !== 'undefined') {
       const config = (window as any).__NUXT__?.config?.public;
       if (config?.apiBaseURL) {
@@ -12,13 +12,15 @@ export class BaseService {
     return 'http://127.0.0.1:8000/api';
   }
 
-  private readToken(): string {
+  protected readToken(): string {
     if (typeof window === 'undefined') return '';
     return localStorage.getItem(this.tokenStorageKey) || '';
   }
 
-  private persistTokenFromResponse(response: any) {
+  protected persistTokenFromResponse(response: any) {
     if (typeof window === 'undefined' || !response || typeof response !== 'object') return;
+
+    console.log('[BaseService.persistTokenFromResponse] input:', JSON.stringify(response));
 
     const token =
       response.token ||
@@ -30,6 +32,27 @@ export class BaseService {
 
     if (typeof token === 'string' && token.trim()) {
       localStorage.setItem(this.tokenStorageKey, token);
+    }
+
+    const role =
+      response.role ||
+      response.data?.role ||
+      response.user?.role ||
+      response.user?.data?.role;
+    if (typeof role === 'string' && role.trim()) {
+      localStorage.setItem('_role', role);
+      console.log('[BaseService] saved _role:', role);
+    }
+
+    const uuid =
+      response.uuid ||
+      response.data?.uuid ||
+      response.user?.uuid ||
+      response.user?.id ||
+      response.user?.data?.uuid;
+    if (typeof uuid === 'string' && uuid.trim()) {
+      localStorage.setItem('_uuid', uuid);
+      console.log('[BaseService] saved _uuid:', uuid);
     }
   }
 
@@ -78,13 +101,14 @@ export class BaseService {
       }
 
       this.persistTokenFromResponse(response);
+      
       return response;
     } catch (error: any) {
       const status = error?.response?.status;
       const message =
         error?.response?._data?.message ||
-        error?.data?.message ||
-        error?.message;
+        error.data?.message ||
+        error.message;
 
       switch (status) {
         case 400:
