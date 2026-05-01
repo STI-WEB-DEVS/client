@@ -103,7 +103,6 @@
 </template>
 
 <script setup lang="ts">
-
 definePageMeta({
   layout: false
 })
@@ -121,18 +120,12 @@ const authService = new AuthService();
 const handleSubmit = async () => {
   error.value = '';
   isLoading.value = true;
-//save to local storage the Role and UUID
-//thesis group: create order flow (flowchart) -> proposal presentation
+
   try {
-    const response = await authService.login(email.value, password.value);
-
-    if (response?.token) {
-      localStorage.setItem('_token', response.token);
-    }
-
+    await authService.login(email.value, password.value);
     await navigateTo('/admin/dashboard');
   } catch (err: any) {
-    error.value = err?.message || '';
+    error.value = err?.message || 'Login failed';
   } finally {
     isLoading.value = false;
   }

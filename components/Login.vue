@@ -101,7 +101,12 @@ const handleSubmit = async () => {
 
   try {
     const response = await authService.login(email.value, password.value);
-    localStorage.setItem('authToken', response.token);
+
+    console.log('Login Successful');
+    console.log('Token:', response.token);
+    console.log('UUID:',  response.user.uuid);
+    console.log('Roles:', response.user.roles); 
+
     await navigateTo('/dashboard');
   } catch (err: any) {
     error.value = err.message;
