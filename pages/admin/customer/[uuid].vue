@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -7,11 +6,11 @@
           <p class="mt-1 text-sm text-gray-500">Viewing customer information.</p>
         </div>
         <div class="flex gap-2">
-          <NuxtLink :to="`/customer/${uuid}/edit`" class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+          <NuxtLink :to="`/admin/customer/${uuid}/edit`" class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700">
             <PencilSquareIcon class="h-4 w-4" />
             Edit Customer
           </NuxtLink>
-          <NuxtLink to="/customer" class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+          <NuxtLink to="/admin/customer" class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
             Back to List
           </NuxtLink>
         </div>
@@ -25,37 +24,38 @@
         <div class="px-6 py-5 border-b border-gray-200 bg-gray-50">
           <h3 class="text-lg font-medium text-gray-900">Customer Information</h3>
         </div>
-        <div class="px-6 py-5 space-y-4">
-          <div class="grid grid-cols-3 gap-4">
-            <div class="font-medium text-gray-500">ID:</div>
-            <div class="col-span-2 text-gray-900">{{ customer?.id }}</div>
-          </div>
-          <div class="grid grid-cols-3 gap-4">
-            <div class="font-medium text-gray-500">UUID:</div>
-            <div class="col-span-2 text-gray-900 font-mono text-sm break-all">{{ customer?.uuid }}</div>
-          </div>
-          <div class="grid grid-cols-3 gap-4">
-            <div class="font-medium text-gray-500">Name:</div>
-            <div class="col-span-2 text-gray-900 font-semibold">{{ customer?.name }}</div>
-          </div>
-          <div class="grid grid-cols-3 gap-4">
-            <div class="font-medium text-gray-500">Email:</div>
-            <div class="col-span-2 text-gray-900">{{ customer?.email }}</div>
-          </div>
-          <div class="grid grid-cols-3 gap-4">
-            <div class="font-medium text-gray-500">Created At:</div>
-            <div class="col-span-2 text-gray-900">{{ formatDate(customer?.created_at) }}</div>
-          </div>
-          <div class="grid grid-cols-3 gap-4">
-            <div class="font-medium text-gray-500">Updated At:</div>
-            <div class="col-span-2 text-gray-900">{{ formatDate(customer?.updated_at) }}</div>
+        <div class="px-6 py-5">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="flex border-b pb-2">
+              <span class="w-1/3 font-medium text-gray-500">ID:</span>
+              <span class="w-2/3 text-gray-900">{{ customer?.id }}</span>
+            </div>
+            <div class="flex border-b pb-2">
+              <span class="w-1/3 font-medium text-gray-500">UUID:</span>
+              <span class="w-2/3 text-gray-900 font-mono text-sm break-all">{{ customer?.uuid }}</span>
+            </div>
+            <div class="flex border-b pb-2">
+              <span class="w-1/3 font-medium text-gray-500">Name:</span>
+              <span class="w-2/3 text-gray-900 font-semibold">{{ customer?.name }}</span>
+            </div>
+            <div class="flex border-b pb-2">
+              <span class="w-1/3 font-medium text-gray-500">Email:</span>
+              <span class="w-2/3 text-gray-900">{{ customer?.email }}</span>
+            </div>
+            <div class="flex border-b pb-2">
+              <span class="w-1/3 font-medium text-gray-500">Created At:</span>
+              <span class="w-2/3 text-gray-900">{{ formatDate(customer?.created_at) }}</span>
+            </div>
+            <div class="flex border-b pb-2">
+              <span class="w-1/3 font-medium text-gray-500">Updated At:</span>
+              <span class="w-2/3 text-gray-900">{{ formatDate(customer?.updated_at) }}</span>
+            </div>
           </div>
         </div>
       </div>
 
       <FeedbackModal :open="isFeedbackModalOpen" :message="feedbackMessage" @close="closeFeedbackModal" />
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

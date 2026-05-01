@@ -17,10 +17,10 @@
             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">₱{{ formatPrice(product.price) }}</td>
             <td class="whitespace-nowrap px-6 py-4">
               <div class="flex items-center justify-end gap-2">
-                <NuxtLink :to="`/product/${product.uuid}`" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <button @click="$emit('view', product)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
                   <EyeIcon class="h-4 w-4" />
                   View
-                </NuxtLink>
+                </button>
                 <button @click="$emit('edit', product)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
                   <PencilSquareIcon class="h-4 w-4" />
                   Edit
@@ -56,7 +56,7 @@ defineProps<{
   meta?: any
 }>()
 
-defineEmits(['edit', 'delete'])
+defineEmits(['view', 'edit', 'delete'])
 
 const formatPrice = (price: string | number) => {
   return Number(price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })

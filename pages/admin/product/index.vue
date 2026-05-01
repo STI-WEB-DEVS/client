@@ -1,51 +1,52 @@
 <template>
-    <div class="space-y-6">
-      <PageHeader 
-        title="Products" 
-        description="Displaying product records from your API."
-        entity-name="Product"
-        :show-create-button="true"
-        @create="openCreateModal"
-      />
+  <div class="space-y-6">
+    <PageHeader 
+      title="Products" 
+      description="Displaying product records from your API."
+      entity-name="Product"
+      :show-create-button="true"
+      @create="openCreateModal"
+    />
 
-      <div v-if="pending" class="flex justify-center py-16">
-        <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
-      </div>
+    <div v-if="pending" class="flex justify-center py-16">
+      <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
+    </div>
 
-      <ProductTable 
-        v-else
-        :products="products"
-        :meta="meta"
-        @edit="openEditModal"
-        @delete="deleteProduct"
-      />
+    <ProductTable 
+      v-else
+      :products="products"
+      :meta="meta"
+      @view="handleView"
+      @edit="openEditModal"
+      @delete="deleteProduct"
+    />
 
-      <!-- Create/Edit Modal -->
-      <div v-if="showModal" class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex min-h-screen items-center justify-center p-4">
-          <div class="fixed inset-0 bg-gray-500 bg-opacity-75" @click="closeModal"></div>
-          <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-semibold mb-4">{{ isEditing ? 'Edit Product' : 'Create Product' }}</h3>
-            <ProductForm 
-              :initial-data="form" 
-              :is-edit="isEditing"
-              @submit="saveProduct"
-              @cancel="closeModal"
-            />
-          </div>
+    <!-- Create/Edit Modal -->
+    <div v-if="showModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75" @click="closeModal"></div>
+        <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <h3 class="text-lg font-semibold mb-4">{{ isEditing ? 'Edit Product' : 'Create Product' }}</h3>
+          <ProductForm 
+            :initial-data="form" 
+            :is-edit="isEditing"
+            @submit="saveProduct"
+            @cancel="closeModal"
+          />
         </div>
       </div>
-
-      <DeleteModal 
-        :show="showDeleteModal"
-        item-type="Product"
-        :item-name="productToDelete?.name"
-        @close="showDeleteModal = false"
-        @confirm="confirmDelete"
-      />
-
-      <FeedbackModal :open="isFeedbackModalOpen" :message="feedbackMessage" @close="closeFeedbackModal" />
     </div>
+
+    <DeleteModal 
+      :show="showDeleteModal"
+      item-type="Product"
+      :item-name="productToDelete?.name"
+      @close="showDeleteModal = false"
+      @confirm="confirmDelete"
+    />
+
+    <FeedbackModal :open="isFeedbackModalOpen" :message="feedbackMessage" @close="closeFeedbackModal" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -83,6 +84,10 @@ const fetchProducts = async () => {
   } finally {
     pending.value = false
   }
+}
+
+const handleView = (product: any) => {
+  navigateTo(`/admin/product/${product.uuid}`)
 }
 
 const openCreateModal = () => {
