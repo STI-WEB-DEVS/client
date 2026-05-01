@@ -70,6 +70,7 @@
       <section v-if="route.path === '/customer/landingpage'" class="bg-white">
         <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div class="grid items-center gap-12 lg:grid-cols-2">
+            <!-- Left: text content -->
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600">
                 New arrivals
@@ -93,8 +94,13 @@
               </div>
             </div>
 
-            <div class="rounded-2xl bg-gray-100 p-8">
-              <div class="aspect-[4/3] rounded-xl bg-gray-200" />
+            <!-- Right: Image (replaces gray placeholder) -->
+            <div class="rounded-2xl bg-gray-100 p-2">
+              <img
+                src="https://i.ytimg.com/vi/SQJrYw1QvSQ/maxresdefault.jpg"
+                alt="Shopping hero"
+                class="aspect-[4/3] w-full rounded-xl object-cover"
+              />
             </div>
           </div>
         </div>
@@ -152,7 +158,7 @@ import { ShoppingBagIcon, UserIcon, ChevronDownIcon, ArrowRightStartOnRectangleI
 import { useCartStore } from '~/stores/cart'
 import { useRoute } from 'vue-router'
 import { AuthService } from '~/api/auth/AuthService'
-import ProductListing from '~/components/product/ProductListing.vue'  // your product grid component
+import ProductListing from '~/components/product/ProductListing.vue'
 
 const cart = useCartStore()
 const route = useRoute()
@@ -181,11 +187,11 @@ const closeLogoutModal = () => {
   showLogoutModal.value = false
 }
 
-  const confirmLogout = async () => {
-    showLogoutModal.value = false
-    await authService.logout()
-    await navigateTo('/')   // change this line
-  }
+const confirmLogout = async () => {
+  showLogoutModal.value = false
+  await authService.logout()
+  await navigateTo('/')
+}
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
