@@ -46,7 +46,7 @@ const clearCart = () => cartService.clear()
 
           <NuxtLink to="/customer/checkout"
             class="w-full mt-8 bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 text-center">
-            Checkout All
+            Checkout
             <Icon name="heroicons:arrow-right" />
           </NuxtLink>
 

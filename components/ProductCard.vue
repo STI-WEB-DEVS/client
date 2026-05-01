@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue';
 import { cartService } from '~/api/cart/CartService';
 const props = defineProps({
     product: {
@@ -6,7 +7,12 @@ const props = defineProps({
         required: true
     }
 })
-const addToCart = (product) => cartService.add(product)
+
+const showSuccessModal = ref(false);
+const addToCart = (product) => {
+    cartService.add(product);
+    showSuccessModal.value = true;
+}
 </script>
 
 <template>
@@ -29,19 +35,30 @@ const addToCart = (product) => cartService.add(product)
         <span class="text-xl font-bold text-gray-900">${{ product.price || '29.00' }}</span>
         
         <div class="flex gap-2">
-          <NuxtLink
-            :to="'/customer/cart'"
+          <button
             @click="addToCart(product)"
             class="p-2 border border-gray-200 text-gray-500 rounded-lg hover:bg-gray-100 hover:text-indigo-600 transition-all shadow-sm flex items-center justify-center active:scale-90"
             title="Add to Cart"
           >
               <Icon name="lineicons:cart-2" size="20" />
-        </NuxtLink>
+        </button>
           <NuxtLink :to="'/customer/checkout?id=' + (product.uuid || product.id)" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors">
             Buy Now
           </NuxtLink>
         </div>
       </div>
     </div>
+    
+    <FeedbackModal
+      :open="showSuccessModal"
+      type="success"
+      title="Added to Cart"
+      :message="`${product.name} has been added to your cart successfully.`"
+      confirmText="Go to Cart"
+      cancelText="Continue Shopping"
+      :showCancel="true"
+      @close="showSuccessModal = false"
+      @confirm="navigateTo('/customer/cart')"
+    />
   </div>
 </template>
