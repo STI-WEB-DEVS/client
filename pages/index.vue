@@ -148,7 +148,13 @@ const handleSubmit = async () => {
       localStorage.setItem("role", response.user.role);
     }
 
-    await navigateTo("/admin/dashboard");
+    const role = (response?.user?.role || "").toString().toUpperCase();
+    if (role === "CUSTOMER") {
+      localStorage.removeItem("customer_uuid");
+      await navigateTo("/customer/order");
+    } else {
+      await navigateTo("/admin/dashboard");
+    }
   } catch (err: any) {
     error.value = err?.message || "";
   } finally {

@@ -53,6 +53,7 @@ class AuthService extends BaseService {
       localStorage.removeItem("_token");
       localStorage.removeItem("uuid");
       localStorage.removeItem("role");
+      localStorage.removeItem("customer_uuid");
     }
   }
 
