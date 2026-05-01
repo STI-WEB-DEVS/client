@@ -7,13 +7,14 @@
         </NuxtLink>
 
         <nav class="hidden items-center gap-8 text-sm font-medium text-gray-600 md:flex">
-          <NuxtLink to="/customer/shop">Shop</NuxtLink>
-          <NuxtLink to="#">Categories</NuxtLink>
-          <NuxtLink to="/customer/order">Orders</NuxtLink>
-          <NuxtLink to="#">Account</NuxtLink>
+          <NuxtLink to="/customer/shop" active-class="text-indigo-600">Shop</NuxtLink>
+          <NuxtLink to="#" active-class="text-indigo-600">Categories</NuxtLink>
+          <NuxtLink to="/customer/order" active-class="text-indigo-600">Orders</NuxtLink>
+          <NuxtLink to="#" active-class="text-indigo-600">Account</NuxtLink>
         </nav>
 
-        <NuxtLink to="/customer/cart" class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">
+        <NuxtLink to="/customer/cart"
+          class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">
           Cart
         </NuxtLink>
       </div>
