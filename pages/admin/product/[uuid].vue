@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout>
+  <div>
     <div class="space-y-6">
       <div>
         <h1 class="text-xl font-semibold tracking-tight text-gray-900">
@@ -53,7 +53,7 @@
         Product not found or failed to load.
       </div>
     </div>
-  </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">

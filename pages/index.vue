@@ -148,15 +148,15 @@ const handleSubmit = async () => {
       return;
     }
     
-    if (role === 'customer') {
-      await navigateTo('/admin/dashboard');
-      return;
-    }
-
     // if (role === 'customer') {
-    //   await navigateTo('/customer/order');
+    //   await navigateTo('/admin/dashboard');
     //   return;
     // }
+
+    if (role === 'customer') {
+      await navigateTo('/customer/landing');
+      return;
+    }
 
     await navigateTo('/');
   } catch (err: any) {
