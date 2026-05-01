@@ -6,16 +6,23 @@ definePageMeta({
 const { products, pending, error, refresh } = useProducts();
 const { addItem } = useCart();
 
-const alert = ref<{
-  variant: "success" | "error" | "info";
-  message: string;
-} | null>(null);
+const feedbackOpen = ref(false);
+const feedbackMessage = ref("");
+
+const openFeedback = (message: string) => {
+  feedbackMessage.value = message;
+  feedbackOpen.value = true;
+};
+
+const closeFeedback = () => {
+  feedbackOpen.value = false;
+};
 
 onMounted(refresh);
 
 const onAdd = (p: any) => {
   addItem(p, 1);
-  alert.value = { variant: "success", message: "Added to cart." };
+  openFeedback("Item has been successfully added to the cart.");
 };
 
 const onBuyNow = async (p: any) => {
@@ -34,8 +41,6 @@ const onBuyNow = async (p: any) => {
         </p>
       </div>
     </div>
-
-    <UiAlert v-if="alert" :variant="alert.variant" :message="alert.message" />
     <UiAlert v-if="error" variant="error" :message="error" />
 
     <div v-if="pending" class="rounded-lg border border-gray-200 bg-white p-6">
@@ -57,5 +62,12 @@ const onBuyNow = async (p: any) => {
     </div>
 
     <ProductList v-else :products="products" @add="onAdd" @buy-now="onBuyNow" />
+
+    <FeedbackModal
+      :open="feedbackOpen"
+      title="Added to cart"
+      :message="feedbackMessage"
+      @close="closeFeedback"
+    />
   </div>
 </template>

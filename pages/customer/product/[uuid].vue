@@ -54,6 +54,18 @@ const alert = ref<{
   message: string;
 } | null>(null);
 
+const feedbackOpen = ref(false);
+const feedbackMessage = ref("");
+
+const openFeedback = (message: string) => {
+  feedbackMessage.value = message;
+  feedbackOpen.value = true;
+};
+
+const closeFeedback = () => {
+  feedbackOpen.value = false;
+};
+
 const handleAdd = () => {
   alert.value = null;
   if (!product.value) {
@@ -61,7 +73,7 @@ const handleAdd = () => {
     return;
   }
   addItem(product.value, 1);
-  alert.value = { variant: "success", message: "Added to cart." };
+  openFeedback("Item has been successfully added to the cart.");
 };
 
 const handleBuyNow = async () => {
@@ -204,6 +216,13 @@ const handleBuyNow = async () => {
             Buy Now
           </button>
         </div>
+
+        <FeedbackModal
+          :open="feedbackOpen"
+          title="Added to cart"
+          :message="feedbackMessage"
+          @close="closeFeedback"
+        />
       </div>
     </div>
   </div>

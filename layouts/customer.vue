@@ -4,6 +4,29 @@
 const route = useRoute();
 
 const showHero = computed(() => route.path === "/customer/order");
+
+const logoutModalOpen = ref(false);
+
+const openLogoutModal = () => {
+  logoutModalOpen.value = true;
+};
+
+const closeLogoutModal = () => {
+  logoutModalOpen.value = false;
+};
+
+const confirmLogout = async () => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("_token");
+    localStorage.removeItem("uuid");
+    localStorage.removeItem("role");
+    localStorage.removeItem("customer_uuid");
+    localStorage.removeItem("customer_cart");
+    sessionStorage.setItem("signed_out", "1");
+  }
+  closeLogoutModal();
+  await navigateTo("/");
+};
 </script>
 
 <template>
@@ -50,12 +73,22 @@ const showHero = computed(() => route.path === "/customer/order");
           </div>
         </nav>
 
-        <NuxtLink
-          to="/customer/cart"
-          class="shrink-0 rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
-          Cart
-        </NuxtLink>
+        <div class="flex items-center gap-3">
+          <NuxtLink
+            to="/customer/cart"
+            class="shrink-0 rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Cart
+          </NuxtLink>
+
+          <button
+            type="button"
+            class="shrink-0 rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+            @click="openLogoutModal"
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </header>
 
@@ -125,5 +158,16 @@ const showHero = computed(() => route.path === "/customer/order");
         </div>
       </div>
     </footer>
+
+    <FeedbackModal
+      :open="logoutModalOpen"
+      title="Sign out"
+      message="Are you sure you want to sign out?"
+      confirm
+      confirm-text="Sign out"
+      cancel-text="Cancel"
+      @close="closeLogoutModal"
+      @confirm="confirmLogout"
+    />
   </div>
 </template>
