@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
     <div>
-      <h1 class="text-xl font-semibold tracking-tight text-gray-900">{{ title }}</h1>
+      <h1 class="text-xl font-bold tracking-tight text-gray-900">{{ title }}</h1>
       <p v-if="description" class="mt-1 text-sm text-gray-500">
         {{ description }}
       </p>

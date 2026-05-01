@@ -35,7 +35,7 @@ const handleSubmit = async () => {
         localStorage.setItem('_role', response.user.role);
 
         if (response.user.role === 'customer') {
-          return await navigateTo('/customer/order');
+          return await navigateTo('/customer');
         }
       }
     }

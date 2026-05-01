@@ -70,6 +70,8 @@ export class AuthService {
 				localStorage.removeItem("_token");
 				localStorage.removeItem("_uuid");
 				localStorage.removeItem("_role");
+				localStorage.removeItem("_email");
+				localStorage.removeItem("_name");
 				return true;
 			}
 			return false;

@@ -15,12 +15,10 @@
         <tbody class="divide-y divide-gray-100 bg-white">
           <template v-if="items && items.length">
             <tr v-for="(item, index) in items" :key="item.id || index" class="transition hover:bg-gray-50">
-              <td v-for="header in headers" :key="header.key"
-                class="whitespace-nowrap px-6 py-4 text-sm"
-                :class="[
-                  header.align === 'right' ? 'text-right' : 'text-left',
-                  header.class || 'text-gray-700'
-                ]">
+              <td v-for="header in headers" :key="header.key" class="whitespace-nowrap px-6 py-4 text-sm" :class="[
+                header.align === 'right' ? 'text-right' : 'text-left',
+                header.class || 'text-gray-700'
+              ]">
                 <slot :name="`cell(${header.key})`" :item="item" :value="item[header.key]">
                   {{ item[header.key] ?? 'N/A' }}
                 </slot>
@@ -37,7 +35,6 @@
       </table>
     </div>
 
-    <!-- Pagination Footer (Optional) -->
     <div v-if="meta" class="border-t border-gray-200 bg-gray-50 px-6 py-4">
       <p class="text-sm text-gray-500">
         Showing

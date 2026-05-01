@@ -92,16 +92,22 @@ const handleSubmit = async () => {
       const authService = new AuthService();
       const response = await authService.login(email.value, password.value);
       if (response?.token) {
+        localStorage.setItem('_name', response.user.name);
+        localStorage.setItem('_email', response.user.email);
         localStorage.setItem('_token', response.token);
         localStorage.setItem('_uuid', response.user.uuid);
-        localStorage.setItem('_role', response.user.role);
+        
+        // Handle Spatie roles array
+        const userRole = response.user.roles?.[0]?.name || response.user.role || 'customer';
+        localStorage.setItem('_role', userRole);
 
-        if (response.user.role === 'customer') {
-          return await navigateTo('/customer/order');
+        if (userRole === 'admin') {
+          return await navigateTo('/admin/dashboard');
         }
+
+        return await navigateTo('/customer');
       }
     }
-    await navigateTo('/admin/dashboard');
   } catch (err: any) {
     error.value = err.message;
   } finally {

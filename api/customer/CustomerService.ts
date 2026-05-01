@@ -25,7 +25,7 @@ class CustomerService extends BaseService {
     }
 
     async update(uuid: string, payload: object): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'PUT', payload);
+        return await this.request(`${this.resource}/${uuid}`, 'POST', { ...payload, _method: 'PUT' });
     }
 
     async delete(uuid: string): Promise<any> {

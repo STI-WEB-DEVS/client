@@ -1,6 +1,6 @@
 import BaseService from '~/api/BaseService';
 
-class ProductService extends BaseService {
+export default class ProductService extends BaseService {
     private static instance: ProductService;
 
     public static getInstance(): ProductService {

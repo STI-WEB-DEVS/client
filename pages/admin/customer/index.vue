@@ -1,75 +1,64 @@
 <template>
-    <div class="space-y-6">
-      <PageHeader
-        title="Customers"
-        description="Displaying customer records from your API."
-        button-text="Create Customer"
-        :show-button="true"
-        :icon="PlusIcon"
-        @action="handleCreate"
-      />
+  <div class="space-y-6">
+    <PageHeader title="Customers" description="Displaying customer records from your API." button-text="Create Customer"
+      :show-button="true" :icon="PlusIcon" @action="handleCreate" />
 
-      <div v-if="pending" class="flex justify-center py-16">
-        <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
-      </div>
-
-      <div v-else-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4">
-        <p class="text-sm text-red-700">{{ error.message }}</p>
-      </div>
-
-      <div v-else>
-        <BaseTable
-          :headers="[
-            { label: 'ID', key: 'id', class: 'font-medium text-gray-900' },
-            { label: 'Name', key: 'name' },
-            { label: 'Email', key: 'email' },
-            { label: 'Created At', key: 'created_at' },
-            { label: 'Actions', key: 'actions', align: 'right' }
-          ]"
-          :items="customers?.data || []"
-          :meta="customers?.meta"
-          resource-name="customers"
-          empty-message="No customers found."
-        >
-          <template #cell(created_at)="{ value }">
-            {{ value ? new Date(value).toLocaleString() : 'N/A' }}
-          </template>
-
-          <template #cell(actions)="{ item }">
-            <div class="flex items-center justify-end gap-2">
-              <button type="button" @click="handleView(item)"
-                class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                <EyeIcon class="h-4 w-4" />
-                <span>View</span>
-              </button>
-
-              <button type="button" @click="handleEdit(item)"
-                class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                <PencilSquareIcon class="h-4 w-4" />
-                <span>Edit</span>
-              </button>
-
-              <button type="button" @click="handleDelete(item)"
-                class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50">
-                <TrashIcon class="h-4 w-4" />
-                <span>Delete</span>
-              </button>
-            </div>
-          </template>
-        </BaseTable>
-      </div>
-
-      <BaseModal :open="isModalOpen" title="Customer" :fields="[
-        { key: 'name', label: 'Name', placeholder: 'John Doe' },
-        { key: 'email', label: 'Email', type: 'email', placeholder: 'john@example.com' }
-      ]" :initial-data="selectedCustomer" :pending="isSaving" @close="closeModal" @save="handleSave" />
-
-      <FeedbackModal :open="isFeedbackModalOpen" :message="feedbackMessage" @close="closeFeedbackModal" />
-
-      <FeedbackModal :open="isDeleteModalOpen" title="Confirm Delete"
-        :message="`Are you sure you want to delete ${customerToDelete?.name}?`" show-cancel
-        @close="isDeleteModalOpen = false" @confirm="confirmDelete" />
+    <div v-if="pending" class="flex justify-center py-16">
+      <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
     </div>
+
+    <div v-else-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4">
+      <p class="text-sm text-red-700">{{ error.message }}</p>
+    </div>
+
+    <div v-else>
+      <BaseTable :headers="[
+        { label: 'ID', key: 'id', class: 'font-medium text-gray-900' },
+        { label: 'Name', key: 'name' },
+        { label: 'Email', key: 'email' },
+        { label: 'Created At', key: 'created_at' },
+        { label: 'Actions', key: 'actions', align: 'right' }
+      ]" :items="customers?.data || []" :meta="customers?.meta" resource-name="customers"
+        empty-message="No customers found.">
+        <template #cell(created_at)="{ value }">
+          {{ value ? new Date(value).toLocaleString() : 'N/A' }}
+        </template>
+
+        <template #cell(actions)="{ item }">
+          <div class="flex items-center justify-end gap-2">
+            <button type="button" @click="handleView(item)"
+              class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+              <EyeIcon class="h-4 w-4" />
+              <span>View</span>
+            </button>
+
+            <button type="button" @click="handleEdit(item)"
+              class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+              <PencilSquareIcon class="h-4 w-4" />
+              <span>Edit</span>
+            </button>
+
+            <button type="button" @click="handleDelete(item)"
+              class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50">
+              <TrashIcon class="h-4 w-4" />
+              <span>Delete</span>
+            </button>
+          </div>
+        </template>
+      </BaseTable>
+    </div>
+
+    <BaseModal :open="isModalOpen" title="Customer" :fields="[
+      { key: 'name', label: 'Name', placeholder: 'John Doe' },
+      { key: 'email', label: 'Email', type: 'email', placeholder: 'john@example.com' }
+    ]" :initial-data="selectedCustomer" :pending="isSaving" @close="closeModal" @save="handleSave" />
+
+    <FeedbackModal :open="isFeedbackModalOpen" :message="feedbackMessage" @close="closeFeedbackModal" />
+
+    <FeedbackModal :open="isDeleteModalOpen" title="Confirm Delete"
+      :message="`Are you sure you want to delete ${customerToDelete?.name}?`" show-cancel
+      @close="isDeleteModalOpen = false" @confirm="confirmDelete" />
+  </div>
 </template>
 
 <script setup lang="ts">
