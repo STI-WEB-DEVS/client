@@ -71,8 +71,8 @@ if (!fs.existsSync(targetDir)){
 }
 
 if (fs.existsSync(targetFile)) {
-    console.error(`❌ File already exists: ${targetFile}`);
+    console.error(` File already exists: ${targetFile}`);
 } else {
     fs.writeFileSync(targetFile, fileContent);
-    console.log(`✅ Created Service: api/${folderName}/${resourceName}Service.ts`);
+    console.log(` Created Service: api/${folderName}/${resourceName}Service.ts`);
 }

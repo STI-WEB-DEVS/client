@@ -1,7 +1,9 @@
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
-    const token = localStorage.getItem('_token');
+
+    // ✅ SSR-safe: only access localStorage on client side
+    const token = process.client ? localStorage.getItem('token') : null;
 
     const headers: Record<string, string> = {
       Accept: 'application/json',
