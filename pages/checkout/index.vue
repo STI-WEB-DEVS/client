@@ -1,27 +1,62 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useCartStore } from '~/stores/cart'
 import { useOrdersStore } from '~/stores/order'   
+import { useRoute } from 'vue-router'
 import { CheckCircleIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
 
 definePageMeta({ layout: 'customer' })
 
+const route = useRoute()
 const cart = useCartStore()
 const ordersStore = useOrdersStore()
 
+// Check for direct purchase query parameters
+const directUuid = route.query.direct_uuid as string
+const directName = route.query.direct_name as string
+const directPrice = route.query.direct_price ? parseFloat(route.query.direct_price as string) : 0
+const directQty = route.query.direct_qty ? parseInt(route.query.direct_qty as string) : 1
+const directCustomerUuid = route.query.direct_customer_uuid as string
+
+const isDirectBuy = !!directUuid
+
+// Use provided customer UUID from query or localStorage
 const customerUuid = ref(
-  process.client ? (localStorage.getItem('uuid') ?? '') : ''
+  isDirectBuy && directCustomerUuid ? directCustomerUuid : (process.client ? (localStorage.getItem('uuid') ?? '') : '')
 )
+
 const errors = ref<{ customer_uuid?: string; items?: string }>({})
 const showSuccess = ref(false)
+
+// Order items: either direct buy item or cart items
+const orderItems = computed(() => {
+  if (isDirectBuy) {
+    return [{
+      product_uuid: directUuid,
+      name: directName,
+      price: directPrice,
+      quantity: directQty,
+    }]
+  }
+  return cart.items.map(item => ({
+    product_uuid: item.product_uuid,
+    name: item.name,
+    price: item.price,
+    quantity: item.quantity,
+  }))
+})
+
+const totalPrice = computed(() => {
+  return orderItems.value.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+})
 
 function validate() {
   errors.value = {}
   if (!customerUuid.value.trim()) {
     errors.value.customer_uuid = 'Customer UUID is required.'
   }
-  if (cart.isEmpty) {
-    errors.value.items = 'Your cart is empty.'
+  if (orderItems.value.length === 0) {
+    errors.value.items = 'No items to order.'
   }
   return Object.keys(errors.value).length === 0
 }
@@ -29,37 +64,29 @@ function validate() {
 function placeOrder() {
   if (!validate()) return
 
-  const orderItems = cart.items.map(item => ({
-    product_uuid: item.product_uuid,
-    name: item.name,
-    price: item.price,
-    quantity: item.quantity,
-  }))
-
-  const total = cart.totalPrice
-  const newOrder = {
-    order_uuid: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-    customer_uuid: customerUuid.value.trim(),
-    date: new Date().toISOString(),
-    total,
-    items: orderItems,
-  }
-
-  console.log('Order Payload (Checkout):', JSON.stringify(newOrder, null, 2))
-
+  // Save order to store
   ordersStore.addOrder(
     customerUuid.value.trim(),
-    orderItems,
-    total
+    orderItems.value,
+    totalPrice.value
   )
 
-  cart.clearCart()
+  // If normal cart checkout, clear the cart. If direct buy, leave cart untouched.
+  if (!isDirectBuy) {
+    cart.clearCart()
+  }
+
   showSuccess.value = true
 }
 
 function cancelOrder() {
-  cart.clearCart()
-  navigateTo('/shop')
+  if (isDirectBuy) {
+    // For direct buy, just go back to shop without touching the cart
+    navigateTo('/shop')
+  } else {
+    cart.clearCart()
+    navigateTo('/shop')
+  }
 }
 
 function goToOrders() {
@@ -97,7 +124,7 @@ function formatPrice(val: number) {
               :class="{ 'border-red-300 focus:border-red-400 focus:ring-red-100': errors.customer_uuid }"
             />
             <p v-if="errors.customer_uuid" class="mt-1 text-xs text-red-500">{{ errors.customer_uuid }}</p>
-            <p class="mt-1 text-xs text-gray-400">Auto-filled from your session. You can override this.</p>
+            <p class="mt-1 text-xs text-gray-400">Auto-filled from your session.</p>
           </label>
         </div>
         <p v-if="errors.items" class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-500">{{ errors.items }}</p>
@@ -107,7 +134,7 @@ function formatPrice(val: number) {
         <div class="sticky top-24 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
           <h3 class="mb-4 text-sm font-semibold uppercase tracking-widest text-gray-400">Order Summary</h3>
           <ul class="divide-y divide-gray-50">
-            <li v-for="item in cart.items" :key="item.product_uuid" class="flex items-start justify-between py-3 text-sm">
+            <li v-for="item in orderItems" :key="item.product_uuid" class="flex items-start justify-between py-3 text-sm">
               <div class="min-w-0 flex-1 pr-2">
                 <p class="truncate font-medium text-gray-800">{{ item.name }}</p>
                 <p class="text-xs text-gray-400">× {{ item.quantity }}</p>
@@ -117,7 +144,7 @@ function formatPrice(val: number) {
           </ul>
           <div class="mt-4 border-t border-gray-100 pt-4 flex items-center justify-between font-bold text-gray-900">
             <span>Total</span>
-            <span class="text-indigo-600">{{ formatPrice(cart.totalPrice) }}</span>
+            <span class="text-indigo-600">{{ formatPrice(totalPrice) }}</span>
           </div>
           <div class="mt-5 flex gap-3">
             <button
@@ -128,7 +155,7 @@ function formatPrice(val: number) {
             </button>
             <button
               class="flex-1 rounded-lg bg-indigo-600 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-50"
-              :disabled="cart.isEmpty"
+              :disabled="orderItems.length === 0"
               @click="placeOrder"
             >
               Place Order
