@@ -87,18 +87,18 @@ const form = ref({
 const isEditMode = computed(() => !!props.product);
 
 watch(
-  () => props.product,
-  (newVal) => {
-    if (newVal) {
+  () => props.open,
+  (isOpen) => {
+    if (!isOpen) return;
+    if (props.product) {
       form.value = {
-        name: newVal.name,
-        price: newVal.price,
+        name: props.product.name,
+        price: props.product.price,
       };
     } else {
       form.value = { name: "", price: null };
     }
   },
-  { immediate: true },
 );
 
 const handleSubmit = () => {

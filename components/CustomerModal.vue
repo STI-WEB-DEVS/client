@@ -85,18 +85,18 @@ const form = ref({
 const isEditMode = computed(() => !!props.customer);
 
 watch(
-  () => props.customer,
-  (newCustomer) => {
-    if (newCustomer) {
+  () => props.open,
+  (isOpen) => {
+    if (!isOpen) return;
+    if (props.customer) {
       form.value = {
-        name: newCustomer.name,
-        email: newCustomer.email,
+        name: props.customer.name,
+        email: props.customer.email,
       };
     } else {
       form.value = { name: "", email: "" };
     }
   },
-  { immediate: true },
 );
 
 const handleSubmit = () => {

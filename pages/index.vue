@@ -147,7 +147,7 @@ const handleSubmit = async () => {
       throw new Error("Invalid login response");
     }
 
-    // ✅ STORE ONLY WHAT YOU NEED
+    // ✅ STORE AUTH DATA
     localStorage.setItem("_token", response.token);
     localStorage.setItem("uuid", response.user.uuid);
     localStorage.setItem("role", response.user.role);
