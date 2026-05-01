@@ -1,24 +1,29 @@
 <template>
-  <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-    
+  <div
+    v-if="open"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+  >
     <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg space-y-4">
-      
       <!-- Title -->
       <div class="flex justify-between items-center">
         <h2 class="text-lg font-semibold text-gray-900">
-          {{ product ? 'Edit Product' : 'Create Product' }}
+          {{ product ? "Edit Product" : "Create Product" }}
         </h2>
-        <button @click="$emit('close')" class="text-gray-500 hover:text-gray-700">
+        <button
+          @click="$emit('close')"
+          class="text-gray-500 hover:text-gray-700"
+        >
           ✕
         </button>
       </div>
 
       <!-- Form -->
       <form @submit.prevent="handleSubmit" class="space-y-4">
-        
         <!-- Name -->
         <div>
-          <label class="block text-sm font-medium text-gray-700">Product Name</label>
+          <label class="block text-sm font-medium text-gray-700"
+            >Product Name</label
+          >
           <input
             v-model="form.name"
             type="text"
@@ -54,33 +59,32 @@
             :disabled="loading"
             class="rounded-lg bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
           >
-            {{ loading ? 'Saving...' : (product ? 'Update' : 'Create') }}
+            {{ loading ? "Saving..." : product ? "Update" : "Create" }}
           </button>
         </div>
-
       </form>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
 const props = defineProps({
   open: Boolean,
   loading: Boolean,
   product: {
     type: Object,
-    default: null
-  }
-})
+    default: null,
+  },
+});
 
-const emit = defineEmits(['close', 'submit'])
+const emit = defineEmits(["close", "submit"]);
 
 const form = ref({
-  name: '',
-  price: ''
-})
+  name: "",
+  price: "",
+});
 
 // Populate form if editing
 watch(
@@ -88,18 +92,18 @@ watch(
   (val) => {
     if (val) {
       form.value = {
-        name: val.name || '',
-        price: val.price || ''
-      }
+        name: val.name || "",
+        price: val.price || "",
+      };
     } else {
       form.value = {
-        name: '',
-        price: ''
-      }
+        name: "",
+        price: "",
+      };
     }
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
 // Optional reset when modal closes
 watch(
@@ -107,20 +111,19 @@ watch(
   (val) => {
     if (!val) {
       form.value = {
-        name: '',
-        price: ''
-      }
+        name: "",
+        price: "",
+      };
     }
-  }
-)
+  },
+);
 
 const handleSubmit = () => {
   if (!form.value.name || !form.value.price) {
-    alert('Please fill in all fields')
-    return
+    alert("Please fill in all fields");
+    return;
   }
 
-  emit('submit', form.value)
-}
+  emit("submit", form.value);
+};
 </script>
-
