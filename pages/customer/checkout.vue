@@ -64,9 +64,6 @@ const handlePlaceOrder = () => {
     
     // sample order placement
     if (typeof window !== 'undefined') {
-        const existingOrders = JSON.parse(localStorage.getItem('_fake_orders') || '[]');
-        existingOrders.push(payload);
-        localStorage.setItem('_fake_orders', JSON.stringify(existingOrders));
         
         if (checkoutItems.value.length > 0) {
             checkoutItems.value.forEach(item => {

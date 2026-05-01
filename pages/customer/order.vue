@@ -8,14 +8,12 @@ definePageMeta({
 const orders = ref([])
 
 onMounted(() => {
-  if (typeof window !== 'undefined') {
-    orders.value = JSON.parse(localStorage.getItem('_fake_orders') || '[]')
-  }
+  // To do: Fetch orders from API
 })
 </script>
 
 <template>
-  <div class="max-w-ffull mx-auto">
+  <div class="max-w-full mx-auto"> 
     <PageHeader title="My Orders" description="View your order history and details." />
 
     <div v-if="orders.length > 0" class="mt-8 space-y-6">
