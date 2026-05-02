@@ -15,18 +15,29 @@
           <span class="cursor-pointer transition hover:text-indigo-600">Account</span>
         </div>
 
-        <NuxtLink
-          to="/customer/cart"
-          class="relative rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-        >
-          Cart
-          <span
-            v-if="itemCount > 0"
-            class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white"
+        <div class="flex items-center gap-3">
+          <NuxtLink
+            to="/customer/cart"
+            class="relative rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
           >
-            {{ itemCount }}
-          </span>
-        </NuxtLink>
+            Cart
+            <span
+              v-if="itemCount > 0"
+              class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white"
+            >
+              {{ itemCount }}
+            </span>
+          </NuxtLink>
+
+          <button
+            type="button"
+            :disabled="isSigningOut"
+            @click="handleSignOut"
+            class="rounded-full border border-red-200 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+          >
+            {{ isSigningOut ? 'Signing out...' : 'Sign Out' }}
+          </button>
+        </div>
       </div>
     </header>
 
@@ -92,13 +103,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCart } from '~/composables/useCart'
+import { AuthService } from '~/api/auth/AuthService'
 
 const route = useRoute()
 const { itemCount } = useCart()
+const isSigningOut = ref(false)
+const authService = new AuthService()
 
-// Only show the hero section on the home/landing page
 const isHome = computed(() => route.path === '/customer/order')
+
+const handleSignOut = async () => {
+  isSigningOut.value = true
+  try {
+    await authService.logout()
+    await navigateTo('/')
+  } catch (err) {
+    console.error('Sign out failed:', err)
+  } finally {
+    isSigningOut.value = false
+  }
+}
 </script>
