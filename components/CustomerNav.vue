@@ -173,6 +173,7 @@ const confirmLogout = async () => {
     localStorage.removeItem('_token')
     localStorage.removeItem('uuid')
     localStorage.removeItem('role')
+    localStorage.removeItem('customer_uuid')
     await router.push('/')
   } catch (error) {
     console.error(error)

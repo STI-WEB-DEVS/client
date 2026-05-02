@@ -135,6 +135,12 @@ const handleSubmit = async () => {
       localStorage.removeItem('uuid');
     }
 
+    if (response?.user?.customer_uuid) {
+      localStorage.setItem('customer_uuid', response.user.customer_uuid);
+    } else {
+      localStorage.removeItem('customer_uuid');
+    }
+
     const role = response?.user?.role ?? null;
 
     if (role) {

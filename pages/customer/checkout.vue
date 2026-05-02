@@ -89,7 +89,7 @@ const CART_KEY = 'cart'
 
 /* Customer (replace with auth store later) */
 const customer = ref({
-  uuid: '',
+  customer_uuid: '',
   name: '',
   email: ''
 })
@@ -98,12 +98,12 @@ const loadCustomer = () => {
   if (!process.client) return
 
   customer.value = {
-    uuid: localStorage.getItem('uuid') || '',
+    customer_uuid: localStorage.getItem('customer_uuid') || '',
     name: localStorage.getItem('name') || 'Guest',
     email: localStorage.getItem('email') || 'guest@example.com'
   }
 }
-
+  
 /* Cart */
 const cart = ref([])
 
@@ -128,9 +128,9 @@ const totalPrice = computed(() =>
 /* Convert cart → API payload */
 const buildPayload = () => {
   return {
-    customer_uuid: customer.value.uuid,
+    customer_uuid: customer.value.customer_uuid,
     items: cart.value.map(item => ({
-      product_uuid: item.id,
+      product_uuid: item.product_uuid, // ✅ fixed
       quantity: item.qty
     }))
   }
@@ -142,16 +142,15 @@ const placeOrder = async () => {
 
   try {
     const payload = buildPayload()
-
+    console.log('CART:', cart.value)
     console.log('PAYLOAD:', payload)
 
     await orderService.create(payload)
 
-    // clear cart after success
+    //clear cart after success
     localStorage.removeItem(CART_KEY)
     cart.value = []
 
-    alert('Order placed successfully!')
     showFeedback('Order placed successfully!')
   } catch (err) {
     console.error(err)
@@ -161,7 +160,11 @@ const placeOrder = async () => {
   }
 }
 
-onMounted(loadCart)
+// onMounted(loadCart)
+onMounted(() => {
+  loadCart()
+  loadCustomer()
+})
 
 
 // --- Feedback State ---

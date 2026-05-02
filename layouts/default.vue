@@ -215,6 +215,7 @@ const confirmLogout = async () => {
     await authService.logout()         // DELETE /logout — throws if not 2xx
     localStorage.removeItem('_token') // only reached on success
     localStorage.removeItem('uuid') 
+    localStorage.removeItem('customer_uuid') 
     localStorage.removeItem('role')     
 
     router.push('/')
