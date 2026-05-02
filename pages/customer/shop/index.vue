@@ -77,6 +77,7 @@ onMounted(loadProducts);
       v-else-if="products && products.length > 0"
       class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
     >
+      <!-- TODO: Will be component soon <333-->
       <div
         v-for="product in products"
         :key="product.id"
@@ -106,7 +107,9 @@ onMounted(loadProducts);
         </div>
 
         <!-- Action Button (Aesthetic indicator) -->
-        <div class="p-6 pt-0 opacity-0 transition-opacity group-hover:opacity-100">
+        <div
+          class="p-6 pt-0 opacity-0 transition-opacity group-hover:opacity-100"
+        >
           <button
             class="w-full rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
           >
