@@ -156,40 +156,50 @@ onMounted(() => {
   cart.value = getCart();
 });
 
+
+import { orderService } from '~/api/order/OrderService';
+
+
 const placeOrder = async () => {
   error.value = '';
   isLoading.value = true;
 
   try {
-    const customerUUID = localStorage.getItem('_uuid');
+    const customerUUID = localStorage.getItem('_customer_uuid');
 
+    if (!customerUUID) {
+      throw new Error('No customer UUID found in localStorage. Please log in again.');
+    }
+
+    // ✅ Build payload with items array using product_uuid
     const payload = {
-      order_uuid: crypto.randomUUID(),
-      customer_uuid: customerUUID,
-      date: new Date().toISOString(),
-      total: totalAmount.value,
-      items: cart.value.map((item: any) => ({
-        product_uuid: item.uuid,
-        name: item.name,
-        price: item.price,
+      customer_id: customerUUID, // repository resolves this UUID to customer
+      items: cart.value.map(item => ({
+        product_uuid: item.uuid,   // use UUID instead of numeric id
         quantity: item.quantity,
       })),
     };
 
-    // ✅ ONLY console log (no backend)
-    console.log('Order Payload:', payload);
+    console.log('Sending payload:', payload);
 
-    // simulate success
+    const response = await orderService.create(payload);
+    console.log('Order response:', response);
+
+    // Clear cart locally after successful order
     clearCart();
     cart.value = [];
 
+    // Show success modal
     showSuccessModal.value = true;
+
   } catch (err: any) {
+    console.error('Order error:', err);
     error.value = err?.message || 'Something went wrong.';
   } finally {
     isLoading.value = false;
   }
 };
+
 const goToOrders = async () => {
   await navigateTo('/customer/order');
 };

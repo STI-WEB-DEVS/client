@@ -23,9 +23,13 @@ export class AuthService {
         },
       });
 
-      localStorage.setItem('_token', response.token);
-      localStorage.setItem('_uuid', response.user.uuid);
-      localStorage.setItem('_role', response.user.role);
+localStorage.setItem('_token', response.token);
+localStorage.setItem('_user_uuid', response.user.uuid);        // user UUID
+localStorage.setItem('_customer_uuid', response.user.customer_uuid); // customer UUID
+localStorage.setItem('_customer_id', response.user.customer_id);     // numeric ID
+localStorage.setItem('_role', response.user.role);
+
+
 
       return response;
     } catch (error: any) {

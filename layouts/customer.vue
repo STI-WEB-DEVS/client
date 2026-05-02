@@ -152,10 +152,43 @@
       :model-value="showSuccessModal"
       @view-orders="goToOrders"
     />
+
+    <!-- Simple Cart Modal -->
+<div
+  v-if="showCartModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+>
+  <div class="w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
+    <h3 class="text-lg font-bold text-gray-900">Added to Cart</h3>
+    <p class="mt-2 text-sm text-gray-600">
+      {{ selectedProductName }} has been added to your cart.
+    </p>
+
+    <div class="mt-4 flex gap-3">
+      <button
+        @click="showCartModal = false"
+        class="flex-1 rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+      >
+        Continue Shopping
+      </button>
+      <button
+        @click="navigateTo('/customer/checkout')"
+        class="flex-1 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+      >
+        Go to Checkout
+      </button>
+    </div>
+  </div>
+</div>
+
   </div>
 </template>
 
 <script setup lang="ts">
+
+const showCartModal = ref(false);
+const selectedProductName = ref('');
+
 import { onMounted, ref } from 'vue';
 import { productService } from '~/api/product/ProductService';
 import { addToCart, setCart } from '~/utils/cart';
@@ -195,8 +228,10 @@ const fetchProducts = async () => {
 
 const handleAddToCart = (product: any) => {
   addToCart(product);
-  alert('Added to cart successfully');
+  selectedProductName.value = product.name;
+  showCartModal.value = true; // ✅ show modal instead of alert
 };
+
 
 const openBuyNowModal = (product: any) => {
   selectedProduct.value = product;
@@ -210,17 +245,28 @@ const closeBuyNowModal = () => {
 };
 
 const confirmBuyNow = async (quantity: number) => {
-  setCart([
-    {
+  const cart = getCart(); // load existing cart
+
+  const existingItem = cart.find(
+    (item: any) => item.uuid === selectedProduct.value.uuid
+  );
+
+  if (existingItem) {
+    existingItem.quantity += quantity;
+  } else {
+    cart.push({
       ...selectedProduct.value,
       quantity,
-    },
-  ]);
+    });
+  }
+
+  setCart(cart); // save updated cart
 
   closeBuyNowModal();
 
   await navigateTo('/customer/checkout');
 };
+
 
 const goToOrders = async () => {
   showSuccessModal.value = false;
