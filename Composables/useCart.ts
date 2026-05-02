@@ -48,7 +48,7 @@ export const useCart = () => {
   );
 
   const buildOrderPayload = () => {
-    const customerUuid = localStorage.getItem('_customer_uuid') || '';
+    const customerUuid = localStorage.getItem('_uuid') || '';
     return {
       customer_uuid: customerUuid,
       items: cartItems.value.map((item) => ({
