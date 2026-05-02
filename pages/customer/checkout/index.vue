@@ -51,7 +51,7 @@ const placeOrder = () => {
   };
 
   // Log to console for development verification
-  console.log("Final Order JSON:", JSON.stringify(orderPayload, null, 2));
+  console.log(JSON.stringify(orderPayload, null, 2));
 
   // Show visual feedback
   showSuccessModal.value = true;
@@ -164,14 +164,14 @@ onMounted(loadCheckoutData);
         </div>
       </div>
     </div>
- 
-     <!-- Success Feedback Modal -->
-     <FeedbackModal
-       :open="showSuccessModal"
-       type="success"
-       title="Order Placed Successfully!"
-       message="Thank you for your purchase. Your order has been received and is being processed."
-       @close="handleOrderSuccess"
-     />
-   </div>
- </template>
+
+    <!-- Success Feedback Modal -->
+    <FeedbackModal
+      :open="showSuccessModal"
+      type="success"
+      title="Order Placed Successfully!"
+      message="Thank you for your purchase. Your order has been received and is being processed."
+      @close="handleOrderSuccess"
+    />
+  </div>
+</template>
