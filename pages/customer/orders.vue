@@ -44,7 +44,7 @@ function formatDate(dateString: string) {
 
     <div v-if="orders.length === 0" class="text-center py-12">
       <p class="text-gray-500">You haven't placed any orders yet.</p>
-      <NuxtLink to="/shop" class="mt-4 inline-block text-indigo-600 hover:underline">
+      <NuxtLink to="/customer/shop" class="mt-4 inline-block text-indigo-600 hover:underline">
         Start Shopping →
       </NuxtLink>
     </div>

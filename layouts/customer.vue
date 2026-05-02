@@ -8,7 +8,7 @@
 
         <nav class="hidden items-center gap-6 md:flex">
           <NuxtLink
-            to="/shop"
+            to="/customer/shop"
             class="cursor-pointer border-b-2 border-transparent py-1 text-sm font-medium text-gray-500 transition hover:border-gray-900 hover:text-gray-900"
             active-class="border-gray-900 text-gray-900"
           >Shop</NuxtLink>
@@ -25,7 +25,7 @@
 
         <div class="flex items-center gap-3">
           <NuxtLink
-            to="/cart"
+            to="/customer/cart"
             class="flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-95"
           >
             <ShoppingBagIcon class="h-4 w-4" />
@@ -83,7 +83,7 @@
               </p>
               <div class="mt-8 flex gap-3">
                 <NuxtLink
-                  to="/shop"
+                  to="/customer/shop"
                   class="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 active:scale-95"
                 >
                   Shop Now

@@ -8,7 +8,7 @@
         </span>
       </h2>
       <NuxtLink
-        to="/shop"
+        to="/customer/shop"
         class="flex items-center gap-1.5 text-sm text-gray-500 transition hover:text-gray-900"
       >
         <ArrowLeftIcon class="h-4 w-4" />
@@ -20,7 +20,7 @@
       <ShoppingBagIcon class="h-14 w-14 text-gray-200" />
       <p class="text-sm text-gray-400">Your cart is empty.</p>
       <NuxtLink
-        to="/shop"
+        to="/customer/shop"
         class="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
       >
         Browse Products
@@ -62,7 +62,7 @@
         </div>
         <div class="mt-5 flex gap-3">
           <button class="flex-1 rounded-lg border border-gray-200 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50" @click="cart.clearCart()">Clear Cart</button>
-          <NuxtLink to="/checkout" class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 active:scale-95">
+          <NuxtLink to="/customer/checkout" class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 active:scale-95">
             Proceed to Checkout
             <ArrowRightIcon class="h-4 w-4" />
           </NuxtLink>

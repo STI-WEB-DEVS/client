@@ -16,45 +16,39 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
+  (e: 'orderPlaced', payload: object): void
 }>()
 
 const router = useRouter()
+
+// Read UUID from localStorage (will be passed to checkout)
 const customerUuid = ref(process.client ? (localStorage.getItem('uuid') ?? '') : '')
-const modalErrors = ref<{ customer_uuid?: string }>({})
 const isProcessing = ref(false)
 const quantity = ref(1)
 
 function closeModal() {
   emit('update:modelValue', false)
-  modalErrors.value = {}
   quantity.value = 1
 }
 
-function increaseQty() {
-  quantity.value++
-}
-
-function decreaseQty() {
-  if (quantity.value > 1) quantity.value--
-}
+function increaseQty() { quantity.value++ }
+function decreaseQty() { if (quantity.value > 1) quantity.value-- }
 
 const totalPrice = computed(() => {
   return props.product ? props.product.price * quantity.value : 0
 })
 
 function proceedToCheckout() {
-  modalErrors.value = {}
   if (!customerUuid.value.trim()) {
-    modalErrors.value.customer_uuid = 'Customer UUID is required.'
+    alert('Customer UUID is missing. Please log in again.')
     return
   }
   if (!props.product) return
 
   isProcessing.value = true
 
-  // Navigate to checkout with direct purchase details
   router.push({
-    path: '/checkout',
+    path: '/customer/checkout',
     query: {
       direct_uuid: props.product.uuid,
       direct_name: props.product.name,
@@ -64,24 +58,21 @@ function proceedToCheckout() {
     }
   })
 
-  // Close the modal after navigation
   closeModal()
   isProcessing.value = false
 }
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat('en-PH', {
-    style: 'currency',
-    currency: 'PHP',
-    minimumFractionDigits: 2,
+    style: 'currency', currency: 'PHP', minimumFractionDigits: 2,
   }).format(value)
 }
 
 watch(
   () => props.modelValue,
   (visible) => {
-    if (visible) {
-      modalErrors.value = {}
+    if (visible && process.client) {
+      customerUuid.value = localStorage.getItem('uuid') || ''
       quantity.value = 1
     }
   }
@@ -134,26 +125,16 @@ watch(
               </div>
             </div>
 
-            <!-- Customer UUID (optional – can be hidden if we already pass it) -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Customer UUID</label>
-              <input
-                v-model="customerUuid"
-                type="text"
-                placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
-                class="mt-1.5 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-800 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-                :class="{ 'border-red-300 focus:border-red-400 focus:ring-red-100': modalErrors.customer_uuid }"
-              />
-              <p v-if="modalErrors.customer_uuid" class="mt-1 text-xs text-red-500">{{ modalErrors.customer_uuid }}</p>
-              <p class="mt-1 text-xs text-gray-400">Auto-filled from your session.</p>
-            </div>
-
             <!-- Actions -->
             <div class="flex gap-3 pt-1">
               <button class="flex-1 rounded-lg border border-gray-200 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50" @click="closeModal" :disabled="isProcessing">
                 Cancel
               </button>
-              <button class="flex-1 rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 active:scale-95 disabled:opacity-50" @click="proceedToCheckout" :disabled="isProcessing">
+              <button 
+                class="flex-1 rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 active:scale-95 disabled:opacity-50" 
+                @click="proceedToCheckout" 
+                :disabled="isProcessing"
+              >
                 {{ isProcessing ? 'Processing...' : 'Proceed to Checkout' }}
               </button>
             </div>
