@@ -139,7 +139,12 @@ const handleSubmit = async () => {
     // Note: AuthService.persistTokenFromResponse() is also called automatically
     // which extracts role/uuid from the login response
 
-    await navigateTo('admin/dashboard');
+    // Redirect based on role
+    if (role === 'customer') {
+      await navigateTo('/customer/order');
+    } else {
+      await navigateTo('/admin/dashboard');
+    }
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {

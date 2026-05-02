@@ -4,19 +4,31 @@
   <div class="min-h-screen bg-gray-50">
     <header class="border-b border-gray-200 bg-white">
       <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <div class="text-xl font-bold text-gray-900">
+        <NuxtLink to="/customer" class="text-xl font-bold text-gray-900">
           My Store
-        </div>
+        </NuxtLink>
  
         <div class="hidden items-center gap-8 text-sm font-medium text-gray-600 md:flex">
-          <span>Shop</span>
-          <span>Categories</span>
-          <span>Orders</span>
-          <span>Account</span>
+          <NuxtLink to="/customer/shop" class="hover:text-indigo-600">Shop</NuxtLink>
+          <span class="cursor-default">Categories</span>
+          <NuxtLink to="/customer/order" class="hover:text-indigo-600">Orders</NuxtLink>
+          <span class="cursor-default">Account</span>
         </div>
- 
-        <div class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">
-          Cart
+
+        <div class="flex items-center gap-4">
+          <button
+            @click="handleLogout"
+            :disabled="isLoggingOut"
+            class="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ isLoggingOut ? 'Logging out...' : 'Logout' }}
+          </button>
+          <NuxtLink to="/customer/cart" class="relative rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            Cart
+            <span v-if="cartCount > 0" class="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-xs text-white">
+              {{ cartCount }}
+            </span>
+          </NuxtLink>
         </div>
       </div>
     </header>
@@ -74,3 +86,29 @@
     </footer>
   </div>
 </template>
+
+<script setup>
+import { computed, ref } from 'vue'
+import { useCart } from '~/composables/useCart'
+import { useRouter } from 'vue-router'
+
+const { cart } = useCart()
+const cartCount = computed(() => cart.value.reduce((sum, item) => sum + item.quantity, 0))
+
+const isLoggingOut = ref(false)
+const router = useRouter()
+
+const handleLogout = async () => {
+  isLoggingOut.value = true
+  
+  // Clear all localStorage items
+  localStorage.removeItem('_token')
+  localStorage.removeItem('_role')
+  localStorage.removeItem('_uuid')
+  
+  // Redirect to login page
+  await router.push('/')
+  
+  isLoggingOut.value = false
+}
+</script>
