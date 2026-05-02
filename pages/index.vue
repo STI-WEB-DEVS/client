@@ -140,12 +140,14 @@ const handleSubmit = async () => {
 
     const role = response?.user?.role;
     const uuid = response?.user?.uuid;
+    const customerUuid = response?.user?.customer_uuid;
 
     if (role) localStorage.setItem('_role', role);
     if (uuid) localStorage.setItem('_uuid', uuid);
+    if (customerUuid) localStorage.setItem('_customer_uuid', customerUuid);
 
     if (role === 'customer') {
-      await navigateTo('/customer/order');
+      await navigateTo('/customer/home');
     } else {
       await navigateTo('/admin/dashboard');
     }
