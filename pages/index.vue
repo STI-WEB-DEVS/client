@@ -160,9 +160,7 @@ const handleSubmit = async () => {
 
     if (response?.user.customer_uuid) {
       localStorage.setItem("_uuid", response.user.customer_uuid);
-    }
-
-    if (response?.user.uuid) {
+    } else if (response?.user.uuid) {
       localStorage.setItem("_uuid", response.user.uuid);
     }
 

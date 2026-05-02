@@ -6,7 +6,7 @@ definePageMeta({
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { ChevronLeftIcon } from "@heroicons/vue/24/outline";
-import { orderService } from "~/api/customer/OrderService";
+import { orderService } from "~/api/order/OrderService";
 
 const router = useRouter();
 const checkoutData = ref(null);
@@ -63,7 +63,8 @@ const placeOrder = async () => {
     showSuccessModal.value = true;
   } catch (error) {
     console.error("Order error:", error);
-    errorMessage.value = error.message || "Failed to place order. Please try again.";
+    errorMessage.value =
+      error.message || "Failed to place order. Please try again.";
     showErrorModal.value = true;
   } finally {
     isSubmitting.value = false;
