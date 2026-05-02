@@ -1,5 +1,8 @@
 export interface LoginResponse {
   token: string;
+  user: {
+    uuid: string;
+  };
 }
 
 export class AuthService {
@@ -7,7 +10,7 @@ export class AuthService {
     const runtimeConfig = useRuntimeConfig();
 
     try {
-      return await $fetch<LoginResponse>('/login', {
+      const response = await $fetch<LoginResponse>('/login', {
         baseURL: runtimeConfig.public.apiBaseURL,
         method: 'POST',
         headers: {
@@ -18,6 +21,11 @@ export class AuthService {
           password,
         },
       });
+
+      localStorage.setItem('_token', response.token);
+      localStorage.setItem('_uuid', response.user.uuid);
+
+      return response;
     } catch (error: any) {
       const status = error?.response?.status;
       const message =
@@ -47,20 +55,20 @@ export class AuthService {
       const token = localStorage.getItem('_token');
       if (!token) return false;
 
-      const response = await $fetch('/logout', {
+      await $fetch('/logout', {
         baseURL: runtimeConfig.public.apiBaseURL,
-        method: 'DELETE', // <--- Change this from 'POST' to 'DELETE'
+        method: 'DELETE',
         headers: {
           Accept: 'application/json',
           Authorization: `Bearer ${token}`,
         },
       });
 
-      // If backend confirms deletion
       localStorage.removeItem('_token');
+      localStorage.removeItem('_uuid');
+
       return true;
     } catch (error: any) {
-      const status = error?.response?.status;
       const message =
         error?.response?._data?.message ||
         error?.data?.message ||
