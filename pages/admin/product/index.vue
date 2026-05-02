@@ -81,11 +81,11 @@ const submitCreate = async () => {
 };
 
 const handleView = (product: any) => {
-  router.push(`/product/${product.uuid}`);
+  router.push(`/admin/product/${product.uuid}`);
 };
 
 const handleEdit = (product: any) => {
-  router.push(`/product/${product.uuid}?mode=edit`);
+  router.push(`/admin/product/${product.uuid}?mode=edit`);
 };
 
 const handleDelete = async (product: any) => {

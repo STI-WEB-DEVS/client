@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <div v-if="pending" class="flex justify-center py-16">
         <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
@@ -110,7 +109,6 @@
         />
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
@@ -201,7 +199,7 @@ const handleDelete = async () => {
       feedbackMessage.value = 'Customer deleted successfully!';
       feedbackType.value = 'success';
       showFeedback.value = true;
-      setTimeout(() => router.push('/customer'), 1500);
+      setTimeout(() => router.push('/admin/customer'), 1500);
     } catch (err: any) {
       feedbackMessage.value = err.message || 'Failed to delete customer';
       feedbackType.value = 'error';
@@ -216,6 +214,6 @@ const handleFeedbackClose = () => {
 };
 
 const goBack = () => {
-  router.push('/customer');
+  router.push('/admin/customer');
 };
 </script>

@@ -86,7 +86,7 @@ const handleDelete = async () => {
       feedbackMessage.value = 'Product deleted successfully!';
       feedbackType.value = 'success';
       showFeedback.value = true;
-      setTimeout(() => router.push('/product'), 1500);
+      setTimeout(() => router.push('/admin/product'), 1500);
     } catch (err) {
       feedbackMessage.value = err.message || 'Failed to delete product';
       feedbackType.value = 'error';
@@ -96,7 +96,7 @@ const handleDelete = async () => {
 };
 
 const goBack = () => {
-  router.push('/product');
+  router.push('/admin/product');
 };
 
 const handleFeedbackClose = () => {
@@ -105,7 +105,6 @@ const handleFeedbackClose = () => {
 </script>
 
 <template>
-  <NuxtLayout>
     <!-- Loading State -->
     <div v-if="pending" class="flex justify-center py-16">
       <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
@@ -229,5 +228,4 @@ const handleFeedbackClose = () => {
         @close="handleFeedbackClose" 
       />
     </div>
-  </NuxtLayout>
 </template>

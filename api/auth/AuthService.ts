@@ -2,6 +2,8 @@ import BaseService from '~/api/BaseService';
 
 export interface LoginResponse {
   token: string;
+  uuid: string;
+  role: string;
 }
 
 class AuthService extends BaseService {
@@ -15,16 +17,22 @@ class AuthService extends BaseService {
   }
 
   async login(email: string, password: string): Promise<LoginResponse> {
-    return await this.request<LoginResponse>('/login', 'POST', {
+    const response = await this.request<LoginResponse>('/login', 'POST', {
       email,
       password,
     });
+
+    localStorage.setItem('uuid', response.uuid);
+    localStorage.setItem('role', response.role);
+
+    return response;
   }
 
   async logout(): Promise<void> {
     await this.request('/logout', 'DELETE');
+    localStorage.removeItem('uuid');
+    localStorage.removeItem('role');
   }
 }
 
 export const authService = AuthService.getInstance();
-
