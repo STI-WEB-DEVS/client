@@ -1,6 +1,7 @@
 export interface LoginUser {
   uuid: string
   role: string
+  customer_uuid: string | null
 }
 
 export interface LoginResponse {
@@ -61,5 +62,6 @@ export class AuthService {
     localStorage.removeItem('_token')
     localStorage.removeItem('_uuid')
     localStorage.removeItem('_role')
+    localStorage.removeItem('_customer_uuid')
   }
 }

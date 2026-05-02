@@ -78,7 +78,7 @@ export const useCart = () => {
   // Build the payload the backend expects:
   // { customer_uuid, items: [ { product_uuid, quantity } ] }
   const buildOrderPayload = () => {
-    const customer_uuid = import.meta.client ? localStorage.getItem('_uuid') : null
+    const customer_uuid = import.meta.client ? localStorage.getItem('_customer_uuid') : null
     return {
       customer_uuid,
       items: cart.value.map(item => ({

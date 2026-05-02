@@ -1,22 +1,37 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useCart } from '~/composables/useCart'
+import { orderService } from '~/api/order/OrderService'
 
 definePageMeta({ layout: 'customer' })
 
-const { cart, itemCount, totalPrice, buildOrderPayload } = useCart()
+const { cart, itemCount, totalPrice, buildOrderPayload, clearCart } = useCart()
+const loading = ref(false)
+const error = ref('')
 
 // Redirect to catalog if cart is empty
 if (import.meta.client && !cart.value.length) {
   navigateTo('/customer/catalog')
 }
 
-const handlePlaceOrder = () => {
+const handlePlaceOrder = async () => {
   const payload = buildOrderPayload()
 
-  // Per instructions: log the payload, do not send the request yet
+  // Log payload to console as required
   console.log('📦 Order Payload:', JSON.stringify(payload, null, 2))
 
-  alert('Order payload logged! Open DevTools > Console to see it.')
+  loading.value = true
+  error.value = ''
+
+  try {
+    await orderService.create(payload)
+    clearCart()
+    await navigateTo('/customer/order')
+  } catch (err: any) {
+    error.value = err?.message || 'Failed to place order. Please try again.'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -28,10 +43,8 @@ const handlePlaceOrder = () => {
     </div>
 
     <div class="grid gap-8 lg:grid-cols-3">
-      <!-- Left: items + payload preview -->
-      <div class="lg:col-span-2 space-y-6">
-
-        <!-- Order items -->
+      <!-- Left: items review -->
+      <div class="lg:col-span-2">
         <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
           <h3 class="text-base font-semibold text-gray-900">Order Items</h3>
           <div class="mt-4 divide-y divide-gray-100">
@@ -54,12 +67,18 @@ const handlePlaceOrder = () => {
         </div>
       </div>
 
-      <!-- Right: order summary + place order -->
+      <!-- Right: summary + place order -->
       <div class="space-y-4">
+        <!-- Error -->
+        <div v-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4">
+          <p class="text-sm text-red-700">{{ error }}</p>
+        </div>
+
         <OrderSummary
           :item-count="itemCount"
           :total-price="totalPrice"
-          primary-label="Place Order"
+          :primary-label="loading ? 'Placing Order...' : 'Place Order'"
+          :disabled="loading"
           secondary-label="Back to Cart"
           secondary-to="/customer/cart"
           @primary-action="handlePlaceOrder"

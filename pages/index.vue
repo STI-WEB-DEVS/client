@@ -129,6 +129,9 @@ const handleSubmit = async () => {
     if (response?.user?.role) {
       localStorage.setItem('_role', response.user.role)
     }
+    if (response?.user?.customer_uuid) {
+      localStorage.setItem('_customer_uuid', response.user.customer_uuid)
+    }
 
     const role = response?.user?.role
     if (role === 'admin') {
