@@ -3,6 +3,7 @@ export interface LoginResponse {
   user: {
     uuid: string;
     role: string;
+    customer_uuid: string | null;
   };
 }
 
@@ -64,6 +65,7 @@ export class AuthService {
     } finally {
       localStorage.removeItem('_token')
       localStorage.removeItem('uuid')
+      localStorage.removeItem('customer_uuid')
       localStorage.removeItem('role')
     }
   }

@@ -146,11 +146,12 @@
         localStorage.setItem("_token", response.token);
         localStorage.setItem("uuid", response.user.uuid);
         localStorage.setItem("role", response.user.role);
+        localStorage.setItem("customer_uuid", response.user.customer_uuid);
 
         const role = (response.user.role || "").toString().toLowerCase();
 
         if (role === "customer") {
-          localStorage.removeItem("customer_uuid");
+          // localStorage.removeItem("customer_uuid");
           await navigateTo("/customer/landing");
         } else if (role === "admin") {
           await navigateTo("/admin/dashboard");

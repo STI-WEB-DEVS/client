@@ -4,6 +4,9 @@
     });
 
     import { ArrowTurnUpLeftIcon, MinusIcon, PlusIcon } from "@heroicons/vue/24/outline";
+    import { OrderService } from "~/api/order/OrderService";
+
+    const orderService = new OrderService();
 
     const { cart, setQuantity, totalPrice } = useCart();
 
@@ -14,7 +17,7 @@
 
     const readCustomerUuid = () => {
         if (!process.client) return "";
-        return (localStorage.getItem("uuid") || "").trim();
+        return (localStorage.getItem("customer_uuid") || "").trim();
     };
 
     const buildPayload = () => {
@@ -36,24 +39,28 @@
         };
     };
 
-    const placeOrder = () => {
-        alert.value = null;
+    const placeOrder = async () => {
+  alert.value = null;
 
-        try {
-            const payload = buildPayload();
-            console.log(payload);
+  try {
+    const payload = buildPayload();
 
-            alert.value = {
-            variant: "success",
-            message: "Order successfully placed! Check console for details.",
-            };
-        } catch (e: any) {
-            alert.value = {
-            variant: "error",
-            message: e?.message || "Unable to place order.",
-            };
-        }
+    const response = await orderService.createOrder(payload);
+
+    console.log("API Response:", response);
+
+    alert.value = {
+      variant: "success",
+      message: response.message || "Order successfully placed!",
     };
+
+  } catch (e: any) {
+    alert.value = {
+      variant: "error",
+      message: e?.message || "Unable to place order.",
+    };
+  }
+};
 
     const formatMoney = (value: number) => {
         return new Intl.NumberFormat("en-PH", {
