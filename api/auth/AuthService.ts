@@ -2,6 +2,7 @@ export interface LoginResponse {
   token: string;
   user: {
     uuid: string;
+    role: string;
   };
 }
 
@@ -24,6 +25,7 @@ export class AuthService {
 
       localStorage.setItem('_token', response.token);
       localStorage.setItem('_uuid', response.user.uuid);
+      localStorage.setItem('_role', response.user.role);
 
       return response;
     } catch (error: any) {
@@ -66,6 +68,7 @@ export class AuthService {
 
       localStorage.removeItem('_token');
       localStorage.removeItem('_uuid');
+      localStorage.removeItem('_role');
 
       return true;
     } catch (error: any) {

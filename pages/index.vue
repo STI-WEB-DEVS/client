@@ -125,7 +125,16 @@ const handleSubmit = async () => {
       localStorage.setItem('_token', response.token);
     }
 
-    await navigateTo('/admin/dashboard');
+    const role = response?.user?.role;
+
+    if (role === 'admin') {
+      await navigateTo('/admin/dashboard');
+    } else if (role === 'customer') {
+      await navigateTo('/customer/order');
+    } else {
+      await navigateTo('/');
+    }
+
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {
