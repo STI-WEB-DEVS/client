@@ -21,7 +21,8 @@ export default class BaseService {
     if (method.toUpperCase() === 'GET') {
       config.params = params;
     } else {
-      config.body = params;
+      config.body = JSON.stringify(params);
+      headers['Content-Type'] = 'application/json';
     }
 
     try {

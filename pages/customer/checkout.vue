@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useCart } from '~/composables/useCart'
+import { orderService } from '~/api/order/OrderService'
 
 definePageMeta({
   layout: 'customer'
@@ -13,7 +14,7 @@ const isPlacing = ref(false)
 const orderSuccess = ref(false)
 const orderError = ref('')
 
-const placeOrder = () => {
+const placeOrder = async () => {
   orderError.value = ''
 
   if (isEmpty.value) {
@@ -25,17 +26,20 @@ const placeOrder = () => {
 
   const payload = buildOrderPayload()
 
-  console.log('══════════════════════════════════════════')
-  console.log('📦 ORDER PAYLOAD (ready to POST /api/orders)')
-  console.log('══════════════════════════════════════════')
-  console.log(JSON.stringify(payload, null, 2))
-  console.log('══════════════════════════════════════════')
+  try {
+    const response = await orderService.create(payload)
 
-  setTimeout(() => {
-    isPlacing.value = false
+    if (!response || !response?.data) {
+      throw new Error('Order could not be placed. Please try again.')
+    }
+
     orderSuccess.value = true
     clearCart()
-  }, 800)
+  } catch (err) {
+    orderError.value = err?.message || 'Failed to place order. Please try again.'
+  } finally {
+    isPlacing.value = false
+  }
 }
 
 const goToOrders = () => {
@@ -57,7 +61,7 @@ const goToOrders = () => {
       </div>
       <div>
         <h2 class="text-2xl font-bold text-green-800">Order Placed Successfully!</h2>
-        <p class="mt-2 text-sm text-green-600">Your order payload has been logged to the console. Check DevTools → Console.</p>
+        <p class="mt-2 text-sm text-green-600">Your order has been placed. You can view it in your order history.</p>
       </div>
       <button
         @click="goToOrders"
