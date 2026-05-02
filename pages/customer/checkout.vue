@@ -1,5 +1,6 @@
 <script setup>
-import ProductService from '~/api/product/ProductService';
+import { productService } from '~/api/product/ProductService';
+import { orderService } from '~/api/order/OrderService';
 import { cartService } from '~/api/cart/CartService';
 const route = useRoute()
 
@@ -32,7 +33,6 @@ onMounted(async () => {
 
     try {
         if (productId) {
-            const productService = ProductService.getInstance();
             const response = await productService.show(productId);
             product.value = response.data || response;
             checkoutItems.value = []
@@ -47,34 +47,51 @@ onMounted(async () => {
     }
 })
 
-const handlePlaceOrder = () => {
+const modalOpen = ref(false)
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalType = ref('success')
+
+const handleModalClose = () => {
+    modalOpen.value = false
+    if (modalType.value === 'success') {
+        const router = useRouter()
+        router.push('/customer/order')
+    }
+}
+
+const handlePlaceOrder = async () => {
     const items = checkoutItems.value.length > 0
         ? checkoutItems.value.map(item => ({ product_uuid: item.uuid || item.id, quantity: item.quantity }))
         : [{ product_uuid: product.value?.uuid || product.value?.id, quantity: quantity.value }]
 
     const payload = {
-        id: Math.random().toString(36).substring(2, 10),
-        date: new Date().toISOString(),
-        total_amount: totalPrice.value,
-        customer_uuid: typeof window !== 'undefined' ? localStorage.getItem('_uuid') : null,
         items: items
     }
 
     console.log('BUILD PAYLOAD:', JSON.stringify(payload, null, 2));
-    
-    // sample order placement
-    if (typeof window !== 'undefined') {
-        
-        if (checkoutItems.value.length > 0) {
-            checkoutItems.value.forEach(item => {
-                cartService.remove(item.uuid || item.id);
-            });
-        }
-        
-        alert('Order payload has been logged to the console!');
 
-        const router = useRouter();
-        router.push('/customer/order');
+    try {
+        await orderService.create(payload);
+
+        if (typeof window !== 'undefined') {
+            if (checkoutItems.value.length > 0) {
+                checkoutItems.value.forEach(item => {
+                    cartService.remove(item.uuid || item.id);
+                });
+            }
+
+            modalType.value = 'success';
+            modalTitle.value = 'Order Placed!';
+            modalMessage.value = 'Your order has been placed successfully.';
+            modalOpen.value = true;
+        }
+    } catch (error) {
+        console.error('Failed to create order:', error);
+        modalType.value = 'danger';
+        modalTitle.value = 'Order Failed';
+        modalMessage.value = 'Failed to place order. Please try again.';
+        modalOpen.value = true;
     }
 }
 </script>
@@ -128,7 +145,7 @@ const handlePlaceOrder = () => {
                         </div>
                         <div class="flex-1">
                             <h3 class="font-bold text-sm text-gray-900">{{ product.name }}</h3>
-                            <p class="text-xs text-gray-500">Qty: {{ quantity }} x ${{ product.price || '29.00' }}</p>
+                            <p class="text-xs text-gray-500">Qty: {{ quantity }} x ₱{{ product.price || '29.00' }}</p>
                         </div>
                     </div>
 
@@ -140,7 +157,7 @@ const handlePlaceOrder = () => {
                         </div>
                         <div class="flex-1">
                             <h3 class="font-bold text-sm text-gray-900">{{ item.name }}</h3>
-                            <p class="text-xs text-gray-500">Qty: {{ item.quantity }} x ${{ item.price || '29.00' }}</p>
+                            <p class="text-xs text-gray-500">Qty: {{ item.quantity }} x ₱{{ item.price || '29.00' }}</p>
                         </div>
                     </div>
                 </div>
@@ -184,5 +201,15 @@ const handlePlaceOrder = () => {
                 Return to Shop
             </NuxtLink>
         </div>
+        
+        <ClientOnly>
+            <FeedbackModal
+                :open="modalOpen"
+                :title="modalTitle"
+                :message="modalMessage"
+                :type="modalType"
+                @close="handleModalClose"
+            />
+        </ClientOnly>
     </div>
 </template>

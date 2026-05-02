@@ -30,7 +30,7 @@
           </div>
           <div class="bg-white p-6">
             <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Price</p>
-            <p class="mt-2 text-lg font-medium text-gray-900">${{ product.price }}</p>
+            <p class="mt-2 text-lg font-medium text-gray-900">₱{{ product.price }}</p>
           </div>
           <div class="bg-white p-6">
             <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Created At</p>

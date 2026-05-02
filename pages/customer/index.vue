@@ -34,7 +34,9 @@ definePageMeta({
           </div>
 
           <div class="rounded-2xl bg-gray-200 p-8">
-            <div class="aspect-[4/3] rounded-xl bg-gray-300" />
+            <img
+              src="https://www.thesoshalnetwork.com/wp-content/uploads/2013/09/wally1-400x400.jpg"
+              class="aspect-[4/3] w-full object-top h-full object-cover rounded-xl bg-gray-300" />
           </div>
         </div>
       </div>

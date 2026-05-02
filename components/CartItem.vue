@@ -43,7 +43,7 @@ const toggleSelection = (id) => cartService.toggleSelection(id)
         <div class="flex-1 text-center sm:text-left">
             <h3 class="text-lg font-bold text-gray-900">{{ item.name }}</h3>
             <p class="text-sm text-gray-500 mt-1 line-clamp-1">{{ item.description || 'Premium Quality' }}</p>
-            <p class="text-indigo-600 font-bold mt-2">${{ item.price || '29.00' }}</p>
+            <p class="text-indigo-600 font-bold mt-2">₱{{ item.price || '29.00' }}</p>
         </div>
 
         <div class="flex flex-col items-center sm:items-end gap-4">

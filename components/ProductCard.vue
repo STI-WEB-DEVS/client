@@ -32,7 +32,7 @@ const addToCart = (product) => {
       <h3 class="text-lg font-semibold text-gray-900 line-clamp-1">{{ product.name }}</h3>
       <p class="text-sm text-gray-500 mt-1 line-clamp-1">{{ product.description || 'High quality everyday product' }}</p>
       <div class="mt-4 flex items-center justify-between">
-        <span class="text-xl font-bold text-gray-900">${{ product.price || '29.00' }}</span>
+        <span class="text-xl font-bold text-gray-900">₱{{ product.price || '29.00' }}</span>
         
         <div class="flex gap-2">
           <button

@@ -12,11 +12,17 @@
           <NuxtLink to="/customer/order" active-class="text-indigo-600">Orders</NuxtLink>
           <NuxtLink to="#" active-class="text-indigo-600">Account</NuxtLink>
         </nav>
+        <div class="flex gap-3">
+          <NuxtLink to="/customer/cart"
+            class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">
+            Cart
+          </NuxtLink>
+          <button @click="handleLogout"
+            class="rounded-full bg-indigo-600 border border-gray-300 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+            Signout
+          </button>
+        </div>
 
-        <NuxtLink to="/customer/cart"
-          class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">
-          Cart
-        </NuxtLink>
       </div>
     </header>
 
@@ -36,10 +42,37 @@
         </div>
       </div>
     </footer>
+
+    <FeedbackModal :open="isLogoutModalOpen" title="Confirm Logout"
+      message="Are you sure you want to log out of your account?" show-cancel confirm-text="Logout"
+      @close="isLogoutModalOpen = false" @confirm="confirmLogout" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { ref } from 'vue'
+import AuthService from '~/api/auth/AuthService'
+import FeedbackModal from '~/components/FeedbackModal.vue'
+
 const route = useRoute()
+const router = useRouter()
+
+const isLogoutModalOpen = ref(false)
+
+const handleLogout = () => {
+  isLogoutModalOpen.value = true
+}
+
+const confirmLogout = async () => {
+  isLogoutModalOpen.value = false
+  try {
+    const success = await AuthService.logout()
+    if (success) {
+      router.push('/')
+    }
+  } catch (error) {
+    console.error("Logout error:", error)
+  }
+}
 </script>

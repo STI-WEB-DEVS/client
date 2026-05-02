@@ -1,35 +1,36 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { orderService } from '~/api/order/OrderService';
 
 definePageMeta({
   layout: 'customer'
 })
 
 const orders = ref([])
+const isLoading = ref(true)
 
-onMounted(() => {
-  // To do: Fetch orders from API
+onMounted(async () => {
+  try {
+    const response = await orderService.list();
+    orders.value = response.data || response;
+  } catch (error) {
+    console.error('Failed to fetch orders:', error);
+  } finally {
+    isLoading.value = false;
+  }
 })
 </script>
 
 <template>
-  <div class="max-w-full mx-auto"> 
+  <div class="max-w-full mx-auto">
     <PageHeader title="My Orders" description="View your order history and details." />
 
-    <div v-if="orders.length > 0" class="mt-8 space-y-6">
-      <div v-for="order in orders" :key="order.id" class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-        <div class="flex justify-between items-start mb-4">
-          <div>
-            <h3 class="text-lg font-bold text-gray-900">Order #{{ order.id }}</h3>
-            <p class="text-sm text-gray-500">{{ new Date(order.date).toLocaleString() }}</p>
-          </div>
-          <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Placed</span>
-        </div>
-        
-        <div class="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm font-mono text-gray-800 border border-gray-200">
-          <pre>{{ JSON.stringify(order, null, 2) }}</pre>
-        </div>
-      </div>
+    <div v-if="isLoading" class="mt-8 py-20 text-center text-gray-400">
+      Loading orders...
+    </div>
+
+    <div v-else-if="orders.length > 0" class="mt-8 space-y-6">
+      <OrderCard v-for="order in orders" :key="order.uuid" :order="order" />
     </div>
 
     <div v-else class="mt-8 py-20 text-center bg-white rounded-2xl border border-dashed border-gray-300">
@@ -39,3 +40,4 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
