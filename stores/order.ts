@@ -1,6 +1,4 @@
-// stores/order.ts
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 
 export interface OrderItem {
   product_uuid: string
@@ -9,67 +7,111 @@ export interface OrderItem {
   quantity: number
 }
 
-export interface Order {
-  order_uuid: string
-  customer_uuid: string
-  date: string
-  total: number
-  items: OrderItem[]
-}
+export const useOrdersStore = defineStore('orders', {
+  state: () => ({
+    orders: [] as any[],   // always an array
+    loading: false,
+    error: null as string | null,
+  }),
 
-export const useOrdersStore = defineStore('orders', () => {
-  const orders = ref<Order[]>([])
-
-  // Load orders from localStorage
-  function loadOrders() {
-    if (process.client) {
-      const stored = localStorage.getItem('customer_orders')
-      if (stored) {
-        try {
-          orders.value = JSON.parse(stored)
-        } catch (e) {
-          console.error('Failed to parse orders', e)
-          orders.value = []
-        }
-      } else {
-        orders.value = []
+  actions: {
+    // Save orders to localStorage
+    saveToLocal() {
+      if (process.client) {
+        localStorage.setItem('order_history', JSON.stringify(this.orders))
       }
+    },
+
+    // Load orders from localStorage
+    loadOrders() {
+      if (process.client) {
+        const saved = localStorage.getItem('order_history')
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved)
+            this.orders = Array.isArray(parsed) ? parsed : []
+          } catch {
+            this.orders = []
+          }
+        }
+      }
+    },
+
+    // Add a new order (API + fallback)
+    async addOrder(customer_uuid: string, items: OrderItem[], total: number) {
+      this.loading = true
+      const config = useRuntimeConfig()
+      
+      try {
+        const response = await $fetch<any>(`${config.public.apiBaseURL}/orders`, {
+          method: 'POST',
+          body: {
+            customer_uuid,
+            total_price: total,
+            status: 'pending',
+            items
+          }
+        })
+
+        // Ensure orders is always an array
+        if (!Array.isArray(this.orders)) {
+          this.orders = []
+        }
+        this.orders.unshift(response)
+        this.saveToLocal()
+        return response
+      } catch (err: any) {
+        // Fallback: save locally if API fails
+        const localOrder = {
+          order_uuid: crypto.randomUUID(),
+          customer_uuid,
+          items,
+          total,
+          date: new Date().toISOString(),
+          status: 'completed'
+        }
+        if (!Array.isArray(this.orders)) {
+          this.orders = []
+        }
+        this.orders.unshift(localOrder)
+        this.saveToLocal()
+        return localOrder
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // Fetch orders from backend by customer UUID
+    async fetchOrdersByCustomer(customerUuid: string) {
+      this.loading = true
+      const config = useRuntimeConfig()
+
+      try {
+        const response = await $fetch<any>(`${config.public.apiBaseURL}/customers/${customerUuid}/orders`)
+        // Normalize response to always be an array
+        if (Array.isArray(response)) {
+          this.orders = response
+        } else if (response?.data && Array.isArray(response.data)) {
+          this.orders = response.data
+        } else {
+          this.orders = response ? [response] : []
+        }
+        this.saveToLocal()
+        return this.orders
+      } catch (err: any) {
+        console.error('Failed to fetch orders:', err)
+        this.error = 'Could not load orders'
+        return []
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // Filter orders by customer UUID
+    getOrdersByCustomer(customerUuid: string) {
+      return Array.isArray(this.orders)
+        ? this.orders.filter(o => o.customer_uuid === customerUuid)
+        : []
     }
   }
-
-  // Save orders to localStorage
-  function saveOrders() {
-    if (process.client) {
-      localStorage.setItem('customer_orders', JSON.stringify(orders.value))
-      console.log('Orders saved:', orders.value.length)
-    }
-  }
-
-  function addOrder(customer_uuid: string, items: OrderItem[], total: number) {
-    const newOrder: Order = {
-      order_uuid: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-      customer_uuid,
-      date: new Date().toISOString(),
-      total,
-      items: items.map(i => ({ ...i }))
-    }
-    orders.value.unshift(newOrder)
-    saveOrders()
-    return newOrder
-  }
-
-  function getOrdersByCustomer(customer_uuid: string) {
-    // Ensure we have fresh data before filtering
-    if (process.client && orders.value.length === 0) {
-      loadOrders()
-    }
-    return orders.value.filter(o => o.customer_uuid === customer_uuid)
-  }
-
-  // Load immediately when store is created (client only)
-  if (process.client) {
-    loadOrders()
-  }
-
-  return { orders, addOrder, getOrdersByCustomer, loadOrders, saveOrders }
 })

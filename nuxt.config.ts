@@ -7,7 +7,8 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     public: {
-      apiBaseURL: process.env.API_BASE_URL || 'https://jsonplaceholder.typicode.com'
+      // This is the source of truth for your API path
+      apiBaseURL: process.env.API_BASE_URL || 'http://localhost:8000/api',
     }
   }
 })

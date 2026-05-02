@@ -1,7 +1,9 @@
+// api/ProductService.ts
 import BaseService from '~/api/BaseService';
 
 class ProductService extends BaseService {
     private static instance: ProductService;
+    private resource = '/products';
 
     public static getInstance(): ProductService {
         if (!ProductService.instance) {
@@ -10,9 +12,8 @@ class ProductService extends BaseService {
         return ProductService.instance;
     }
 
-    private resource = '/products';
-
     async list(params: object = {}): Promise<any> {
+        // This will result in: apiBaseURL + '/products'
         return await this.request(this.resource, 'GET', params);
     }
 
@@ -37,4 +38,5 @@ class ProductService extends BaseService {
     }
 }
 
+// Export the instance directly
 export const productService = ProductService.getInstance();
