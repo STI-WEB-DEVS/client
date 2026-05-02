@@ -67,7 +67,23 @@ function validate() {
 async function placeOrder() {
   if (!validate()) return
   isPlacing.value = true
-  
+
+  // 📦 Build full order details for console logging
+  const orderPayload = {
+    customer_uuid: customerUuid.value.trim(),
+    items: orderItems.value.map(item => ({
+      product_uuid: item.product_uuid,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      subtotal: item.price * item.quantity,
+    })),
+    total: totalPrice.value,
+    date: new Date().toISOString(),
+  }
+
+  console.log('📦 Order Details:', JSON.stringify(orderPayload, null, 2))
+
   await new Promise(resolve => setTimeout(resolve, 500))
   
   ordersStore.addOrder(
@@ -126,7 +142,7 @@ function formatPrice(val: number) {
       <div class="grid gap-8 lg:grid-cols-3">
         <!-- Left Column -->
         <div class="lg:col-span-2 space-y-6">
-          <!-- Customer Information Card – flex column to fill height -->
+          <!-- Customer Information Card -->
           <div class="h-full flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
             <div class="border-b border-gray-100 bg-gray-50/50 px-6 py-4">
               <div class="flex items-center gap-2">
@@ -194,7 +210,7 @@ function formatPrice(val: number) {
           </p>
         </div>
 
-        <!-- Right Column: Order Summary – flex column to match height -->
+        <!-- Right Column: Order Summary -->
         <div class="lg:col-span-1">
           <div class="h-full flex flex-col rounded-xl border border-gray-200 bg-white shadow-lg">
             <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 rounded-t-xl">

@@ -70,7 +70,6 @@
       <section v-if="route.path === '/customer/landingpage'" class="bg-white">
         <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div class="grid items-center gap-12 lg:grid-cols-2">
-            <!-- Left: text content -->
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600">
                 New arrivals
@@ -93,8 +92,6 @@
                 </button>
               </div>
             </div>
-
-            <!-- Right: Image (replaces gray placeholder) -->
             <div class="rounded-2xl bg-gray-100 p-2">
               <img
                 src="https://i.ytimg.com/vi/SQJrYw1QvSQ/maxresdefault.jpg"
@@ -106,14 +103,14 @@
         </div>
       </section>
 
-      <!-- Product listing – only on landingpage (appears after hero) -->
+      <!-- Product listing – only on landingpage -->
       <div v-if="route.path === '/customer/landingpage'">
         <ProductListing />
       </div>
 
       <!-- For other pages (shop, orders, etc.), render the slot content -->
       <section v-else class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <nuxt-page />
+        <slot />
       </section>
     </main>
 
