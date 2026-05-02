@@ -122,18 +122,12 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { AuthService } from "~/api/auth/AuthService";
-
-definePageMeta({
-  layout: false,
-});
+import { authService } from "~/api/auth/AuthService";
 
 const email = ref("");
 const password = ref("");
 const error = ref("");
 const isLoading = ref(false);
-
-const authService = new AuthService();
 
 const handleSubmit = async () => {
   error.value = "";
@@ -142,17 +136,19 @@ const handleSubmit = async () => {
   try {
     const response = await authService.login(email.value, password.value);
 
-    // VALIDATE RESPONSE
-    if (!response?.token || !response?.user) {
+    // Make sure response has user data
+    if (!response?.user) {
       throw new Error("Invalid login response");
     }
 
-    // ✅ STORE AUTH DATA
+    // Store all needed data
     localStorage.setItem("_token", response.token);
-    localStorage.setItem("uuid", response.user.uuid);
+    localStorage.setItem("uuid", response.user.uuid);                    // User UUID
+    localStorage.setItem("customer_uuid", response.user.customer_uuid);  // ← THIS IS KEY
     localStorage.setItem("role", response.user.role);
 
-    // ROLE-BASED REDIRECT
+    alert("Login successful!");
+
     if (response.user.role === "admin") {
       await navigateTo("/admin/dashboard");
     } else {

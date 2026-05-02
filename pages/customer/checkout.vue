@@ -1,150 +1,123 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 
-definePageMeta({
-  layout: "customer",
-});
+definePageMeta({ layout: "customer" });
 
 const router = useRouter();
 
 const cart = ref<any[]>([]);
 const customerUUID = ref("");
+const isLoading = ref(false);
 
 onMounted(() => {
   cart.value = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  // Try all possible keys where the customer UUID might be stored
-  customerUUID.value =
-    localStorage.getItem("customer_uuid") || localStorage.getItem("uuid") || "";
+  // Prefer customer_uuid, fallback to uuid
+  customerUUID.value = localStorage.getItem("customer_uuid") || 
+                       localStorage.getItem("uuid") || "";
+
+  console.log("Loaded Customer UUID:", customerUUID.value);
 
   if (cart.value.length === 0) {
     router.replace("/customer/cart");
   }
 });
 
-const subtotal = computed(() =>
-  cart.value.reduce(
-    (sum, item) => sum + (Number(item.price) || 0) * item.quantity,
-    0,
-  ),
+const subtotal = computed(() => 
+  cart.value.reduce((sum, item) => {
+    const price = Number(item?.price) || 0;
+    const qty = Number(item?.quantity) || 0;
+    return sum + price * qty;
+  }, 0)
 );
 
-const totalItems = computed(() =>
-  cart.value.reduce((sum, item) => sum + item.quantity, 0),
-);
-
-// 🔥 BUILD PAYLOAD — matches backend OrderStoreRequest exactly
 const orderPayload = computed(() => ({
-  customer_id: customerUUID.value,
+  customer_uuid: customerUUID.value,
   items: cart.value.map((item) => ({
     product_id: item.uuid,
     quantity: item.quantity,
   })),
 }));
 
-const placeOrder = () => {
-  console.log("═══════════════════════════════════");
-  console.log("📦ORDER PAYLOAD (POST /api/orders)");
-  console.log("═══════════════════════════════════");
-  console.log(JSON.stringify(orderPayload.value, null, 2));
-  console.log("═══════════════════════════════════");
+const placeOrder = async () => {
+  const token = localStorage.getItem("_token");
+
+  console.log("Sending customer_uuid:", customerUUID.value);
+
+  if (!token) return alert("Please login first!");
+  if (!customerUUID.value) return alert("Customer UUID is missing! Please login again.");
+
+  isLoading.value = true;
+
+  try {
+    const { public: { apiBaseURL } } = useRuntimeConfig();
+
+    const response = await $fetch(`${apiBaseURL}/orders`, {
+      method: "POST",
+      body: orderPayload.value,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    console.log("✅ Order Created:", response);
+
+    localStorage.removeItem("cart");
+    alert("✅ Order placed successfully!");
+    router.push("/customer/order");   // Changed to existing page
+
+  } catch (error: any) {
+    console.error("Full Error:", error?.response?._data || error);
+    alert(error?.response?._data?.message || "Failed to place order");
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const goBack = () => router.push("/customer/cart");
 </script>
 
 <template>
-  <section class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-    <div class="mb-8">
-      <button
-        @click="goBack"
-        class="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition mb-4"
-      >
-        <svg
-          class="h-4 w-4"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M15.75 19.5 8.25 12l7.5-7.5"
-          />
-        </svg>
-        Back to Cart
-      </button>
-      <h2 class="text-2xl font-bold text-gray-900">Checkout</h2>
-      <p class="mt-1 text-sm text-gray-500">
-        Review your order before placing it.
-      </p>
-    </div>
+  <!-- Your template remains the same -->
+  <section class="mx-auto max-w-3xl px-4 py-10">
+    <button @click="goBack" class="mb-6 text-gray-500 hover:text-gray-700 flex items-center gap-1">
+      ← Back to Cart
+    </button>
+
+    <h2 class="text-2xl font-bold mb-8">Checkout</h2>
 
     <div class="space-y-6">
-      <!-- Customer Info -->
-      <div class="rounded-xl border border-gray-200 bg-white p-5">
-        <h3 class="text-sm font-semibold text-gray-900 mb-3">Customer</h3>
-        <div class="text-sm text-gray-600">
-          <span class="font-medium text-gray-700">UUID:</span>
-          <code
-            class="ml-2 rounded bg-gray-100 px-2 py-0.5 text-xs font-mono text-gray-800"
-          >
-            {{ customerUUID || "Not found — check localStorage" }}
-          </code>
-        </div>
+      <div class="bg-white border rounded-xl p-5">
+        <h3 class="font-semibold mb-2">Customer UUID</h3>
+        <code class="bg-gray-100 px-3 py-1 text-sm">{{ customerUUID || "Not found" }}</code>
       </div>
 
-      <!-- Order Items -->
-      <div
-        class="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100"
-      >
-        <div class="p-5">
-          <h3 class="text-sm font-semibold text-gray-900">
-            Order Items ({{ totalItems }} item{{ totalItems !== 1 ? "s" : "" }})
-          </h3>
-        </div>
-        <div
-          v-for="item in cart"
-          :key="item.uuid"
-          class="flex items-center justify-between p-5"
-        >
+      <div class="bg-white border rounded-xl divide-y">
+        <div class="p-5 font-semibold">Order Items ({{ cart.length }})</div>
+        <div v-for="item in cart" :key="item.uuid" class="p-5 flex justify-between">
           <div>
-            <p class="text-sm font-semibold text-gray-900">{{ item.name }}</p>
-            <p class="text-xs text-gray-500">
-              ₱{{ Number(item.price).toFixed(2) }} × {{ item.quantity }}
-            </p>
-            <p class="text-xs text-gray-400 font-mono mt-0.5">
-              UUID: {{ item.uuid }}
-            </p>
+            <p>{{ item.name }}</p>
+            <p class="text-sm text-gray-500">₱{{ Number(item.price).toFixed(2) }} × {{ item.quantity }}</p>
           </div>
-          <p class="text-sm font-semibold text-gray-900">
-            ₱{{ (Number(item.price) * item.quantity).toFixed(2) }}
-          </p>
+          <p class="font-semibold">₱{{ (Number(item.price) * item.quantity).toFixed(2) }}</p>
         </div>
       </div>
 
-      <!-- Total & Place Order -->
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <div class="flex justify-between mb-6">
-          <span class="text-base font-semibold text-gray-900">Total</span>
-          <span class="text-lg font-bold text-indigo-600"
-            >₱{{ subtotal.toFixed(2) }}</span
-          >
+      <div class="bg-white border rounded-xl p-6">
+        <div class="flex justify-between text-xl font-bold mb-6">
+          <span>Total</span>
+          <span>₱{{ subtotal.toFixed(2) }}</span>
         </div>
 
         <button
           @click="placeOrder"
-          :disabled="!cart.length || !customerUUID"
-          class="w-full rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="isLoading || !customerUUID"
+          class="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 disabled:opacity-50"
         >
-          Place Order
+          {{ isLoading ? "Processing..." : "Place Order" }}
         </button>
-
-        <p v-if="!customerUUID" class="mt-2 text-xs text-center text-red-500">
-          ⚠ Customer UUID missing from localStorage. Check your login response.
-        </p>
       </div>
     </div>
   </section>

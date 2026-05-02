@@ -1,5 +1,12 @@
 export interface LoginResponse {
   token: string;
+  user?: {
+    uuid: string;
+    customer_uuid?: string;
+    role?: string;
+    name?: string;
+    email?: string;
+  };
 }
 
 export class AuthService {
@@ -48,12 +55,9 @@ export class AuthService {
 
   async logout(): Promise<any> {
     const runtimeConfig = useRuntimeConfig();
-
     const token = this.getToken();
 
-    if (!token) {
-      throw new Error("No token found");
-    }
+    if (!token) throw new Error("No token found");
 
     try {
       return await $fetch("/logout", {
@@ -66,15 +70,9 @@ export class AuthService {
       });
     } catch (error: any) {
       const status = error?.response?.status;
-      const message =
-        error?.response?._data?.message ||
-        error?.data?.message ||
-        error?.message;
+      const message = error?.response?._data?.message || error?.message;
 
-      if (status === 401) {
-        throw new Error("Unauthenticated");
-      }
-
+      if (status === 401) throw new Error("Unauthenticated");
       throw new Error(message || "Logout failed");
     }
   }
