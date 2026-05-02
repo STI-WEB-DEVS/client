@@ -127,6 +127,7 @@ definePageMeta({
 
 import { ref } from "vue";
 import { AuthService } from "~/api/auth/AuthService";
+import Order from "./customer/order.vue";
 
 const email = ref("");
 const password = ref("");
@@ -144,6 +145,21 @@ const handleSubmit = async () => {
 
     if (response?.token) {
       localStorage.setItem("_token", response.token);
+    }
+
+    /**
+     * @description - Store customer uuid in local storage. Use uuid instead of customer_uuid for naming consistency.
+     *                But possible if necessary.
+     *                ~Overthink ni Flare.
+     *
+     * if (response?.user.customer_uuid) {
+     *   localStorage.setItem("_customer_uuid", response.user.customer_uuid);
+     * }
+     *
+     */
+
+    if (response?.user.customer_uuid) {
+      localStorage.setItem("_uuid", response.user.customer_uuid);
     }
 
     if (response?.user.uuid) {

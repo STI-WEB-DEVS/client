@@ -3,6 +3,7 @@ import { BaseService } from "../BaseService";
 export interface LoginResponse {
   token: string;
   user: {
+    customer_uuid: string;
     uuid: string;
     role: string;
   };

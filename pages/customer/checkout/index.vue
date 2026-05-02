@@ -6,10 +6,14 @@ definePageMeta({
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { ChevronLeftIcon } from "@heroicons/vue/24/outline";
+import { orderService } from "~/api/customer/OrderService";
 
 const router = useRouter();
 const checkoutData = ref(null);
 const showSuccessModal = ref(false);
+const showErrorModal = ref(false);
+const errorMessage = ref("");
+const isSubmitting = ref(false);
 
 const loadCheckoutData = () => {
   if (process.client) {
@@ -35,8 +39,10 @@ const total = computed(() => subtotal.value + shipping.value + tax.value);
 
 const { formatPrice } = useCurrency();
 
-const placeOrder = () => {
-  if (!checkoutData.value) return;
+const placeOrder = async () => {
+  if (!checkoutData.value || isSubmitting.value) return;
+
+  isSubmitting.value = true;
 
   // Retrieve current logged-in customer UUID from localStorage
   const customerUuid = localStorage.getItem("_uuid") || "GUEST-USER-UUID";
@@ -50,11 +56,18 @@ const placeOrder = () => {
     })),
   };
 
-  // Log to console for development verification
-  console.log(JSON.stringify(orderPayload, null, 2));
-
-  // Show visual feedback
-  showSuccessModal.value = true;
+  try {
+    // Post to backend using OrderService
+    await orderService.create(orderPayload);
+    // Show visual feedback
+    showSuccessModal.value = true;
+  } catch (error) {
+    console.error("Order error:", error);
+    errorMessage.value = error.message || "Failed to place order. Please try again.";
+    showErrorModal.value = true;
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 
 const handleOrderSuccess = () => {
@@ -156,9 +169,10 @@ onMounted(loadCheckoutData);
             <button
               @click="placeOrder"
               type="button"
-              class="mt-8 flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-6 py-6 text-xl font-black text-white shadow-xl shadow-indigo-100 transition-all active:scale-[0.98] hover:bg-indigo-700"
+              :disabled="isSubmitting"
+              class="mt-8 flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-6 py-6 text-xl font-black text-white shadow-xl shadow-indigo-100 transition-all active:scale-[0.98] hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Place Order
+              {{ isSubmitting ? "Processing..." : "Place Order" }}
             </button>
           </div>
         </div>
@@ -172,6 +186,15 @@ onMounted(loadCheckoutData);
       title="Order Placed Successfully!"
       message="Thank you for your purchase. Your order has been received and is being processed."
       @close="handleOrderSuccess"
+    />
+
+    <!-- Error Feedback Modal -->
+    <FeedbackModal
+      :open="showErrorModal"
+      type="error"
+      title="Order Failed"
+      :message="errorMessage"
+      @close="showErrorModal = false"
     />
   </div>
 </template>

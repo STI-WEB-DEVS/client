@@ -247,6 +247,21 @@
         </div>
       </main>
     </div>
+
+    <!-- Sign Out Confirmation Modal -->
+    <BaseModal
+      :open="showConfirmLogout"
+      title="Confirm Sign Out"
+      confirm-text="Sign Out"
+      cancel-text="Cancel"
+      variant="danger"
+      :loading="isLoggingOut"
+      @close="showConfirmLogout = false"
+      @confirm="handleLogoutConfirm"
+    >
+      Are you sure you want to sign out of your account? Any unsaved changes may
+      be lost.
+    </BaseModal>
   </div>
 </template>
 
@@ -281,16 +296,26 @@ const authService = new AuthService();
 
 const route = useRoute();
 
-const logout = async () => {
+const showConfirmLogout = ref(false);
+const isLoggingOut = ref(false);
+
+const logout = () => {
+  showConfirmLogout.value = true;
+};
+
+const handleLogoutConfirm = async () => {
+  isLoggingOut.value = true;
   try {
     await authService.logout();
     localStorage.removeItem("_token");
     localStorage.removeItem("_uuid");
     localStorage.removeItem("_role");
-    await navigateTo("/");
+    showConfirmLogout.value = false;
+    navigateTo("/");
   } catch (error) {
     console.error("Logout failed:", error);
-    // Optionally show an error message to the user
+  } finally {
+    isLoggingOut.value = false;
   }
 };
 
