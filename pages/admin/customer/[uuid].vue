@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout>
+
     <div class="space-y-6">
       <div>
         <h1 class="text-xl font-semibold tracking-tight text-gray-900">
@@ -60,7 +60,6 @@
         </div>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

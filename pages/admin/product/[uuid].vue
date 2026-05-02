@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <h1 class="text-xl font-semibold">View Product</h1>
 
@@ -14,7 +13,6 @@
         <p><strong>Updated At:</strong> {{ product.updated_at }}</p>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

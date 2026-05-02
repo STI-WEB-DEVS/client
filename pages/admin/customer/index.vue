@@ -173,7 +173,7 @@ const handleCreate = () => {
 }
 
 const handleView = (customer: any) => {
-  router.push(`/customer/${customer.uuid}`)
+  router.push(`/admin/customer/${customer.uuid}`)
 }
 
 const handleEdit = (customer: any) => {
