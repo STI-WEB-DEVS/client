@@ -67,16 +67,20 @@ const router = useRouter();
 const cart = ref<any[]>([]);
 const customerUUID = ref("");
 const route = useRoute();
+const checkoutMode = ref("cart");
+const showFeedback = inject<(msg: string) => void>("showFeedback"); 
 
 onMounted(() => {
   const mode = route.query.mode;
 
   if (mode === "buynow") {
     // Load buy now item only
+    checkoutMode.value = "buynow";
     cart.value = JSON.parse(localStorage.getItem("buynow") || "[]");
     localStorage.removeItem("buynow"); // clean up after loading
   } else {
     // Load regular cart
+    checkoutMode.value = "cart";
     cart.value = JSON.parse(localStorage.getItem("cart") || "[]");
   }
 
@@ -120,15 +124,20 @@ const placeOrder = async () => {
     const response = await orderService.create(payload);
     console.log("✅ Order Success:", response);
 
-    localStorage.removeItem("cart");
-    localStorage.removeItem("buynow");
+    if (checkoutMode.value === "buynow") {
+      localStorage.removeItem("buynow");
+    } else {
+      localStorage.removeItem("cart");
+    }
 
-    alert("Order placed successfully!");
+    if(showFeedback)
+    showFeedback("Order placed successfully!");
     router.push("/customer/order");
 
   } catch (error: any) {
     console.error(error);
-    alert(error.message || "Failed to place order");
+    if(showFeedback)
+    showFeedback(error.message || "Failed to place order");
   }
 };
 </script>
