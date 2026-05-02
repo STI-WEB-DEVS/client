@@ -126,7 +126,10 @@ const handleSubmit = async () => {
 
     if (response?.user) {
       localStorage.setItem('_role', response.user.role);
-      localStorage.setItem('_uuid', response.user.uuid);
+      if (response.user.customer_uuid) {
+        localStorage.setItem('_customer_uuid', response.user.customer_uuid);
+      }
+      localStorage.setItem('_user_uuid', response.user.uuid);
     }
 
     await navigateTo('/customer/shop');

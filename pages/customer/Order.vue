@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useCart } from '~/composables/useCart'
+import { orderService } from '~/api/order/OrderService'
 import { ClipboardDocumentListIcon } from '@heroicons/vue/24/outline'
 
 definePageMeta({
@@ -9,10 +10,32 @@ definePageMeta({
 
 const { getLocalOrders } = useCart()
 const orders = ref<any[]>([])
+const pending = ref(false)
+const error = ref<string | null>(null)
 
-onMounted(() => {
-  orders.value = getLocalOrders()
-})
+const loadOrders = async () => {
+  pending.value = true
+  error.value = null
+
+  const customerUuid = typeof window !== 'undefined' ? localStorage.getItem('_customer_uuid') : null
+
+  try {
+    if (customerUuid) {
+      const response = await orderService.listByCustomer(customerUuid)
+      orders.value = response?.data || response || []
+      return
+    }
+
+    orders.value = getLocalOrders()
+  } catch (err: any) {
+    console.error('Failed to fetch backend orders:', err)
+    error.value = err?.message || 'Unable to load orders from server.'
+  } finally {
+    pending.value = false
+  }
+}
+
+onMounted(loadOrders)
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('en-PH', {
@@ -34,7 +57,18 @@ const formatDate = (date: string) => {
       </div>
     </div>
 
-    <div v-if="orders.length === 0" class="mt-16 text-center">
+    <div v-if="pending" class="mt-16 text-center">
+      <div class="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-indigo-600"></div>
+      <p class="mt-4 text-sm font-medium text-gray-900">Loading your orders...</p>
+    </div>
+
+    <div v-else-if="error" class="mt-16 text-center">
+      <ClipboardDocumentListIcon class="mx-auto h-12 w-12 text-red-400" />
+      <h3 class="mt-2 text-sm font-medium text-gray-900">Unable to load orders</h3>
+      <p class="mt-1 text-sm text-gray-500">{{ error }}</p>
+    </div>
+
+    <div v-else-if="orders.length === 0" class="mt-16 text-center">
       <ClipboardDocumentListIcon class="mx-auto h-12 w-12 text-gray-400" />
       <h3 class="mt-2 text-sm font-medium text-gray-900">No orders found</h3>
       <p class="mt-1 text-sm text-gray-500">You haven't placed any orders yet.</p>
@@ -68,10 +102,10 @@ const formatDate = (date: string) => {
                       {{ item.quantity }}x {{ item.product_name }}
                     </div>
                   </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900 font-semibold">₱{{ order.total_amount.toLocaleString() }}</td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900 font-semibold">₱{{ Number(order.total_amount).toLocaleString() }}</td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm">
                     <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                      {{ order.status }}
+                      {{ order.status || 'Completed' }}
                     </span>
                   </td>
                 </tr>

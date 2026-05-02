@@ -129,6 +129,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { XMarkIcon, CheckIcon, QuestionMarkCircleIcon, ShoppingCartIcon } from '@heroicons/vue/20/solid'
+import { orderService } from '~/api/order/OrderService'
 import { useCart } from '~/composables/useCart'
 import FeedbackModal from '~/components/FeedbackModal.vue'
 
@@ -141,11 +142,18 @@ const { cart, removeFromCart, updateQuantity, toggleSelection, cartTotal, select
 const isModalOpen = ref(false)
 const modalMessage = ref('')
 
-const handleCheckout = () => {
+const handleCheckout = async () => {
   if (!selectedItems.value.length) return;
 
-  const payload = {
-    customer_uuid: localStorage.getItem('_uuid') || 'GUEST',
+  const customerUuid = typeof window !== 'undefined' ? localStorage.getItem('_customer_uuid') : null
+  const userUuid = typeof window !== 'undefined' ? localStorage.getItem('_user_uuid') : null
+  if (!userUuid) {
+    modalMessage.value = 'Please sign in before checking out.'
+    isModalOpen.value = true
+    return
+  }
+
+  const payload: any = {
     items: selectedItems.value.map(item => ({
       product_uuid: item.uuid,
       product_name: item.name,
@@ -154,15 +162,21 @@ const handleCheckout = () => {
       total: item.price * item.quantity
     })),
     total_amount: cartTotal.value,
-    action: 'CHECKOUT'
   }
-  
-  console.log('Checkout Payload:', JSON.stringify(payload, null, 2))
-  
-  // Save to local storage
-  saveLocalOrder(payload)
-  
-  modalMessage.value = 'Your order has been placed successfully! You can view it in the Orders page.'
-  isModalOpen.value = true
+
+  if (customerUuid) {
+    payload.customer_uuid = customerUuid
+  }
+
+  try {
+    await orderService.create(payload)
+    saveLocalOrder(payload)
+    modalMessage.value = 'Your order has been placed successfully! You can view it in the Orders page.'
+  } catch (err: any) {
+    console.error('Checkout failed:', err)
+    modalMessage.value = 'Unable to complete checkout. Please try again.'
+  } finally {
+    isModalOpen.value = true
+  }
 }
 </script>

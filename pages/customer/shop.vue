@@ -85,6 +85,7 @@
 import { ref, onMounted } from 'vue'
 import { ShoppingCartIcon, PlusIcon, MinusIcon } from '@heroicons/vue/24/outline'
 import { productService } from '~/api/product/ProductService'
+import { orderService } from '~/api/order/OrderService'
 import { useCart } from '~/composables/useCart'
 import FeedbackModal from '~/components/FeedbackModal.vue'
 
@@ -145,12 +146,17 @@ const handleAddToCart = (product: any) => {
   showFeedback(`Added ${qty} ${product.name} to cart`)
 }
 
-const handleBuyNow = (product: any) => {
+const handleBuyNow = async (product: any) => {
   const qty = quantities.value[product.uuid] || 1
-  
-  // As per user request: display on console like a payload structure
-  const payload = {
-    customer_uuid: typeof window !== 'undefined' ? (localStorage.getItem('_uuid') || 'GUEST') : 'GUEST',
+  const customerUuid = typeof window !== 'undefined' ? localStorage.getItem('_customer_uuid') : null
+  const userUuid = typeof window !== 'undefined' ? localStorage.getItem('_user_uuid') : null
+
+  if (!userUuid) {
+    showFeedback('Please sign in before placing an order.')
+    return
+  }
+
+  const payload: any = {
     items: [
       {
         product_uuid: product.uuid,
@@ -161,14 +167,19 @@ const handleBuyNow = (product: any) => {
       }
     ],
     total_amount: product.price * qty,
-    action: 'BUY_NOW'
   }
-  
-  console.log('Buy Now Payload:', JSON.stringify(payload, null, 2))
-  
-  // Save to local storage
-  saveLocalOrder(payload)
-  
-  showFeedback(`Order placed successfully for ${product.name}! Check console for payload and Orders page for history.`)
+
+  if (customerUuid) {
+    payload.customer_uuid = customerUuid
+  }
+
+  try {
+    await orderService.create(payload)
+    saveLocalOrder(payload)
+    showFeedback(`Order placed successfully for ${product.name}! Check the Orders page for history.`)
+  } catch (err: any) {
+    console.error('Buy now failed:', err)
+    showFeedback('Unable to place order. Please try again.')
+  }
 }
 </script>
