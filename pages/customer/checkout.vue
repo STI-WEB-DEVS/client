@@ -24,13 +24,8 @@ const placeOrder = () => {
   isPlacing.value = true
 
   const payload = buildOrderPayload()
-
-  console.log('══════════════════════════════════════════')
-  console.log('📦 ORDER PAYLOAD (ready to POST /api/orders)')
-  console.log('══════════════════════════════════════════')
+  console.log('📦 ORDER (ready to POST /api/orders)')
   console.log(JSON.stringify(payload, null, 2))
-  console.log('══════════════════════════════════════════')
-
   setTimeout(() => {
     isPlacing.value = false
     orderSuccess.value = true
