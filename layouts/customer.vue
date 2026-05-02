@@ -13,9 +13,23 @@
           <NuxtLink to="/account" class="hover:text-indigo-600 transition-colors">Account</NuxtLink>
         </div>
 
-        <NuxtLink to="/cart" class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-indigo-300 transition-colors">
-          Cart
-        </NuxtLink>
+        <div class="flex items-center gap-4">
+          <NuxtLink to="/cart" class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-indigo-300 transition-colors">
+            Cart
+          </NuxtLink>
+          
+          <!-- Creative Logout Button -->
+          <button 
+            @click="showLogoutModal = true" 
+            class="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-red-600 to-red-700 px-5 py-2 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+            </svg>
+            <span>Sign Out</span>
+            <span class="absolute inset-0 -translate-x-full rounded-full bg-white/20 transition-transform duration-300 group-hover:translate-x-0"></span>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -74,5 +88,92 @@
         </div>
       </div>
     </footer>
+
+    <!-- Stylish Logout Confirmation Modal -->
+    <div v-if="showLogoutModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm transition-opacity" @click="showLogoutModal = false"></div>
+        
+        <div class="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all">
+          <div class="relative">
+            <!-- Decorative top bar -->
+            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-500 to-red-600"></div>
+            
+            <div class="p-6 text-center">
+              <!-- Animated icon -->
+              <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-8 w-8 text-red-600 animate-bounce">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                </svg>
+              </div>
+              
+              <h3 class="mt-4 text-xl font-bold text-gray-900">Ready to leave?</h3>
+              <p class="mt-2 text-sm text-gray-500">
+                You're about to sign out of your account. 
+                <span class="block text-xs text-gray-400 mt-1">We'll miss you! 👋</span>
+              </p>
+              
+              <div class="mt-6 flex gap-3">
+                <button 
+                  @click="showLogoutModal = false" 
+                  class="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 hover:border-gray-400"
+                >
+                  Stay
+                </button>
+                <button 
+                  @click="confirmLogout" 
+                  class="flex-1 rounded-lg bg-gradient-to-r from-red-600 to-red-700 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:scale-105 hover:shadow-lg hover:from-red-700 hover:to-red-800"
+                >
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+import { AuthService } from '~/api/auth/AuthService'
+
+const authService = new AuthService()
+const showLogoutModal = ref(false)
+
+const handleLogout = async () => {
+  try {
+    await authService.logout();
+    window.location.href = '/';
+  } catch (error) {
+    console.error('Logout error:', error);
+    window.location.href = '/';
+  }
+}
+
+const confirmLogout = async () => {
+  showLogoutModal.value = false;
+  await handleLogout();
+}
+</script>
+
+<style scoped>
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-bounce {
+  animation: bounce 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+.animate-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+</style>
