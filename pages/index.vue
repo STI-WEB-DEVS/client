@@ -79,6 +79,7 @@
             </div>
           </div>
 
+          <p v-if="unauthMessage" class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{{ unauthMessage }}</p>
           <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
 
           <div>
@@ -103,37 +104,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { AuthService } from '~/api/auth/AuthService';
+
+definePageMeta({
+  layout: false
+})
 
 const email = ref('');
 const password = ref('');
 const error = ref('');
+const unauthMessage = ref('');
 const isLoading = ref(false);
 
 const authService = new AuthService();
 
+onMounted(() => {
+  const params = new URLSearchParams(window.location.search);
+  const msg = params.get('message');
+  if (msg) {
+    unauthMessage.value = msg;
+  }
+});
+
 const handleSubmit = async () => {
   error.value = '';
   isLoading.value = true;
-  
+
   try {
     const response = await authService.login(email.value, password.value);
 
     if (response?.token) {
-      localStorage.setItem('_token', response.token);
+      authService.setToken(response.token);
     }
 
-    await navigateTo('admin/dashboard');
+    const role = response?.user?.role;
+    const uuid = response?.user?.uuid;
+    const customerUuid = response?.user?.customer_uuid;
+
+    if (role) localStorage.setItem('_role', role);
+    if (uuid) localStorage.setItem('_uuid', uuid);
+    if (customerUuid) localStorage.setItem('_customer_uuid', customerUuid);
+
+    if (role === 'customer') {
+      await navigateTo('/customer/home');
+    } else {
+      await navigateTo('/admin/dashboard');
+    }
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {
     isLoading.value = false;
   }
 };
-
-definePageMeta({
-  layout: false
-})
-
 </script>

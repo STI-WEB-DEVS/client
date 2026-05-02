@@ -1,74 +1,47 @@
-export interface LoginResponse {
-  token: string;
-}
+import BaseService from '~/api/BaseService';
 
-export class AuthService {
-  async login(email: string, password: string): Promise<LoginResponse> {
-    const runtimeConfig = useRuntimeConfig();
-
-    try {
-      return await $fetch<LoginResponse>('/login', {
-        baseURL: runtimeConfig.public.apiBaseURL,
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-        },
-        body: {
-          email,
-          password,
-        },
-      });
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const message =
-        error?.response?._data?.message ||
-        error?.data?.message ||
-        error?.message;
-
-      switch (status) {
-        case 400:
-        case 401:
-        case 404:
-        case 422:
-        case 429:
-          throw new Error(message || 'Validation or Request Error');
-        case 500:
-          throw new Error('Server error. Please try again or contact the administrator.');
-        default:
-          throw new Error(message || 'Something went wrong. Please try again.');
-      }
+export class AuthService extends BaseService {
+    /**
+     * Authenticate a user and return the token + user data.
+     * Mirrors: POST /api/login → UserService::loginUser()
+     */
+    async login(email: string, password: string): Promise<any> {
+        return await this.request('/login', 'POST', { email, password });
     }
-  }
 
-  async logout(): Promise<boolean> {
-    const runtimeConfig = useRuntimeConfig();
-
-    try {
-      const token = localStorage.getItem('_token');
-      if (!token) return false;
-
-      const response = await $fetch('/logout', {
-        baseURL: runtimeConfig.public.apiBaseURL,
-        method: 'DELETE', // <--- Change this from 'POST' to 'DELETE'
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // If backend confirms deletion
-      localStorage.removeItem('_token');
-      return true;
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const message =
-        error?.response?._data?.message ||
-        error?.data?.message ||
-        error?.message;
-
-      console.error('Logout failed:', message);
-
-      return false;
+    /**
+     * Revoke the current access token from the database.
+     * Mirrors: DELETE /api/logout → UserService::logoutUser()
+     *
+     * The backend calls $user->currentAccessToken()->delete()
+     * which removes the row from the personal_access_tokens table
+     * for the token that was sent in the Authorization header.
+     *
+     * Returns the response so the caller can check for success
+     * before clearing the local token.
+     */
+    async logout(): Promise<any> {
+        return await this.request('/logout', 'DELETE');
     }
-  }
+
+    /**
+     * Store the token in localStorage after a successful login.
+     */
+    setToken(token: string): void {
+        localStorage.setItem('_token', token);
+    }
+
+    /**
+     * Remove the token from localStorage.
+     */
+    clearToken(): void {
+        localStorage.removeItem('_token');
+    }
+
+    /**
+     * Check if a token exists in localStorage.
+     */
+    isAuthenticated(): boolean {
+        return !!localStorage.getItem('_token');
+    }
 }

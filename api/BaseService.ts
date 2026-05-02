@@ -1,4 +1,5 @@
-export class BaseService {
+// ~/api/BaseService.ts
+export default class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
     const token = localStorage.getItem('_token');
@@ -16,11 +17,6 @@ export class BaseService {
       method,
       headers,
     };
-
-    // Attach Authorization header if token exists
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
 
     if (method.toUpperCase() === 'GET') {
       config.params = params;
@@ -52,5 +48,3 @@ export class BaseService {
     }
   }
 }
-
-export default BaseService;
