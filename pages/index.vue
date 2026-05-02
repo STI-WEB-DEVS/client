@@ -124,9 +124,9 @@
 import { ref } from "vue";
 import { AuthService } from "~/api/auth/AuthService";
 
-const email = ref("");
-const password = ref("");
-const error = ref("");
+const email = ref('');
+const password = ref('');
+const error = ref('');
 const isLoading = ref(false);
 
 const authService = new AuthService();
@@ -148,20 +148,17 @@ const handleSubmit = async () => {
   try {
     const response = await authService.login(email.value, password.value);
 
-    // Save token and user info
-    if (response?.token && response?.user) {
-      localStorage.setItem("_token", response.token);
-      localStorage.setItem("uuid", response.user.uuid);
-      localStorage.setItem("role", response.user.role);
+    // ✅ Get role directly from response (top-level, not respaonse.user.role)
+    const role = response.role;
+
+    if (role === 'customer') {
+      await navigateTo('/customer/order');
+    } else {
+      // Admin or any other role goes to admin dashboard
+      await navigateTo('/admin/dashboard');
     }
-
-    // Resolve route based on role
-    const route = roleRoutes[response?.user?.role] ?? "/";
-
-    await navigateTo(route);
-
   } catch (err: any) {
-    error.value = err?.message || "Login failed";
+    error.value = err?.message || 'Login failed. Please try again.';
   } finally {
     isLoading.value = false;
   }

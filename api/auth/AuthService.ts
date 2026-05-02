@@ -1,69 +1,79 @@
+// api/auth/AuthService.ts
+import { useRuntimeConfig } from '#app'
+
 export interface LoginResponse {
   token: string;
+  uuid: string;   
+  name: string;  
+  role: string;
 }
 
 export class AuthService {
   async login(email: string, password: string): Promise<LoginResponse> {
     const runtimeConfig = useRuntimeConfig();
 
-    try {
-      return await $fetch<LoginResponse>('/login', {
-        baseURL: runtimeConfig.public.apiBaseURL,
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-        },
-        body: {
-          email,
-          password,
-        },
-      });
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const message =
-        error?.response?._data?.message ||
-        error?.data?.message ||
-        error?.message;
+    if (process.client) {
+      this.cleanAuthKeys();
+    }
 
-      switch (status) {
-        case 400:
-        case 401:
-        case 404:
-        case 422:
-        case 429:
-          throw new Error(message || 'Validation or Request Error');
-        case 500:
-          throw new Error('Server error. Please try again or contact the administrator.');
-        default:
-          throw new Error(message || 'Something went wrong. Please try again.');
+    const response = await $fetch<LoginResponse>('/login', {
+      baseURL: runtimeConfig.public.apiBaseURL,
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+      body: { email, password },
+    });
+
+    if (response.token && process.client) {
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('uuid', response.uuid || '');
+      localStorage.setItem('role', response.role || '');
+      localStorage.setItem('name', response.name || '');
+  
+    }
+    return response;
+  }
+
+  async logout(): Promise<void> {
+    const runtimeConfig = useRuntimeConfig();
+    const tokenValue = process.client ? localStorage.getItem('token') : null;
+
+    try {
+      if (tokenValue) {
+        await $fetch('/logout', {
+          baseURL: runtimeConfig.public.apiBaseURL,
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${tokenValue}`,
+          },
+        });
+      }
+    } catch (error: any) {
+      console.error('Logout failed:', error.message);
+    } finally {
+      if (process.client) {
+        this.cleanAuthKeys();
+        this.removeNuisanceKeys();
       }
     }
   }
 
-async logout(): Promise<void> {
-  const runtimeConfig = useRuntimeConfig();
-  
-const token = localStorage.getItem('_token'); 
-
-  try {
-    await $fetch('/logout', {
-      baseURL: runtimeConfig.public.apiBaseURL,
-      method: 'DELETE',
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}` 
-      }
-    });
-    console.log('Successfully deleted from database');
-  } catch (error) {
-    console.error('Database deletion failed:', error);
-  } finally {
-  //  localStorage.removeItem('_token');
-  //  localStorage.removeItem('uuid');
-  //  localStorage.removeItem('role');
-   localStorage.clear();
+  private cleanAuthKeys() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('uuid');
+    localStorage.removeItem('role');
+    localStorage.removeItem('name');
   }
-}
 
-  
+  private removeNuisanceKeys() {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('nuxt-error-overlay') || key.includes('_VUE_DEVTOOLS_'))) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    if (keysToRemove.length) console.log('Removed nuisance keys:', keysToRemove);
+  }
 }

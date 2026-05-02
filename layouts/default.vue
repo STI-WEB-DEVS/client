@@ -71,9 +71,18 @@
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
           <div class="flex flex-1"></div>
           <div class="flex items-center gap-x-4 lg:gap-x-6">
+            <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
+              <span class="sr-only">View notifications</span>
+              <BellIcon class="size-6" aria-hidden="true" />
+            </button>
+
+            <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true"></div>
+
             <Menu as="div" class="relative">
               <MenuButton class="relative flex items-center">
-                <img class="size-8 rounded-full bg-gray-50" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                <span class="absolute -inset-1.5"></span>
+                <span class="sr-only">Open user menu</span>
+                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
                 <span class="hidden lg:flex lg:items-center">
                   <span class="ml-4 text-sm/6 font-semibold text-gray-900">Tom Cook</span>
                   <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
@@ -82,12 +91,20 @@
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
-                  </MenuItem>
-                  <MenuItem v-slot="{ active }">
-                    <button @click="showLogoutModal = true" :class="[active ? 'bg-gray-50' : '', 'block w-full text-left px-3 py-1 text-sm/6 text-gray-900']">
-                      Sign out
+                    <button
+                      v-if="item.id === 'logout'"
+                      @click="handleSignOut"
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full text-left px-3 py-1 text-sm/6 text-gray-900']"
+                    >
+                      {{ item.name }}
                     </button>
+                    <NuxtLink
+                      v-else
+                      :to="item.href"
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']"
+                    >
+                      {{ item.name }}
+                    </NuxtLink>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -103,13 +120,13 @@
       </main>
     </div>
 
-    <TransitionRoot as="template" :show="showLogoutModal">
-      <Dialog as="div" class="relative z-[100]" @close="showLogoutModal = false">
+    <TransitionRoot as="template" :show="signOutModalOpen">
+      <Dialog class="relative z-[100]" @close="signOutModalOpen = false">
         <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
           <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
         </TransitionChild>
 
-        <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
               <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
@@ -120,13 +137,13 @@
                   <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                     <DialogTitle as="h3" class="text-base font-semibold text-gray-900">Sign out</DialogTitle>
                     <div class="mt-2">
-                      <p class="text-sm text-gray-500">Are you sure you want to sign out of your account?</p>
+                      <p class="text-sm text-gray-500">Are you sure you want to sign out? Unsaved changes may be lost.</p>
                     </div>
                   </div>
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                  <button type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto" @click="handleLogout">Sign out</button>
-                  <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" @click="showLogoutModal = false">Cancel</button>
+                  <button type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto" @click="confirmSignOut">Sign out</button>
+                  <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" @click="signOutModalOpen = false">Cancel</button>
                 </div>
               </DialogPanel>
             </TransitionChild>
@@ -139,6 +156,8 @@
 
 <script setup>
 import { ref } from 'vue'
+
+
 import {
   Dialog,
   DialogPanel,
@@ -161,38 +180,55 @@ import {
   ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
-import { useRoute, useRouter } from 'vue-router'
-import { AuthService } from '~/api/auth/AuthService'
+import { useRoute } from 'vue-router'
+import { AuthService } from '~/api/auth/AuthService';
 
 const route = useRoute()
-const router = useRouter()  
 const authService = new AuthService()
 
+// State
 const sidebarOpen = ref(false)
-const showLogoutModal = ref(false)
+const signOutModalOpen = ref(false)
 
-definePageMeta({
-  layout: false
-})
 
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/admin/products', icon: ShoppingBagIcon },
+  { name: 'Products', href: '/admin/product', icon: UserGroupIcon },
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
+  { name: 'Your profile', href: '/profile' },
+  { name: 'Sign out', href: '#', id: 'logout' },
 ]
 
-const handleLogout = async () => {
+// Opens the modal
+const handleSignOut = () => {
+  signOutModalOpen.value = true
+}
+
+
+
+// Executes the logout logic
+const confirmSignOut = async () => {
+  signOutModalOpen.value = false
   try {
+    // 1. Delete token from DB via backend
     await authService.logout()
+    
+    // 2. Clear local cookies/state and redirect
+    const token = useCookie('auth_token')
+    token.value = null
+    await navigateTo('/') 
   } catch (error) {
-    console.error('Error during logout process:', error)
-  } finally {
-    showLogoutModal.value = false
-    router.push('/')
+    console.error('Logout failed:', error.message)
+    // Fallback: still redirect even if API fails
+    const token = useCookie('auth_token')
+    token.value = null
+    await navigateTo('/')
   }
 }
+
+
+
 </script>

@@ -1,48 +1,44 @@
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
-    const token = localStorage.getItem('_token');
+    const apiBase = runtimeConfig.public.apiBaseURL;
+
+    const token = process.client ? localStorage.getItem('token') : null;
 
     const headers: Record<string, string> = {
-      Accept: 'application/json',
+      'Accept': 'application/json',
     };
 
     if (token) {
-      headers.Authorization = `Bearer ${token}`;
+      headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const config: any = {
-      baseURL: runtimeConfig.public.apiBaseURL,
-      method,
+    const fetchOptions: any = {
+      baseURL: apiBase,
+      method: method.toUpperCase(),
       headers,
     };
 
-    if (method.toUpperCase() === 'GET') {
-      config.params = params;
+    if (fetchOptions.method === 'GET') {
+      fetchOptions.query = params; 
     } else {
-      config.body = params;
+      fetchOptions.body = params;
     }
 
     try {
-      return await $fetch<T>(url, config);
+      return await $fetch<T>(url, fetchOptions);
     } catch (error: any) {
+      console.error(`[API Error ${method} ${url}]:`, error);
       const status = error?.response?.status;
-      const message =
-        error?.response?._data?.message ||
-        error?.data?.message ||
-        error?.message;
+      const data = error?.response?._data;
+      const message = data?.message || error?.message || 'Unknown Error';
 
       switch (status) {
-        case 400:
-        case 401:
-        case 404:
-        case 422:
-        case 429:
-          throw new Error(message || 'Validation or Request Error');
-        case 500:
-          throw new Error('Server error. Please try again or contact the administrator.');
-        default:
-          throw new Error(message || 'Something went wrong. Please try again.');
+        case 401: throw new Error('Unauthorized: Please login again.');
+        case 404: throw new Error(`Endpoint not found: ${url}`);
+        case 422: return Promise.reject(data); 
+        case 500: throw new Error('Server error. Please contact administrator.');
+        default: throw new Error(message);
       }
     }
   }
