@@ -26,7 +26,7 @@ export class AuthService {
                 localStorage.setItem('user_role', data.user.role || 'customer');
             }
             
-            return { success: true, data };
+            return { success: true, data, user: data.user };
         }
         
         throw new Error(data.message || 'Login failed');

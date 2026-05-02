@@ -106,6 +106,10 @@
 import { ref } from 'vue';
 import { AuthService } from '~/api/auth/AuthService';
 
+definePageMeta({
+  layout: false
+})
+
 const email = ref('');
 const password = ref('');
 const error = ref('');
@@ -123,16 +127,25 @@ const handleSubmit = async () => {
     if (response?.token) {
       localStorage.setItem('_token', response.token);
     }
+    
+    if (response?.user) {
+      localStorage.setItem('user_uuid', response.user.uuid);
+      localStorage.setItem('user_role', response.user.role || 'customer');
+    }
 
-    await navigateTo('/dashboard');
+    // ✅ Role-based redirection
+    const userRole = response?.user?.role || 'customer';
+    
+    if (userRole === 'admin') {
+      await navigateTo('/admin/dashboard');
+    } else {
+      // Customer goes to customer order page
+      await navigateTo('/customer/order');
+    }
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {
     isLoading.value = false;
   }
 };
-
-definePageMeta({
-  layout: false
-})
 </script>
