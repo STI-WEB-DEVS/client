@@ -121,40 +121,47 @@
 </template>
 
 <script setup lang="ts">
+  definePageMeta({
+    layout: false
+  })
 
-definePageMeta({
- layout: false
-})
+  import { ref } from "vue";
+  import { AuthService } from "~/api/auth/AuthService";
 
-import { ref } from "vue";
-import { AuthService } from "~/api/auth/AuthService";
+  const email = ref("");
+  const password = ref("");
+  const error = ref("");
+  const isLoading = ref(false);
 
-const email = ref("");
-const password = ref("");
-const error = ref("");
-const isLoading = ref(false);
+  const authService = new AuthService();
 
-const authService = new AuthService();
+  const handleSubmit = async () => {
+    error.value = "";
+    isLoading.value = true;
 
-const handleSubmit = async () => {
-  error.value = "";
-  isLoading.value = true;
+    try {
+      const response = await authService.login(email.value, password.value);
 
-  try {
-    const response = await authService.login(email.value, password.value);
+      if (response?.token) {
+        localStorage.setItem("_token", response.token);
+        localStorage.setItem("uuid", response.user.uuid);
+        localStorage.setItem("role", response.user.role);
 
-    if (response?.token) {
-      localStorage.setItem("_token", response.token);
-      localStorage.setItem("uuid", response.user.uuid);
-      localStorage.setItem("role", response.user.role);
+        const role = (response.user.role || "").toString().toLowerCase();
 
+        if (role === "customer") {
+          localStorage.removeItem("customer_uuid");
+          await navigateTo("/customer/landing");
+        } else if (role === "admin") {
+          await navigateTo("/admin/dashboard");
+        } else {
+          await navigateTo("/");
+        }
+      }
+    } catch (err: any) {
+      error.value = err?.message || "";
+    } finally {
+      isLoading.value = false;
     }
-
-    await navigateTo("/admin/dashboard");
-  } catch (err: any) {
-    error.value = err?.message || "";
-  } finally {
-    isLoading.value = false;
-  }
-};
+  };
 </script>
