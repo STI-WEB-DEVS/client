@@ -19,6 +19,11 @@
 
       <div v-else-if="customer" class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
         <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">UUID</p>
+          <p class="mt-1 text-lg font-medium text-gray-900">{{ customer.uuid }}</p>
+        </div>
+
+        <div>
           <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Full Name</p>
           <p class="mt-1 text-lg font-medium text-gray-900">{{ customer.name }}</p>
         </div>
