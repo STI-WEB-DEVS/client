@@ -10,7 +10,7 @@ class OrderService extends BaseService {
     return OrderService.instance;
   }
 
-  private resource = "/Order";
+  private resource = "/orders";
 
   async create(payload: object): Promise<any> {
     return await this.request(this.resource, "POST", payload);

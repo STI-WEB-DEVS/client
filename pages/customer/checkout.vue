@@ -58,7 +58,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, inject } from "vue";
+import { orderService } from "~/api/order/OrderService";
 
 definePageMeta({ layout: "customer" });
 
@@ -97,19 +98,37 @@ const totalItems = computed(() =>
 );
 
 //  PAYLOAD 
-const orderPayload = computed(() => ({
-  customer_uuid: customerUUID.value,
-  items: cart.value.map((item) => ({
-    product_uuid: item.uuid,
-    quantity: item.quantity,
-  })),
-}));
-
-const placeOrder = () => {
+const placeOrder = async () => {
   if (!cart.value.length) return;
 
-  // LOG TO CONSOLE
-  console.log("ORDER PAYLOAD → POST /api/Order");
-  console.log(JSON.stringify(orderPayload.value, null, 2));
+  //const customerUuid = localStorage.getItem("uuid");   // ← Make sure this exists
+
+  // if (!customerUuid) {
+  //   alert("Please login again. Customer UUID not found.");
+  //   return;
+  // }
+
+  const payload = {
+    customer_uuid: customerUUID.value,
+    items: cart.value.map((item) => ({
+      product_uuid: item.uuid,
+      quantity: item.quantity,
+    })),
+  };
+
+  try {
+    const response = await orderService.create(payload);
+    console.log("✅ Order Success:", response);
+
+    localStorage.removeItem("cart");
+    localStorage.removeItem("buynow");
+
+    alert("Order placed successfully!");
+    router.push("/customer/order");
+
+  } catch (error: any) {
+    console.error(error);
+    alert(error.message || "Failed to place order");
+  }
 };
 </script>
