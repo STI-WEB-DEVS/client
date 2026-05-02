@@ -129,10 +129,17 @@ const handleSubmit = async () => {
       if (response.user) {
         localStorage.setItem('_uuid', response.user.uuid);
         localStorage.setItem('_role', response.user.role);
+        localStorage.setItem('_name', response.user.name ?? '');
+        localStorage.setItem('_email', response.user.email ?? '');
       }
     }
 
-    await navigateTo('/admin/dashboard');
+    const role = response.user?.role;
+    if (role === 'customer') {
+      await navigateTo('/customer/shop');
+    } else {
+      await navigateTo('/admin/dashboard');
+    }
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {
