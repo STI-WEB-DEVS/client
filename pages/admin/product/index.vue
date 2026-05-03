@@ -159,6 +159,11 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: 'default',
+  role: 'admin'
+})
+
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import {

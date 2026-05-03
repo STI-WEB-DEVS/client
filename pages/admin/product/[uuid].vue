@@ -38,6 +38,11 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: 'default',
+  role: 'admin'
+})
+
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { productService } from '~/api/product/ProductService';

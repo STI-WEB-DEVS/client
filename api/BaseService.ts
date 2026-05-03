@@ -20,7 +20,8 @@ export class BaseService {
   protected persistTokenFromResponse(response: any) {
     if (typeof window === 'undefined' || !response || typeof response !== 'object') return;
 
-    console.log('[BaseService.persistTokenFromResponse] input:', JSON.stringify(response));
+    // Commented out to prevent raw data flooding your console
+    // console.log('[BaseService.persistTokenFromResponse] input:', JSON.stringify(response));
 
     const token =
       response.token ||
@@ -34,25 +35,43 @@ export class BaseService {
       localStorage.setItem(this.tokenStorageKey, token);
     }
 
-    const role =
-      response.role ||
-      response.data?.role ||
-      response.user?.role ||
-      response.user?.data?.role;
-    if (typeof role === 'string' && role.trim()) {
-      localStorage.setItem('_role', role);
-      console.log('[BaseService] saved _role:', role);
-    }
-
     const uuid =
       response.uuid ||
       response.data?.uuid ||
       response.user?.uuid ||
       response.user?.id ||
       response.user?.data?.uuid;
+
     if (typeof uuid === 'string' && uuid.trim()) {
       localStorage.setItem('_uuid', uuid);
-      console.log('[BaseService] saved _uuid:', uuid);
+      // console.log('[BaseService] saved _uuid:', uuid);
+    }
+
+    /**
+     * Logic Fix: Only attempt to extract a role if a token or UUID is present.
+     * This prevents warnings when fetching general data like product lists.
+     */
+    if (token || uuid) {
+      let role: any;
+      if (response.role != null) {
+        role = response.role;
+      } else if (response.data?.role != null) {
+        role = response.data.role;
+      } else if (response.user?.role != null) {
+        role = response.user.role;
+      } else if (response.data?.user?.role != null) {
+        role = response.data.user.role;
+      } else if (response.user?.data?.role != null) {
+        role = response.user.data.role;
+      }
+
+      if (role != null) {
+        localStorage.setItem('_role', String(role));
+        console.log('[BaseService] saved _role:', role);
+      } else {
+        // This will now only warn during actual authentication attempts
+        console.warn('[BaseService] could not extract role from response');
+      }
     }
   }
 
@@ -100,6 +119,7 @@ export class BaseService {
         };
       }
 
+      // Automatically handle token and role persistence
       this.persistTokenFromResponse(response);
       
       return response;

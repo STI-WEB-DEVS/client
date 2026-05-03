@@ -108,44 +108,92 @@ definePageMeta({
 })
 import { ref } from 'vue';
 import { authService } from '~/api/auth/AuthService';
+import { userService } from '~/api/auth/UserService';
 
 const email = ref('');
 const password = ref('');
 const error = ref('');
 const isLoading = ref(false);
 
+const extractRole = (resp: any): string | undefined => {
+  if (!resp) return undefined;
+  if (typeof resp === 'string') return resp;
+  
+  console.log('[extractRole] checking response:', JSON.stringify(resp).substring(0, 200));
+  
+  if (resp?.role) return String(resp.role);
+  if (resp?.data?.role) return String(resp.data.role);
+  if (resp?.user?.role) return String(resp.user.role);
+  if (resp?.data?.user?.role) return String(resp.data.user.role);
+  if (resp?.user?.data?.role) return String(resp.user.data.role);
+  
+  console.log('[extractRole] no role found in response structure');
+  return undefined;
+};
+
 const handleSubmit = async () => {
   error.value = '';
   isLoading.value = true;
 
   try {
+    console.log('=== Login attempt ===');
+    console.log('Email:', email.value);
+    
     const response = await authService.login(email.value, password.value);
+    
+    console.log('=== After authService.login() ===');
+    console.log('localStorage._token:', localStorage.getItem('_token'));
+    console.log('localStorage._role:', localStorage.getItem('_role'));
+    console.log('localStorage._uuid:', localStorage.getItem('_uuid'));
+    console.log('Response received:', JSON.stringify(response).substring(0, 200));
 
-    if (response?.token) {
-      localStorage.setItem('_token', response.token);
+    // Try to get role from localStorage (saved by BaseService)
+    let role = localStorage.getItem('_role');
+    console.log('Role from localStorage:', role);
+
+    // If not saved, try extracting from response
+    if (!role) {
+      console.log('No role in localStorage, trying response extraction');
+      role = extractRole(response);
+      if (role) {
+        console.log('Extracted role from response:', role);
+        localStorage.setItem('_role', role);
+      } else {
+        console.log('Could not extract role from response');
+      }
+    } else {
+      console.log('Role already in localStorage, skipping extraction');
     }
 
-    // Extract and save role/uuid from login response (user object structure)
-    const role = response?.role || response?.user?.role;
-    const uuid = response?.uuid || response?.user?.uuid;
-
-    if (role) {
-      localStorage.setItem('_role', role);
+    // If still not found, fetch profile as fallback
+    if (!role) {
+      console.log('No role yet, fetching profile as fallback');
+      try {
+        const profile = await userService.profile();
+        console.log('Profile response:', JSON.stringify(profile).substring(0, 200));
+        role = extractRole(profile);
+        if (role) {
+          console.log('Extracted role from profile:', role);
+          localStorage.setItem('_role', role);
+          localStorage.setItem('_uuid', profile?.uuid || profile?.data?.uuid || profile?.user?.uuid || '');
+        } else {
+          console.warn('Could not extract role from profile response');
+        }
+      } catch (profileErr: any) {
+        console.warn('Failed to fetch profile for role:', profileErr);
+      }
     }
-    if (uuid) {
-      localStorage.setItem('_uuid', uuid);
-    }
 
-    // Note: AuthService.persistTokenFromResponse() is also called automatically
-    // which extracts role/uuid from the login response
-
-    // Redirect based on role
+    console.log('=== Final role used for redirect:', role);
+    
+    // Redirect based on role (defaults to admin if not 'customer')
     if (role === 'customer') {
       await navigateTo('/customer/order');
     } else {
       await navigateTo('/admin/dashboard');
     }
   } catch (err: any) {
+    console.error('Login error:', err);
     error.value = err?.message || '';
   } finally {
     isLoading.value = false;

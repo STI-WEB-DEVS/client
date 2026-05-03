@@ -1,6 +1,7 @@
 <script setup>
 definePageMeta({
-  layout: 'customer'
+  layout: 'customer',
+  role: 'customer'
 })
 
 const router = useRouter()

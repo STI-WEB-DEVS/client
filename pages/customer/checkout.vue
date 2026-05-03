@@ -1,291 +1,142 @@
 <script setup>
-definePageMeta({
-  layout: 'customer'
-})
-
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useCart } from '~/composables/useCart'
+import { useRouter } from 'vue-router'
 
-const router = useRouter()
-const { cart, getCartTotal, getCartItems, clearCart } = useCart()
-
-const form = ref({
-  name: '',
-  email: '',
-  address: '',
-  city: '',
-  postalCode: '',
-  phone: ''
+definePageMeta({ 
+  layout: 'customer',
+  role: 'customer' 
 })
 
-const errors = ref({})
-const step = ref('form') // 'form' | 'review' | 'success'
+const { cart, getCartTotal, updateQuantity } = useCart()
+const router = useRouter()
 
-const subtotal = computed(() => getCartTotal())
-const shipping = ref(10)
-const total = computed(() => subtotal.value + shipping.value)
+const formatCurrency = (n) => new Intl.NumberFormat('en-PH', { 
+  style: 'currency', 
+  currency: 'PHP' 
+}).format(n)
 
-const validateForm = () => {
-  errors.value = {}
-  let isValid = true
-
-  if (!form.value.name.trim()) {
-    errors.value.name = 'Name is required'
-    isValid = false
-  }
-  if (!form.value.email.trim()) {
-    errors.value.email = 'Email is required'
-    isValid = false
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)) {
-    errors.value.email = 'Invalid email format'
-    isValid = false
-  }
-  if (!form.value.address.trim()) {
-    errors.value.address = 'Address is required'
-    isValid = false
-  }
-  if (!form.value.city.trim()) {
-    errors.value.city = 'City is required'
-    isValid = false
-  }
-  if (!form.value.postalCode.trim()) {
-    errors.value.postalCode = 'Postal code is required'
-    isValid = false
-  }
-  if (!form.value.phone.trim()) {
-    errors.value.phone = 'Phone is required'
-    isValid = false
+/**
+ * Requirement 4: On Place Order, build payload first then console.log(payload)
+ */
+const handlePlaceOrder = () => {
+  // Requirement 4: Validate empty cart before checkout
+  if (cart.value.length === 0) {
+    alert("Error: Your cart is empty. Please add items before placing an order.")
+    return
   }
 
-  return isValid
-}
+  try {
+    // Requirement 3: Build specific payload structure
+    const payload = {
+      // Rule: customer_uuid must come from localStorage
+      "customer_uuid": localStorage.getItem('_uuid'),
+      "items": cart.value.map(item => ({
+        // Rule: product_uuid must come from selected cart items
+        "product_uuid": item.product_uuid,
+        // Rule: quantity must come from cart quantity
+        "quantity": item.quantity
+      }))
+    }
 
-const proceedToReview = () => {
-  if (validateForm()) {
-    step.value = 'review'
+    // Rule: Do NOT submit to API yet - console.log the JSON result
+    console.log("Generated Order Payload:", JSON.stringify(payload, null, 2))
+    
+    // Requirement 4: Show UI success message
+    alert("Success! Order payload has been generated and logged to the console.")
+    
+  } catch (err) {
+    // Requirement 4: Show UI error message
+    alert("An error occurred while preparing your order.")
+    console.error(err)
   }
 }
 
-const submitOrder = () => {
-  const customerUuid = localStorage.getItem('_uuid') || ''
-  
-  const payload = {
-    customer_uuid: customerUuid,
-    items: getCartItems()
-  }
-
-  console.log('Order Payload:', JSON.stringify(payload, null, 2))
-
-  clearCart()
-  step.value = 'success'
-}
-
-const goToOrders = () => {
-  router.push('/customer/order')
-}
-
-const backToForm = () => {
-  step.value = 'form'
-}
+const goBack = () => router.push('/customer/cart')
 </script>
 
 <template>
-  <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-    <h1 class="mb-8 text-2xl font-bold text-gray-900">Checkout</h1>
-
-    <div v-if="cart.length === 0 && step !== 'success'" class="text-center py-12">
-      <p class="text-gray-500">Your cart is empty</p>
-    </div>
-
-    <div v-else-if="step === 'form'" class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-10">
       <div>
-        <h2 class="text-lg font-semibold text-gray-900">Shipping Information</h2>
-        <form @submit.prevent="proceedToReview" class="mt-6 space-y-4">
-          <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
-            <input
-              id="name"
-              v-model="form.name"
-              type="text"
-              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-              :class="{ 'border-red-500': errors.name }"
-            />
-            <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
-          </div>
-
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              id="email"
-              v-model="form.email"
-              type="email"
-              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-              :class="{ 'border-red-500': errors.email }"
-            />
-            <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
-          </div>
-
-          <div>
-            <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
-            <input
-              id="address"
-              v-model="form.address"
-              type="text"
-              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-              :class="{ 'border-red-500': errors.address }"
-            />
-            <p v-if="errors.address" class="mt-1 text-sm text-red-600">{{ errors.address }}</p>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label for="city" class="block text-sm font-medium text-gray-700">City</label>
-              <input
-                id="city"
-                v-model="form.city"
-                type="text"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                :class="{ 'border-red-500': errors.city }"
-              />
-              <p v-if="errors.city" class="mt-1 text-sm text-red-600">{{ errors.city }}</p>
-            </div>
-
-            <div>
-              <label for="postalCode" class="block text-sm font-medium text-gray-700">Postal Code</label>
-              <input
-                id="postalCode"
-                v-model="form.postalCode"
-                type="text"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                :class="{ 'border-red-500': errors.postalCode }"
-              />
-              <p v-if="errors.postalCode" class="mt-1 text-sm text-red-600">{{ errors.postalCode }}</p>
-            </div>
-          </div>
-
-          <div>
-            <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
-            <input
-              id="phone"
-              v-model="form.phone"
-              type="tel"
-              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-              :class="{ 'border-red-500': errors.phone }"
-            />
-            <p v-if="errors.phone" class="mt-1 text-sm text-red-600">{{ errors.phone }}</p>
-          </div>
-
-          <button
-            type="submit"
-            class="mt-6 w-full rounded-md bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-500"
-          >
-            Review Order
-          </button>
-        </form>
+        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Checkout</h1>
+        <p class="mt-2 text-sm text-gray-500">Review your items before finalizing your purchase.</p>
       </div>
-
-      <div>
-        <h2 class="text-lg font-semibold text-gray-900">Order Summary</h2>
-        <div class="mt-6 rounded-lg border border-gray-200 bg-white p-6">
-          <ul role="list" class="divide-y divide-gray-200">
-            <li v-for="item in cart" :key="item.product_uuid" class="flex py-4">
-              <div class="flex-1">
-                <h3 class="text-sm font-medium text-gray-900">{{ item.name }}</h3>
-                <p class="mt-1 text-sm text-gray-500">Qty: {{ item.quantity }}</p>
-              </div>
-              <p class="text-sm font-medium text-gray-900">${{ (item.price * item.quantity).toFixed(2) }}</p>
-            </li>
-          </ul>
-          <div class="mt-6 space-y-2 border-t border-gray-200 pt-4">
-            <div class="flex justify-between text-sm text-gray-600">
-              <p>Subtotal</p>
-              <p>${{ subtotal.toFixed(2) }}</p>
-            </div>
-            <div class="flex justify-between text-sm text-gray-600">
-              <p>Shipping</p>
-              <p>${{ shipping.toFixed(2) }}</p>
-            </div>
-            <div class="flex justify-between text-base font-medium text-gray-900">
-              <p>Total</p>
-              <p>${{ total.toFixed(2) }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div v-else-if="step === 'review'" class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-      <div>
-        <h2 class="text-lg font-semibold text-gray-900">Review Order</h2>
-        <div class="mt-6 rounded-lg border border-gray-200 bg-white p-6">
-          <h3 class="font-medium text-gray-900">Shipping To</h3>
-          <p class="mt-2 text-sm text-gray-600">{{ form.name }}</p>
-          <p class="text-sm text-gray-600">{{ form.email }}</p>
-          <p class="text-sm text-gray-600">{{ form.address }}</p>
-          <p class="text-sm text-gray-600">{{ form.city }}, {{ form.postalCode }}</p>
-          <p class="text-sm text-gray-600">{{ form.phone }}</p>
-        </div>
-        <div class="mt-6 flex gap-4">
-          <button
-            @click="backToForm"
-            class="flex-1 rounded-md border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-          >
-            Back
-          </button>
-          <button
-            @click="submitOrder"
-            class="flex-1 rounded-md bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-500"
-          >
-            Place Order
-          </button>
-        </div>
-      </div>
-
-      <div>
-        <h2 class="text-lg font-semibold text-gray-900">Order Items</h2>
-        <div class="mt-6 rounded-lg border border-gray-200 bg-white p-6">
-          <ul role="list" class="divide-y divide-gray-200">
-            <li v-for="item in cart" :key="item.product_uuid" class="flex py-4">
-              <div class="flex-1">
-                <h3 class="text-sm font-medium text-gray-900">{{ item.name }}</h3>
-                <p class="mt-1 text-sm text-gray-500">Qty: {{ item.quantity }}</p>
-              </div>
-              <p class="text-sm font-medium text-gray-900">${{ (item.price * item.quantity).toFixed(2) }}</p>
-            </li>
-          </ul>
-          <div class="mt-6 space-y-2 border-t border-gray-200 pt-4">
-            <div class="flex justify-between text-sm text-gray-600">
-              <p>Subtotal</p>
-              <p>${{ subtotal.toFixed(2) }}</p>
-            </div>
-            <div class="flex justify-between text-sm text-gray-600">
-              <p>Shipping</p>
-              <p>${{ shipping.toFixed(2) }}</p>
-            </div>
-            <div class="flex justify-between text-base font-medium text-gray-900">
-              <p>Total</p>
-              <p>${{ total.toFixed(2) }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div v-else-if="step === 'success'" class="text-center py-12">
-      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-        <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
-      <h2 class="mt-4 text-2xl font-bold text-gray-900">Order Placed Successfully!</h2>
-      <p class="mt-2 text-gray-600">Thank you for your purchase.</p>
-      <button
-        @click="goToOrders"
-        class="mt-6 rounded-md bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500"
+      <button 
+        @click="goBack"
+        class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
       >
-        View Orders
+        <span>←</span> Back to Cart
       </button>
+    </div>
+
+    <div class="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:items-start">
+      <!-- Requirement 3: Order Summary Section -->
+      <div class="lg:col-span-4">
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+          <h2 class="text-lg font-bold text-gray-900 mb-6">Order Summary</h2>
+          
+          <div v-if="cart.length > 0" class="space-y-6">
+            <div v-for="item in cart" :key="item.product_uuid" class="flex items-center gap-4">
+              <div class="h-14 w-14 flex-shrink-0 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center">
+                <svg class="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.587-1.587a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-sm font-bold text-gray-900">{{ item.name }}</h3>
+                <div class="mt-1 flex items-center gap-3 text-xs font-medium text-gray-500">
+                  <button @click="updateQuantity(item.product_uuid, item.quantity - 1)" class="hover:text-indigo-600 transition-colors"><span>−</span></button>
+                  <span class="text-gray-900">{{ item.quantity }}</span>
+                  <button @click="updateQuantity(item.product_uuid, item.quantity + 1)" class="hover:text-indigo-600 transition-colors"><span>+</span></button>
+                </div>
+              </div>
+              <div class="text-sm font-bold text-gray-900">
+                {{ formatCurrency(item.price * item.quantity) }}
+              </div>
+            </div>
+          </div>
+          
+          <div v-else class="py-6 text-center text-sm text-gray-500 italic">
+            Your cart is currently empty.
+          </div>
+
+          <div class="mt-8 border-t border-gray-100 pt-6">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-gray-500">Subtotal</span>
+              <span class="text-sm font-bold text-gray-900">{{ formatCurrency(getCartTotal()) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Card: Details & Payload Instruction -->
+      <div class="mt-8 lg:col-span-8 lg:mt-0">
+        <div class="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm ring-1 ring-gray-900/5 h-full flex flex-col justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-gray-900">Details</h2>
+            <p class="mt-2 text-sm text-gray-500">
+              This will only generate the JSON payload and log it to the comsole.
+            </p>
+
+            <div class="mt-16">
+              <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Total Amount</span>
+              <div class="mt-2 text-6xl font-black text-gray-900 tracking-tighter">
+                {{ formatCurrency(getCartTotal()) }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-12 flex justify-end">
+            <button
+              @click="handlePlaceOrder"
+              class="rounded-xl bg-indigo-600 px-12 py-4 text-base font-bold text-white shadow-xl hover:bg-indigo-700 transition-all active:scale-95 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              :disabled="cart.length === 0"
+            >
+              Place Order
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
