@@ -5,6 +5,7 @@ export interface LoginResponse {
     role: string; // This comes from your getRoleNames()->first() in Laravel
     name: string;
     email: string;
+    customer_uuid: string;
   };
 }
 
@@ -31,6 +32,7 @@ export class AuthService {
       if (response.user) {
       localStorage.setItem('user_uuid', response.user.uuid);
       localStorage.setItem('user_role', response.user.role);
+      localStorage.setItem('customer_uuid', response.user.customer_uuid);
     }
 
       return response;
@@ -57,6 +59,7 @@ export class AuthService {
       localStorage.removeItem(AuthService.TOKEN_KEY);
       localStorage.removeItem('user_uuid');
       localStorage.removeItem('user_role');
+      localStorage.removeItem('customer_uuid');
       return true;
     } catch (error) {
       console.error('Logout failed:', error);

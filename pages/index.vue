@@ -118,15 +118,27 @@ const handleSubmit = async () => {
   isLoading.value = true;
 
   try {
+    // 1. The service handles the API call AND saves the data to localStorage
     const response = await authService.login(email.value, password.value);
 
-    if (response?.token) {
-      localStorage.setItem('_token', response.token);
-    }
+    // 2. Redirect based on the role returned by the server
+    if (response?.user) {
+      const role = response.user.role;
 
-    await navigateTo('/dashboard');
+      if (role === 'customer') {
+        // Redirects to your file: pages/customer/order.vue
+        await navigateTo('/customer/order');
+      } else if (role === 'admin') {
+        // Redirects to your file: pages/admin/index.vue
+        await navigateTo('/admin');
+      } else {
+        // If the role is unknown, just go to the home page
+        await navigateTo('/');
+      }
+    }
   } catch (err: any) {
-    error.value = err?.message || '';
+    // Keeps your existing error handling
+    error.value = err?.message || 'Login failed';
   } finally {
     isLoading.value = false;
   }

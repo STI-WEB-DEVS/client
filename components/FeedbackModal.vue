@@ -1,55 +1,68 @@
 <template>
-  <teleport to="body">
-    <transition name="fade">
-      <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="$emit('close')" />
-        <div class="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <h2 class="text-lg font-semibold text-gray-900">{{ title }}</h2>
-              <p class="mt-2 text-sm text-gray-600">{{ message }}</p>
-            </div>
-            <button type="button" class="text-gray-400 hover:text-gray-600" @click="$emit('close')">✕</button>
-          </div>
+  <div v-if="show" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl">
+      <div class="text-center mb-8">
+        <!-- Placeholder for Product Image -->
+        <div class="w-32 h-32 bg-gray-100 rounded-2xl mx-auto mb-4 flex items-center justify-center border border-gray-200">
+           <span class="text-gray-300 text-xs italic">Product Image</span>
+        </div>
 
-          <div class="mt-6 flex justify-end gap-3">
-            <button 
-              v-if="title === 'Confirmation'" 
-              type="button" 
-              class="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100" 
-              @click="$emit('close')"
-            >
-              Cancel
-            </button>
-            
-            <button
-              type="button"
-              class="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white transition"
-              :class="{
-                'bg-gray-900 hover:bg-gray-800': title === 'Success',
-                'bg-red-600 hover:bg-red-700': title === 'Error' || title === 'Confirmation'
-              }"
-              @click="$emit('confirm')"
-            >
-              {{ confirmText }}
-            </button>
+        <h3 class="text-2xl font-bold text-gray-900">{{ product?.name }}</h3>
+        <p class="text-[10px] font-mono text-gray-400 mt-1 uppercase tracking-widest">
+          UUID: {{ product?.uuid }}
+        </p>
+      </div>
+
+      <div class="bg-gray-50 rounded-2xl p-6 mb-8">
+        <div class="flex items-center justify-between gap-4">
+          <button @click="decrement" class="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center text-2xl font-bold text-gray-600 hover:bg-gray-100">-</button>
+          
+          <div class="flex-1 text-center">
+            <!-- Added 'no-spinner' class here -->
+            <input 
+              v-model.number="quantity" 
+              type="number" 
+              min="1"
+              class="no-spinner w-full text-center text-3xl font-black bg-transparent border-none focus:ring-0 text-gray-900"
+            />
+            <p class="text-[10px] font-bold text-gray-400 uppercase mt-1">Quantity</p>
           </div>
+          
+          <button @click="increment" class="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center text-2xl font-bold text-gray-600 hover:bg-gray-100">+</button>
         </div>
       </div>
-    </transition>
-  </teleport>
+
+      <div class="flex gap-4">
+        <button @click="$emit('close')" class="flex-1 py-4 text-gray-500 font-bold hover:bg-gray-50 rounded-2xl">Cancel</button>
+        <button @click="submit" class="flex-1 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-black shadow-lg">
+          Add · ${{ (product?.price * quantity).toFixed(2) }}
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
-  open: boolean
-  message: string
-  title?: string
-  confirmText?: string
-}>(), {
-  title: 'Confirmation',
-  confirmText: 'Confirm'
-})
+import { ref, watch } from 'vue';
+const props = defineProps<{ show: boolean; product: any; }>();
+const emit = defineEmits(['close', 'confirm']);
+const quantity = ref(1);
 
-defineEmits(['close', 'confirm'])
+watch(() => props.show, (newVal) => { if (newVal) quantity.value = 1; });
+
+const increment = () => quantity.value++;
+const decrement = () => { if (quantity.value > 1) quantity.value--; };
+const submit = () => { emit('confirm', { ...props.product, quantity: quantity.value }); };
 </script>
+
+<style scoped>
+/* Removes arrows from number input */
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinner {
+  -moz-appearance: textfield;
+}
+</style>
