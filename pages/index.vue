@@ -139,8 +139,8 @@ const handleSubmit = async () => {
     if (userRole === 'admin') {
       await navigateTo('/admin/dashboard');
     } else {
-      // Customer goes to customer order page
-      await navigateTo('/customer/order');
+      // Customer goes to landing page (hero section)
+      await navigateTo('/landing');
     }
   } catch (err: any) {
     error.value = err?.message || '';
