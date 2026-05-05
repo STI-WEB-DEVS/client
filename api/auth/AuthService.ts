@@ -35,10 +35,12 @@ export class AuthService {
     async logout() {
         const token = localStorage.getItem('_token');
         
+        // Clear everything regardless of API call outcome
+        localStorage.removeItem('_token');
+        localStorage.removeItem('user_uuid');  
+        localStorage.removeItem('user_role');  
+        
         if (!token) {
-            localStorage.removeItem('_token');
-            localStorage.removeItem('user_uuid');  
-            localStorage.removeItem('user_role');  
             return { success: true };
         }
         
@@ -53,20 +55,12 @@ export class AuthService {
             });
             
             if (response.ok) {
-                localStorage.removeItem('_token');
-                localStorage.removeItem('user_uuid');   
-                localStorage.removeItem('user_role');   
                 return { success: true };
             } else {
-                localStorage.removeItem('_token');
-                localStorage.removeItem('user_uuid');  
-                localStorage.removeItem('user_role');   
                 throw new Error('Logout failed on server');
             }
         } catch (error) {
-            localStorage.removeItem('_token');
-            localStorage.removeItem('user_uuid');   
-            localStorage.removeItem('user_role');    
+            console.error('Logout API error:', error);
             throw error;
         }
     }

@@ -1,60 +1,70 @@
-import { ref, computed } from 'vue'
+import { ref, computed, readonly } from 'vue'
+
+// Create a singleton instance outside the composable
+const cartItemsRef = ref([])
+const notificationRef = ref(null)
+const cartBadgeAnimationRef = ref(false)
 
 export const useCart = () => {
-    const cartItems = ref([])
-    const notification = ref(null)
-    const cartBadgeAnimation = ref(false)
-
     const showNotification = (message, type = 'success') => {
-        notification.value = { message, type }
+        notificationRef.value = { message, type }
         setTimeout(() => {
-            notification.value = null
+            notificationRef.value = null
         }, 2500)
     }
 
     const triggerCartBadge = () => {
-        cartBadgeAnimation.value = true
+        cartBadgeAnimationRef.value = true
         setTimeout(() => {
-            cartBadgeAnimation.value = false
+            cartBadgeAnimationRef.value = false
         }, 300)
     }
 
     const loadCart = () => {
         const saved = localStorage.getItem('cart_items')
+        console.log('loadCart called. localStorage:', saved)
+        
         if (saved) {
             try {
-                cartItems.value = JSON.parse(saved)
-                console.log('Cart loaded:', cartItems.value.length, 'items')
-                console.log('Items in cart:', cartItems.value.map(i => i.name))
+                const parsed = JSON.parse(saved)
+                cartItemsRef.value = parsed
+                console.log('Cart loaded. Items count:', cartItemsRef.value.length)
+                console.log('Products:', cartItemsRef.value.map(i => i.name))
             } catch (e) {
                 console.error('Error loading cart:', e)
-                cartItems.value = []
+                cartItemsRef.value = []
             }
         } else {
-            console.log('No cart found in localStorage')
-            cartItems.value = []
+            cartItemsRef.value = []
         }
     }
 
     const saveCart = () => {
-        localStorage.setItem('cart_items', JSON.stringify(cartItems.value))
-        console.log('Cart saved:', cartItems.value.length, 'items')
+        console.log('saveCart called. Saving items:', cartItemsRef.value.length)
+        localStorage.setItem('cart_items', JSON.stringify(cartItemsRef.value))
         triggerCartBadge()
+        
+        // Force a small delay to ensure DOM updates
+        setTimeout(() => {
+            console.log('Cart saved. Total items now:', totalItems.value)
+        }, 50)
     }
 
     const addItem = (product, quantity = 1) => {
-        console.log('Adding to cart:', product.name, 'UUID:', product.uuid, 'Quantity:', quantity)
+        console.log('=== ADDING ITEM ===')
+        console.log('Product:', product.name)
+        console.log('Current cart before:', [...cartItemsRef.value])
         
-        // Check if product already exists in cart by UUID
-        const existing = cartItems.value.find(item => item.product_uuid === product.uuid)
+        // Check if product exists
+        const existingIndex = cartItemsRef.value.findIndex(item => item.product_uuid === product.uuid)
         
-        if (existing) {
-            // Update existing item quantity
-            existing.quantity += quantity
-            console.log('Updated existing item:', existing.name, 'new quantity:', existing.quantity)
-            showNotification(`Updated ${product.name} quantity to ${existing.quantity}`, 'success')
+        if (existingIndex !== -1) {
+            // Update existing
+            cartItemsRef.value[existingIndex].quantity += quantity
+            console.log('Updated existing. New quantity:', cartItemsRef.value[existingIndex].quantity)
+            showNotification(`Updated ${product.name} to ${cartItemsRef.value[existingIndex].quantity}`, 'success')
         } else {
-            // Add new item to cart (accumulating, not overwriting)
+            // Add new
             const newItem = {
                 product_uuid: product.uuid,
                 name: product.name,
@@ -62,68 +72,76 @@ export const useCart = () => {
                 quantity: quantity,
                 addedAt: Date.now()
             }
-            cartItems.value.push(newItem)
-            console.log('Added NEW item to cart:', product.name)
-            console.log('Total items in cart now:', cartItems.value.length)
-            console.log('Cart contents:', cartItems.value.map(i => i.name))
+            cartItemsRef.value.push(newItem)
+            console.log('Added new. Total items now:', cartItemsRef.value.length)
             showNotification(`Added ${product.name} to cart!`, 'success')
         }
         
+        // Force reactivity by creating a new reference
+        cartItemsRef.value = [...cartItemsRef.value]
+        
+        console.log('Cart after add:', cartItemsRef.value.map(i => `${i.name} (${i.quantity})`))
         saveCart()
+        
         return true
     }
 
     const updateQuantity = (productUuid, quantity) => {
-        const item = cartItems.value.find(i => i.product_uuid === productUuid)
-        if (item) {
+        const itemIndex = cartItemsRef.value.findIndex(i => i.product_uuid === productUuid)
+        
+        if (itemIndex !== -1) {
             if (quantity <= 0) {
-                cartItems.value = cartItems.value.filter(i => i.product_uuid !== productUuid)
-                console.log('Removed item:', item.name)
-                showNotification(`Removed ${item.name} from cart`, 'info')
+                const itemName = cartItemsRef.value[itemIndex].name
+                cartItemsRef.value.splice(itemIndex, 1)
+                showNotification(`Removed ${itemName} from cart`, 'info')
             } else {
-                item.quantity = quantity
-                console.log('Updated quantity for:', item.name, 'to', quantity)
-                showNotification(`Updated ${item.name} quantity to ${quantity}`, 'success')
+                cartItemsRef.value[itemIndex].quantity = quantity
+                showNotification(`Updated ${cartItemsRef.value[itemIndex].name} to ${quantity}`, 'success')
             }
+            // Force reactivity
+            cartItemsRef.value = [...cartItemsRef.value]
             saveCart()
         }
     }
 
     const removeItem = (productUuid) => {
-        const item = cartItems.value.find(i => i.product_uuid === productUuid)
-        if (item) {
-            cartItems.value = cartItems.value.filter(i => i.product_uuid !== productUuid)
-            console.log('Removed item:', item.name)
-            showNotification(`Removed ${item.name} from cart`, 'info')
+        const itemIndex = cartItemsRef.value.findIndex(i => i.product_uuid === productUuid)
+        
+        if (itemIndex !== -1) {
+            const itemName = cartItemsRef.value[itemIndex].name
+            cartItemsRef.value.splice(itemIndex, 1)
+            cartItemsRef.value = [...cartItemsRef.value]
+            showNotification(`Removed ${itemName} from cart`, 'info')
             saveCart()
         }
     }
 
     const clearCart = () => {
-        console.log('Clearing entire cart')
-        cartItems.value = []
+        cartItemsRef.value = []
         saveCart()
         showNotification('Cart cleared', 'info')
     }
 
+    // Computed properties
     const totalItems = computed(() => {
-        const total = cartItems.value.reduce((sum, i) => sum + i.quantity, 0)
+        const total = cartItemsRef.value.reduce((sum, i) => sum + i.quantity, 0)
+        console.log('totalItems computed (reactive):', total)
         return total
     })
     
     const totalPrice = computed(() => {
-        return cartItems.value.reduce((sum, i) => sum + (i.price * i.quantity), 0)
+        return cartItemsRef.value.reduce((sum, i) => sum + (i.price * i.quantity), 0)
     })
     
     const formattedTotal = computed(() => `₱${totalPrice.value.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`)
 
     return {
-        cartItems,
+        cartItems: readonly(cartItemsRef),
         totalItems,
         totalPrice,
         formattedTotal,
-        notification,
-        cartBadgeAnimation,
+        notification: readonly(notificationRef),
+        cartBadgeAnimation: readonly(cartBadgeAnimationRef),
         loadCart,
         addItem,
         updateQuantity,
