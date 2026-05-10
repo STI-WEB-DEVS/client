@@ -1,9 +1,21 @@
 import BaseService from '~/api/BaseService';
 
-export interface LoginResponse {
-  token: string;
+export interface User {
+  id: number;
   uuid: string;
+  company_id: number | null;
+  customer_id: number | null;
+  name: string;
+  email: string;
+  email_verified_at: string | null;
+  created_at: string;
+  updated_at: string;
   role: string;
+}
+
+export interface LoginResponse {
+  user: User;
+  token: string;
 }
 
 class AuthService extends BaseService {
@@ -22,14 +34,17 @@ class AuthService extends BaseService {
       password,
     });
 
-    localStorage.setItem('uuid', response.uuid);
-    localStorage.setItem('role', response.role);
+    // Store token, uuid, and role in localStorage
+    localStorage.setItem('_token', response.token);
+    localStorage.setItem('uuid', response.user.uuid);
+    localStorage.setItem('role', response.user.role);
 
     return response;
   }
 
   async logout(): Promise<void> {
     await this.request('/logout', 'DELETE');
+    localStorage.removeItem('_token');
     localStorage.removeItem('uuid');
     localStorage.removeItem('role');
   }

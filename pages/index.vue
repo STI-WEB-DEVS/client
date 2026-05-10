@@ -125,7 +125,13 @@ const handleSubmit = async () => {
       localStorage.setItem('_token', response.token);
     }
 
-    await navigateTo('/admin/dashboard');
+    // Redirect based on role
+    const role = localStorage.getItem('role');
+    if (role === 'customer') {
+      await navigateTo('/customer/order');
+    } else {
+      await navigateTo('/admin/dashboard');
+    }
   } catch (err: any) {
     error.value = err?.message || '';
   } finally {

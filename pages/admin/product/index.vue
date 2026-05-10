@@ -160,8 +160,8 @@ const handleFeedbackClose = () => {
 
             <tbody class="divide-y divide-gray-100 bg-white">
               <tr
-                v-for="(product, index) in [...(products?.data || [])].reverse()"
-                :key="product.id"
+                v-for="(product, index) in products?.data || []"
+                :key="product.uuid"
                 class="transition hover:bg-gray-50"
               >
                 <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">

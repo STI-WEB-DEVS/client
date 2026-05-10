@@ -48,8 +48,8 @@
 
             <tbody class="divide-y divide-gray-100 bg-white">
               <tr
-                v-for="(customer, index) in [...(customers?.data || [])].reverse()"
-                :key="customer.id"
+                v-for="(customer, index) in customers?.data || []"
+                :key="customer.uuid"
                 class="transition hover:bg-gray-50"
               >
                 <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
