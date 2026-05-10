@@ -95,7 +95,7 @@ const buyNow = (product) => {
             {{ product.name }}
           </h3>
           <p class="mt-1 text-lg font-semibold text-gray-900">
-            ${{ parseFloat(product.price).toFixed(2) }}
+            ₱{{ parseFloat(product.price).toFixed(2) }}
           </p>
 
           <!-- Actions -->

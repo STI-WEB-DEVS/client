@@ -121,9 +121,9 @@ const closeCart = () => {
                             <div>
                               <div class="flex justify-between text-base font-medium text-gray-900">
                                 <h3>{{ item.product.name }}</h3>
-                                <p class="ml-4">${{ (item.product.price * item.quantity).toFixed(2) }}</p>
+                                <p class="ml-4">₱{{ (item.product.price * item.quantity).toFixed(2) }}</p>
                               </div>
-                              <p class="mt-1 text-sm text-gray-500">${{ item.product.price }} each</p>
+                              <p class="mt-1 text-sm text-gray-500">₱{{ item.product.price }} each</p>
                             </div>
                             <div class="flex flex-1 items-end justify-between text-sm">
                               <div class="flex items-center gap-2">
@@ -146,7 +146,7 @@ const closeCart = () => {
                 <div v-if="cart.length > 0" class="border-t border-gray-200 px-4 py-6 sm:px-6">
                   <div class="flex justify-between text-base font-medium text-gray-900">
                     <p>Subtotal</p>
-                    <p>${{ cart.reduce((total, item) => total + (item.product.price * item.quantity), 0).toFixed(2) }}</p>
+                    <p>₱{{ cart.reduce((total, item) => total + (item.product.price * item.quantity), 0).toFixed(2) }}</p>
                   </div>
                   <p class="mt-0.5 text-sm text-gray-500">Shipping calculated at checkout.</p>
                   <div class="mt-6">

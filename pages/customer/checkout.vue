@@ -124,7 +124,7 @@ const confirmOrder = () => {
                 <!-- Product Details -->
                 <div class="flex-1">
                   <h3 class="text-base font-medium text-gray-900">{{ item.product.name }}</h3>
-                  <p class="mt-1 text-sm text-gray-500">${{ parseFloat(item.product.price).toFixed(2) }} each</p>
+                  <p class="mt-1 text-sm text-gray-500">₱{{ parseFloat(item.product.price).toFixed(2) }} each</p>
                   
                   <!-- Quantity Controls -->
                   <div class="mt-4 flex items-center gap-4">
@@ -156,7 +156,7 @@ const confirmOrder = () => {
                 <!-- Item Total -->
                 <div class="text-right">
                   <p class="text-base font-medium text-gray-900">
-                    ${{ (item.product.price * item.quantity).toFixed(2) }}
+                    ₱{{ (item.product.price * item.quantity).toFixed(2) }}
                   </p>
                 </div>
               </div>
@@ -173,19 +173,19 @@ const confirmOrder = () => {
           <dl class="space-y-3">
             <div class="flex justify-between text-sm">
               <dt class="text-gray-600">Subtotal</dt>
-              <dd class="font-medium text-gray-900">${{ subtotal.toFixed(2) }}</dd>
+              <dd class="font-medium text-gray-900">₱{{ subtotal.toFixed(2) }}</dd>
             </div>
 
             <div class="flex justify-between text-sm">
               <dt class="text-gray-600">Shipping</dt>
               <dd class="font-medium text-gray-900">
-                {{ shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}` }}
+                {{ shipping === 0 ? 'FREE' : `₱${shipping.toFixed(2)}` }}
               </dd>
             </div>
 
             <div class="border-t border-gray-200 pt-3 flex justify-between">
               <dt class="text-base font-medium text-gray-900">Total</dt>
-              <dd class="text-base font-medium text-gray-900">${{ total.toFixed(2) }}</dd>
+              <dd class="text-base font-medium text-gray-900">₱{{ total.toFixed(2) }}</dd>
             </div>
           </dl>
 
@@ -197,7 +197,7 @@ const confirmOrder = () => {
           </button>
 
           <p class="mt-4 text-xs text-center text-gray-500">
-            Free shipping on orders over $100
+            Free shipping on orders over ₱100
           </p>
         </div>
       </div>
@@ -221,13 +221,13 @@ const confirmOrder = () => {
               <ul class="space-y-2">
                 <li v-for="item in cart" :key="item.product.uuid" class="flex justify-between text-sm">
                   <span class="text-gray-600">{{ item.product.name }} × {{ item.quantity }}</span>
-                  <span class="font-medium text-gray-900">${{ (item.product.price * item.quantity).toFixed(2) }}</span>
+                  <span class="font-medium text-gray-900">₱{{ (item.product.price * item.quantity).toFixed(2) }}</span>
                 </li>
               </ul>
               
               <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between">
                 <span class="text-base font-medium text-gray-900">Total</span>
-                <span class="text-base font-medium text-gray-900">${{ total.toFixed(2) }}</span>
+                <span class="text-base font-medium text-gray-900">₱{{ total.toFixed(2) }}</span>
               </div>
             </div>
 
