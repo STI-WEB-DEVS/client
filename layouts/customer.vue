@@ -54,6 +54,7 @@ const closeCart = () => {
  
         <nav class="hidden items-center gap-8 text-sm font-medium text-gray-600 md:flex">
           <NuxtLink to="/customer/shop" class="hover:text-gray-900">Shop</NuxtLink>
+          <NuxtLink to="/customer/categories" class="hover:text-gray-900">Categories</NuxtLink>
           <NuxtLink to="/customer/orders" class="hover:text-gray-900">Orders</NuxtLink>
           <NuxtLink to="/customer/account" class="hover:text-gray-900">Account</NuxtLink>
         </nav>
