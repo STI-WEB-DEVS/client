@@ -16,17 +16,33 @@
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
       <div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
         <form class="space-y-6" method="POST" @submit.prevent="handleSubmit">
-          <div>
+         <div>
             <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
             <div class="mt-2">
-              <input type="email" name="email" id="email" autocomplete="email" required="" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+              <input 
+                v-model="email" 
+                type="email" 
+                name="email" 
+                id="email" 
+                autocomplete="email" 
+                required 
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" 
+              />
             </div>
           </div>
 
           <div>
             <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
             <div class="mt-2">
-              <input type="password" name="password" id="password" autocomplete="current-password" required="" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+              <input 
+                v-model="password" 
+                type="password" 
+                name="password" 
+                id="password" 
+                autocomplete="current-password" 
+                required 
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" 
+              />
             </div>
           </div>
 
@@ -92,12 +108,12 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
+
 definePageMeta({
   layout: false,
 });
- 
-import { ref } from "vue";
-import { AuthService } from "~/api/auth/AuthService";
  
 const email = ref("");
 const password = ref("");
@@ -107,6 +123,7 @@ const isLoading = ref(false);
 const authService = new AuthService();
  
 const handleSubmit = async () => {
+  console.log("Submit clicked!", email.value, password.value);
   error.value = "";
   isLoading.value = true;
  
@@ -130,7 +147,7 @@ const handleSubmit = async () => {
     // await navigateTo("/admin/dashboard");
  
     await navigateTo(
-      response.user.role === "admin" ? "/admin/dashboard" : "admin/dashboard",
+      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
     );
   } catch (err: any) {
     error.value = err?.message || "";

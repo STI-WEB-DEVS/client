@@ -135,6 +135,8 @@ const navigation = [
   { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
   { name: 'Documents', href: '/document', icon: DocumentDuplicateIcon },
   { name: 'Reports', href: '/reports', icon: ChartPieIcon },
+  { name: 'Customers', href: '/customers', icon: UsersIcon },
+  { name: 'Products', href: '/products', icon: FolderIcon },
 ]
 
 const userNavigation = [
