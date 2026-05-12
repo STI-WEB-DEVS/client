@@ -32,6 +32,9 @@
               <td class="px-6 py-4 font-['Syne'] text-sm text-[#CFFFB3]">{{ customer.name }}</td>
               <td class="px-6 py-4 font-['DM_Mono'] text-xs text-[#ADE25D]/70">{{ customer.email }}</td>
               <td class="px-6 py-4 text-right space-x-3">
+                <button @click="viewCustomer(customer.uuid)" class="text-blue-400 hover:text-blue-300 transition-colors">
+                  <EyeIcon class="size-4" />
+                </button>
                 <button @click="openModal(customer)" class="text-[#ADE25D] hover:text-[#CFFFB3] transition-colors">
                   <PencilSquareIcon class="size-4" />
                 </button>
@@ -75,8 +78,9 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseService from '@/api/BaseService' // Adjust path as needed
+
 
 // Initialize the service
 const api = new BaseService()
@@ -120,6 +124,11 @@ const openModal = (customer: any = null) => {
   }
   isModalOpen.value = true
 }
+
+const viewCustomer = (uuid: string) => {
+  navigateTo(`/customers/${uuid}`)
+}
+
 
 // CREATE & UPDATE: Unified save logic
 const saveCustomer = async () => {

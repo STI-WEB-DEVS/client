@@ -1,0 +1,71 @@
+<template>
+  <NuxtLayout>
+    <div class="max-w-4xl mx-auto space-y-6">
+      <div v-if="pending" class="text-[#ADE25D] font-['DM_Mono'] text-sm animate-pulse">
+        Accessing hiker profile {{ $route.params.id }}...
+      </div>
+
+      <div v-else-if="customer" class="bg-[#3B7080]/20 border border-[#3B7080] p-8 rounded-sm">
+        <div class="flex justify-between items-start mb-8">
+          <div>
+            <h1 class="font-['Syne'] text-3xl font-bold text-[#CFFFB3]">{{ customer.name }}</h1>
+            <p class="font-['DM_Mono'] text-[#ADE25D]/70 uppercase tracking-widest text-[10px] mt-1">
+              UUID: {{ customer.uuid }}
+            </p>
+          </div>
+          <button 
+            @click="navigateTo('/customers')" 
+            class="font-['DM_Mono'] text-[10px] text-[#ADE25D] border border-[#ADE25D]/30 px-3 py-1 hover:bg-[#ADE25D]/10 transition-colors"
+          >
+            ← Back to Database
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="space-y-4">
+            <div>
+              <label class="block font-['DM_Mono'] text-[10px] uppercase text-[#ADE25D]/50">Email Address</label>
+              <p class="font-['DM_Mono'] text-[#CFFFB3]">{{ customer.email }}</p>
+            </div>
+            </div>
+        </div>
+      </div>
+
+      <div v-else class="text-red-400 font-['DM_Mono'] text-sm">
+        Customer record not found.
+      </div>
+    </div>
+  </NuxtLayout>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import BaseService from '@/api/BaseService'
+
+const route = useRoute()
+const api = new BaseService()
+const customer = ref<any>(null)
+const pending = ref(true)
+
+const loadCustomer = async () => {
+  pending.value = true
+  try {
+    // Laravel's ProductResource usually wraps the object in a 'data' key
+    const response = await api.request<any>(`/customers/${route.params.id}`, 'GET')
+    
+    // Check if the response itself is the object or if it's nested under .data
+    customer.value = response.data ? response.data : response
+  } catch (error: any) {
+    console.error("Profile Load Error:", error.message)
+  } finally {
+    pending.value = false
+  }
+}
+
+onMounted(() => {
+  if (route.params.id) {
+    loadCustomer()
+  }
+})
+</script>
