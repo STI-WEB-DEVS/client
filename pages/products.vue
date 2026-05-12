@@ -5,58 +5,60 @@
         <h1 class="text-2xl font-bold text-[#2d4123] mb-8">Product Inventory</h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <!-- LEFT: Management Form -->
           <div class="lg:col-span-4">
+            <div 
+              v-if="statusMessage" 
+              :class="[
+                'mb-4 p-3 rounded-md text-sm font-medium border transition-all',
+                isError ? 'bg-red-100 text-red-700 border-red-200' : 'bg-green-100 text-green-700 border-green-200'
+              ]"
+            >
+              {{ statusMessage }}
+            </div>
+
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
               <h2 class="text-lg font-semibold text-gray-800 mb-6">
                 {{ isEditing ? 'Edit Product' : 'Add New Product' }}
               </h2>
 
               <form class="space-y-5" @submit.prevent="handleSubmit">
-                <!-- Product Name -->
                 <div>
                   <label for="productName" class="block text-sm font-medium text-gray-700">Product Name</label>
-                  <div class="mt-1">
-                    <input 
-                      v-model="productName"
-                      type="text" 
-                      id="productName" 
-                      placeholder="e.g. Ultra Light Tent"
-                      required 
-                      class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#8fa386] sm:text-sm" 
-                    />
-                  </div>
+                  <input 
+                    v-model="productName"
+                    type="text" 
+                    id="productName" 
+                    required 
+                    class="mt-1 block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-[#8fa386] sm:text-sm" 
+                  />
                 </div>
 
-                <!-- Price -->
                 <div>
                   <label for="price" class="block text-sm font-medium text-gray-700">Price (₱)</label>
-                  <div class="mt-1">
-                    <input 
-                      v-model.number="productPrice"
-                      type="number" 
-                      id="price" 
-                      placeholder="0.00"
-                      step="0.01"
-                      required 
-                      class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#8fa386] sm:text-sm" 
-                    />
-                  </div>
+                  <input 
+                    v-model.number="productPrice"
+                    type="number" 
+                    id="price" 
+                    step="0.01"
+                    required 
+                    class="mt-1 block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-[#8fa386] sm:text-sm" 
+                  />
                 </div>
 
                 <div class="pt-2 flex flex-col gap-3">
                   <button 
                     type="submit" 
-                    class="flex w-full justify-center rounded-md bg-[#8fa386] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#7a8d72] transition-colors"
+                    :disabled="isSubmitting"
+                    class="w-full rounded-md bg-[#8fa386] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#7a8d72] transition-colors disabled:opacity-50"
                   >
-                    {{ isEditing ? 'Update Item' : 'Add to Inventory' }}
+                    {{ isSubmitting ? 'Saving...' : (isEditing ? 'Update Item' : 'Add to Inventory') }}
                   </button>
 
                   <button 
                     v-if="isEditing"
                     @click="resetForm"
                     type="button" 
-                    class="flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                    class="w-full rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                   >
                     Cancel Edit
                   </button>
@@ -65,36 +67,52 @@
             </div>
           </div>
 
-          <!-- RIGHT: Product Table -->
           <div class="lg:col-span-8">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Product</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Price</th>
-                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 bg-white">
-                  <tr v-for="product in products" :key="product.id" class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-semibold text-[#2d4123]">{{ product.name }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+            <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div v-for="i in 4" :key="i" class="h-64 bg-gray-200 animate-pulse rounded-xl"></div>
+            </div>
+
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
+              <div 
+                v-for="product in products" 
+                :key="product.uuid" 
+                class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group"
+              >
+                <div class="h-40 bg-gray-100 flex items-center justify-center relative overflow-hidden">
+                  <span class="text-gray-300 text-4xl font-bold uppercase">{{ product.name.charAt(0) }}</span>
+                  <div class="absolute inset-0 bg-[#2d4123] opacity-0 group-hover:opacity-5 transition-opacity"></div>
+                </div>
+
+                <div class="p-5">
+                  <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-md font-bold text-[#2d4123] truncate pr-2">{{ product.name }}</h3>
+                    <span class="text-sm font-bold text-gray-900 bg-gray-50 px-2 py-1 rounded">
                       ₱{{ product.price.toLocaleString() }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button @click="editProduct(product)" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
-                      <button @click="deleteProduct(product.id)" class="text-red-600 hover:text-red-900">Remove</button>
-                    </td>
-                  </tr>
-                  <!-- Empty State -->
-                  <tr v-if="products.length === 0">
-                    <td colspan="3" class="px-6 py-10 text-center text-gray-400 italic">No products in stock.</td>
-                  </tr>
-                </tbody>
-              </table>
+                    </span>
+                  </div>
+                  
+                  <p class="text-xs text-gray-400 mb-6 uppercase tracking-wider">SKU: {{ product.uuid.split('-')[0] }}</p>
+
+                  <div class="flex border-t border-gray-100 pt-4 gap-4">
+                    <button 
+                      @click="editProduct(product)" 
+                      class="flex-1 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 py-2 rounded-md transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      @click="deleteProduct(product.uuid)" 
+                      class="flex-1 text-sm font-semibold text-red-600 hover:bg-red-50 py-2 rounded-md transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="products.length === 0" class="col-span-full bg-white rounded-xl border border-dashed border-gray-300 p-20 text-center">
+                <p class="text-gray-400 italic">Inventory is empty.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -104,65 +122,95 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { productService } from '~/api/product/ProductService';
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-}
-
-// Form State
-const productName = ref('');
-const productPrice = ref<number | ''>('');
+const products = ref<any[]>([]);
+const productName = ref("");
+const productPrice = ref<number | "">("");
 const isEditing = ref(false);
-const editingId = ref<number | null>(null);
+const editingUuid = ref<string | null>(null);
 
-// Mock Data
-const products = ref<Product[]>([
-  { id: 1, name: 'Hiking Backpack 45L', price: 2500 },
-  { id: 2, name: 'Waterproof Trekking Boots', price: 4200 },
-  { id: 3, name: 'Portable Camping Stove', price: 1200 },
-]);
+const isLoading = ref(false);
+const isSubmitting = ref(false);
+const statusMessage = ref("");
+const isError = ref(false);
 
-// Methods
-const handleSubmit = () => {
-  if (isEditing.value && editingId.value !== null) {
-    const index = products.value.findIndex(p => p.id === editingId.value);
-    if (index !== -1) {
-      products.value[index] = {
-        id: editingId.value,
-        name: productName.value,
-        price: Number(productPrice.value)
-      };
-    }
-  } else {
-    products.value.push({
-      id: Date.now(),
-      name: productName.value,
-      price: Number(productPrice.value)
-    });
-  }
-  resetForm();
+const setNotification = (msg: string, error = false) => {
+  statusMessage.value = msg;
+  isError.value = error;
+  setTimeout(() => {
+    statusMessage.value = "";
+    isError.value = false;
+  }, 4000);
 };
 
-const editProduct = (product: Product) => {
+const fetchProducts = async () => {
+  isLoading.value = true;
+  try {
+    const response = await productService.list();
+    products.value = response.data || response;
+  } catch (err: any) {
+    console.error("Fetch failed:", err);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const handleSubmit = async () => {
+  const isDuplicate = products.value.some(p => 
+    p.name.toLowerCase() === productName.value.toLowerCase() && p.uuid !== editingUuid.value
+  );
+
+  if (isDuplicate) {
+    setNotification("Product already exists.", true);
+    return;
+  }
+
+  isSubmitting.value = true;
+  try {
+    const payload = { name: productName.value, price: Number(productPrice.value) };
+    if (isEditing.value && editingUuid.value) {
+      await productService.update(editingUuid.value, payload);
+      setNotification("Product updated!");
+    } else {
+      await productService.create(payload);
+      setNotification("Product added!");
+    }
+    await fetchProducts();
+    resetForm();
+  } catch (err: any) {
+    setNotification("Save failed.", true);
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const deleteProduct = async (uuid: string) => {
+  if (!confirm("Remove this item?")) return;
+  try {
+    await productService.delete(uuid);
+    await fetchProducts();
+    setNotification("Removed successfully.");
+  } catch (err: any) {
+    setNotification("Delete failed.", true);
+  }
+};
+
+const editProduct = (product: any) => {
   isEditing.value = true;
-  editingId.value = product.id;
+  editingUuid.value = product.uuid; 
   productName.value = product.name;
   productPrice.value = product.price;
-};
-
-const deleteProduct = (id: number) => {
-  if(confirm('Delete this product?')) {
-    products.value = products.value.filter(p => p.id !== id);
-  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 const resetForm = () => {
-  productName.value = '';
-  productPrice.value = '';
+  productName.value = "";
+  productPrice.value = "";
   isEditing.value = false;
-  editingId.value = null;
+  editingUuid.value = null;
 };
+
+onMounted(fetchProducts);
 </script>
