@@ -11,52 +11,70 @@
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
       <div class="bg-black/10 px-6 py-12 shadow-xl ring-1 ring-[#3B7080] sm:rounded-lg sm:px-12">
-        
-        <div v-if="error" class="mb-4 p-3 rounded bg-red-500/20 border border-red-500 text-red-200 text-sm">
-          {{ error }}
-        </div>
-
         <form class="space-y-6" @submit.prevent="handleSubmit">
           <div>
             <label for="email" class="block text-sm/6 font-medium text-[#CFFFB3]">Email address</label>
             <div class="mt-2">
-              <input 
-                v-model="email"
-                type="email" 
-                name="email" 
-                id="email" 
-                autocomplete="email" 
-                required 
-                class="block w-full rounded-md border-0 bg-black/20 py-1.5 text-[#CFFFB3] shadow-sm ring-1 ring-inset ring-[#3B7080] placeholder:text-[#3B7080] focus:ring-2 focus:ring-inset focus:ring-[#ADE25D] sm:text-sm/6" 
-              />
+              <input type="email" name="email" id="email" autocomplete="email" required class="block w-full rounded-md border-0 bg-black/20 py-1.5 text-[#CFFFB3] shadow-sm ring-1 ring-inset ring-[#3B7080] placeholder:text-[#3B7080] focus:ring-2 focus:ring-inset focus:ring-[#ADE25D] sm:text-sm/6" />
             </div>
           </div>
 
           <div>
             <label for="password" class="block text-sm/6 font-medium text-[#CFFFB3]">Password</label>
             <div class="mt-2">
-              <input 
-                v-model="password"
-                type="password" 
-                name="password" 
-                id="password" 
-                autocomplete="current-password" 
-                required 
-                class="block w-full rounded-md border-0 bg-black/20 py-1.5 text-[#CFFFB3] shadow-sm ring-1 ring-inset ring-[#3B7080] placeholder:text-[#3B7080] focus:ring-2 focus:ring-inset focus:ring-[#ADE25D] sm:text-sm/6" 
-              />
+              <input type="password" name="password" id="password" autocomplete="current-password" required class="block w-full rounded-md border-0 bg-black/20 py-1.5 text-[#CFFFB3] shadow-sm ring-1 ring-inset ring-[#3B7080] placeholder:text-[#3B7080] focus:ring-2 focus:ring-inset focus:ring-[#ADE25D] sm:text-sm/6" />
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex gap-3">
+              <div class="flex h-6 shrink-0 items-center">
+                <div class="group grid size-4 grid-cols-1">
+                  <input id="remember-me" name="remember-me" type="checkbox" class="col-start-1 row-start-1 appearance-none rounded border border-[#3B7080] bg-black/20 checked:border-[#ADE25D] checked:bg-[#ADE25D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ADE25D]" />
+                  <svg class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-[#3A5743] opacity-0 group-has-[:checked]:opacity-100" viewBox="0 0 14 14" fill="none">
+                    <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+              </div>
+              <label for="remember-me" class="block text-sm/6 text-[#ADE25D]">Remember me</label>
+            </div>
+
+            <div class="text-sm/6">
+              <a href="#" class="font-semibold text-[#ADE25D] hover:text-[#CFFFB3]">Forgot password?</a>
             </div>
           </div>
 
           <div>
-            <button 
-              type="submit" 
-              :disabled="isLoading"
-              class="flex w-full justify-center rounded-md bg-[#ADE25D] px-3 py-1.5 text-sm/6 font-semibold text-[#3A5743] shadow-sm hover:bg-[#CFFFB3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ADE25D] transition-colors disabled:opacity-50"
-            >
-              {{ isLoading ? 'Signing in...' : 'Sign in' }}
-            </button>
+            <button type="submit" class="flex w-full justify-center rounded-md bg-[#ADE25D] px-3 py-1.5 text-sm/6 font-semibold text-[#3A5743] shadow-sm hover:bg-[#CFFFB3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ADE25D] transition-colors">Sign in</button>
           </div>
         </form>
+
+        <div>
+          <div class="mt-10 flex items-center gap-x-6">
+            <div class="w-full flex-1 border-t border-[#3B7080]"></div>
+            <p class="text-nowrap text-sm/6 font-medium text-[#ADE25D]">Or continue with</p>
+            <div class="w-full flex-1 border-t border-[#3B7080]"></div>
+          </div>
+
+          <div class="mt-6 grid grid-cols-2 gap-4">
+            <a href="#" class="flex w-full items-center justify-center gap-3 rounded-md bg-black/20 px-3 py-2 text-sm font-semibold text-[#CFFFB3] shadow-sm ring-1 ring-inset ring-[#3B7080] hover:bg-[#3B7080]/60 transition-colors">
+              <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335" />
+                <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4" />
+                <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05" />
+                <path d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.2654 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z" fill="#34A853" />
+              </svg>
+              <span class="text-sm/6 font-semibold">Google</span>
+            </a>
+
+            <a href="#" class="flex w-full items-center justify-center gap-3 rounded-md bg-black/20 px-3 py-2 text-sm font-semibold text-[#CFFFB3] shadow-sm ring-1 ring-inset ring-[#3B7080] hover:bg-[#3B7080]/60 transition-colors">
+              <svg fill="#ADE25D" width="20px" height="20px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2.03998C6.5 2.03998 2 6.52998 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.84998C10.44 7.33998 11.93 5.95998 14.22 5.95998C15.31 5.95998 16.45 6.14998 16.45 6.14998V8.61998H15.19C13.95 8.61998 13.56 9.38998 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96C15.9164 21.5878 18.0622 20.3855 19.6099 18.57C21.1576 16.7546 22.0054 14.4456 22 12.06C22 6.52998 17.5 2.03998 12 2.03998Z"></path>
+              </svg>
+              <span class="text-sm/6 font-semibold">Facebook</span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>

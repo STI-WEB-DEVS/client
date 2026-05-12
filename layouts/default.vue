@@ -68,7 +68,6 @@
       </Dialog>
     </TransitionRoot>
 
-    <!-- Desktop sidebar -->
     <div class="hidden bg-[#3A5743] ring-1 ring-[#3B7080] lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
       <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
         <div class="flex h-16 shrink-0 items-center gap-x-3">
@@ -111,7 +110,6 @@
     </div>
 
     <div class="lg:pl-72">
-      <!-- Topbar -->
       <div
         class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-[#3B7080] bg-[#3A5743] px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
         <button type="button" class="-m-2.5 p-2.5 text-[#ADE25D] hover:text-[#CFFFB3] lg:hidden"
@@ -181,6 +179,7 @@ import {
   Bars3Icon, BellIcon, Cog6ToothIcon, XMarkIcon,
   HomeIcon, UsersIcon, FolderIcon, DocumentDuplicateIcon,
   ChartPieIcon, CurrencyDollarIcon, MapIcon, ClipboardDocumentListIcon,
+  UserGroupIcon, TagIcon, // Added new icons
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 import { useRoute } from 'vue-router'
@@ -200,6 +199,7 @@ const navigationGroups = [
     items: [
       { name: 'Organizers', href: '/organizers', icon: FolderIcon },
       { name: 'Hikers', href: '/hikers', icon: UsersIcon },
+      { name: 'Customers', href: '/customers', icon: UserGroupIcon }, // Added Customers
       { name: 'Team', href: '/team', icon: ClipboardDocumentListIcon },
     ],
   },
@@ -207,6 +207,7 @@ const navigationGroups = [
     label: 'Operations',
     items: [
       { name: 'Hiking Tours', href: '/tours', icon: MapIcon },
+      { name: 'Products', href: '/products', icon: TagIcon }, // Added Products
       { name: 'Sales & Commission', href: '/commission', icon: CurrencyDollarIcon },
       { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
     ],
