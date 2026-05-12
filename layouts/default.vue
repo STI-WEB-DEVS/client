@@ -99,7 +99,7 @@
               <MenuButton class="relative flex items-center">
                 <span class="absolute -inset-1.5"></span>
                 <span class="sr-only">Open user menu</span>
-                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="c:\Users\My PC\Downloads\IMG_0005.jpg" alt="" />
+                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="" alt="" />
                 <span class="hidden lg:flex lg:items-center">
                   <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Justine Mantua</span>
                   <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
