@@ -49,6 +49,13 @@
                     </li>
                   </ul>
                 </nav>
+                <div class="mt-4 px-2">
+                  <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">Customer</h3>
+                  <CustomerForm :modelValue="customerModel" :disabled="formsDisabled" @update:modelValue="val => customerModel = val" />
+
+                  <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-300 mt-4 mb-2">Product</h3>
+                  <ProductsForm :modelValue="productModel" :disabled="formsDisabled" @update:modelValue="val => productModel = val" />
+                </div>
               </div>
             </DialogPanel>
           </TransitionChild>
@@ -88,6 +95,15 @@
             </li>
           </ul>
         </nav>
+
+        <div class="mt-4 px-2">
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">Customer</h3>
+          <CustomerForm :modelValue="customerModel" :disabled="formsDisabled" @update:modelValue="val => customerModel = val" />
+
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-300 mt-4 mb-2">Product</h3>
+          <ProductsForm :modelValue="productModel" :disabled="formsDisabled" @update:modelValue="val => productModel = val" />
+        </div>
+
       </div>
     </div>
 
@@ -148,6 +164,8 @@
 
 <script setup>
 import { ref } from 'vue'
+import CustomerForm from '~/components/CustomerForm.vue'
+import ProductsForm from '~/components/ProductsForm.vue'
 import {
   Dialog,
   DialogPanel,
@@ -197,4 +215,8 @@ const handleSignOut = async () => {
 }
 
 const sidebarOpen = ref(false)
+
+const customerModel = ref({ name: '', email: '' })
+const productModel = ref({ name: '', price: '' })
+const formsDisabled = ref(false)
 </script>
