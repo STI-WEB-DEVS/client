@@ -1,55 +1,21 @@
-import { BaseService } from "../BaseService";
+import * as BaseModule from '~/api/BaseService'
 
+const BaseCls: any = (BaseModule && (BaseModule.default || BaseModule))
 
-export interface LoginResponse {
-  token: string;
-  user: {
-    id: string | number;
-    name?: string;
-    email: string;
-    role: string;
-  };
+const base = new BaseCls()
+
+export const authService = {
+  async login(payload: { email: string; password: string }) {
+    return base.request('/login', 'POST', payload)
+  },
+
+  async logout() {
+    const authToken = useCookie<string | null>('_token')
+    authToken.value = null
+    localStorage.removeItem('_token')
+    return base.request('/logout', 'POST')
+  },
 }
-export class AuthService extends BaseService {
-  async login(email: string, password: string): Promise<LoginResponse> {
-    const runtimeConfig = useRuntimeConfig();
 
-    try {
-      return await $fetch<LoginResponse>("/login", {
-        baseURL: runtimeConfig.public.apiBaseURL,
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-        },
-        body: {
-          email,
-          password,
-        },
-      });
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const message =
-        error?.response?._data?.message ||
-        error?.data?.message ||
-        error?.message;
+export default authService
 
-      switch (status) {
-        case 400:
-        case 401:
-        case 404:
-        case 422:
-        case 429:
-          throw new Error(message || "Validation or Request Error");
-        case 500:
-          throw new Error(
-            "Server error. Please try again or contact the administrator.",
-          );
-        default:
-          throw new Error(message || "Something went wrong. Please try again.");
-      }
-    }
-  }
-  async logout(): Promise<void> {
-    await this.request<void>("/logout", "DELETE");
-  }
-}

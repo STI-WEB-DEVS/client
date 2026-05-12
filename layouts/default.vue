@@ -49,13 +49,7 @@
                     </li>
                   </ul>
                 </nav>
-                <div class="mt-4 px-2">
-                  <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">Customer</h3>
-                  <CustomerForm :modelValue="customerModel" :disabled="formsDisabled" @update:modelValue="val => customerModel = val" />
-
-                  <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-300 mt-4 mb-2">Product</h3>
-                  <ProductsForm :modelValue="productModel" :disabled="formsDisabled" @update:modelValue="val => productModel = val" />
-                </div>
+                <!-- Sidebar inline forms removed -->
               </div>
             </DialogPanel>
           </TransitionChild>
@@ -96,13 +90,7 @@
           </ul>
         </nav>
 
-        <div class="mt-4 px-2">
-          <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">Customer</h3>
-          <CustomerForm :modelValue="customerModel" :disabled="formsDisabled" @update:modelValue="val => customerModel = val" />
-
-          <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-300 mt-4 mb-2">Product</h3>
-          <ProductsForm :modelValue="productModel" :disabled="formsDisabled" @update:modelValue="val => productModel = val" />
-        </div>
+        <!-- Sidebar inline forms removed -->
 
       </div>
     </div>
@@ -164,8 +152,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import CustomerForm from '~/components/CustomerForm.vue'
-import ProductsForm from '~/components/ProductsForm.vue'
 import {
   Dialog,
   DialogPanel,
@@ -183,8 +169,10 @@ import {
   ChartPieIcon,
   Cog6ToothIcon,
   DocumentDuplicateIcon,
+  GiftIcon,
   HomeIcon,
   QrCodeIcon,
+  UserGroupIcon,
   UsersIcon,
   XMarkIcon,
   ArrowRightOnRectangleIcon,
@@ -197,6 +185,8 @@ const route = useRoute()
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Team', href: '/team', icon: UsersIcon },
+  { name: 'Customers', href: '/customers', icon: UserGroupIcon },
+  { name: 'Products', href: '/products', icon: GiftIcon },
   { name: 'Parking Zones', href: '/projects', icon: BuildingOffice2Icon },
   { name: 'QR Tickets', href: '/calendar', icon: QrCodeIcon },
   { name: 'Operations Logs', href: '/documents', icon: DocumentDuplicateIcon },
@@ -216,7 +206,5 @@ const handleSignOut = async () => {
 
 const sidebarOpen = ref(false)
 
-const customerModel = ref({ name: '', email: '' })
-const productModel = ref({ name: '', price: '' })
-const formsDisabled = ref(false)
+// sidebar forms removed; related state cleaned up
 </script>
