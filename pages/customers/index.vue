@@ -79,11 +79,9 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
-import BaseService from '@/api/BaseService' // Adjust path as needed
+// Import the service instance directly
+import { customerService } from '~/api/Customer/CustomerService' 
 
-
-// Initialize the service
-const api = new BaseService()
 const customerList = ref<any[]>([])
 const pending = ref(false)
 const isModalOpen = ref(false)
@@ -95,20 +93,62 @@ const form = reactive({
   email: ''
 })
 
-// READ: Fetch customers using the BaseService request helper
-
+// READ: Uses the list() method from your new service
 const fetchCustomers = async () => {
   pending.value = true
   try {
-    // Laravel Paginated Response structure: { data: [...], links: {...}, meta: {...} }
-    const response = await api.request<any>('/customers', 'GET')
-    
-    // Assign the data array to your list variable
+    const response = await customerService.list() 
     customerList.value = response.data || []
   } catch (error: any) {
     console.error("Fetch Error:", error.message)
   } finally {
     pending.value = false
+  }
+}
+
+// CREATE & UPDATE: Uses create() and update() from your service
+const saveCustomer = async () => {
+  submitting.value = true
+  const uuid = editingCustomer.value?.uuid
+
+  try {
+    // Create a clean payload object
+    const payload = {
+      name: form.name,
+      email: form.email
+    }
+
+    if (uuid) {
+      // Calls updateCustomer in backend
+      await customerService.update(uuid, payload)
+    } else {
+      // Calls createCustomer in backend
+      await customerService.create(payload)
+    }
+    
+    await fetchCustomers() 
+    isModalOpen.value = false
+    
+    // Reset form after successful creation
+    Object.assign(form, { name: '', email: '' })
+    editingCustomer.value = {}
+  } catch (error: any) {
+    // BaseService throws a standard Error object with the backend message
+    alert(error.message) 
+  } finally {
+    submitting.value = false
+  }
+}
+
+// DELETE: Uses the delete() method
+const deleteCustomer = async (uuid: string) => {
+  if (confirm('Are you sure?')) {
+    try {
+      await customerService.delete(uuid)
+      await fetchCustomers()
+    } catch (error: any) {
+      console.error(error.message)
+    }
   }
 }
 
@@ -118,7 +158,8 @@ const openModal = (customer: any = null) => {
     form.name = customer.name
     form.email = customer.email
   } else {
-    editingCustomer.value = {}
+    // CRITICAL: Reset these to ensure 'saveCustomer' hits the 'else' block
+    editingCustomer.value = {} 
     form.name = ''
     form.email = ''
   }
@@ -126,45 +167,8 @@ const openModal = (customer: any = null) => {
 }
 
 const viewCustomer = (uuid: string) => {
+  // This must match your file structure: pages/customers/[id].vue
   navigateTo(`/customers/${uuid}`)
-}
-
-
-// CREATE & UPDATE: Unified save logic
-const saveCustomer = async () => {
-  submitting.value = true
-  
-  // Identify if we use the UUID for the path (Update) or the base endpoint (Create)
-  const uuid = editingCustomer.value?.uuid
-  const url = uuid ? `/customers/${uuid}` : '/customers'
-  const method = uuid ? 'PUT' : 'POST'
-
-  try {
-    // BaseService handles the headers and baseURL automatically
-    await api.request(url, method, {
-      name: form.name,
-      email: form.email,
-    })
-    
-    await fetchCustomers() // Refresh list
-    isModalOpen.value = false
-  } catch (error: any) {
-    alert(error.message) // Uses the error mapping from BaseService
-  } finally {
-    submitting.value = false
-  }
-}
-
-// DELETE: Uses the uuid string required by CustomerService.php
-const deleteCustomer = async (uuid: string) => {
-  if (confirm('Are you sure you want to remove this customer?')) {
-    try {
-      await api.request(`/customers/${uuid}`, 'DELETE')
-      await fetchCustomers()
-    } catch (error: any) {
-      console.error(error.message)
-    }
-  }
 }
 
 onMounted(() => {

@@ -41,21 +41,21 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import BaseService from '@/api/BaseService'
+// Use the service instance
+import { customerService } from '~/api/Customer/CustomerService' 
 
 const route = useRoute()
-const api = new BaseService()
 const customer = ref<any>(null)
 const pending = ref(true)
 
 const loadCustomer = async () => {
   pending.value = true
   try {
-    // Laravel's ProductResource usually wraps the object in a 'data' key
-    const response = await api.request<any>(`/customers/${route.params.id}`, 'GET')
+    // The response from the backend is { data: { name: '...', email: '...' } }
+    const response = await customerService.show(route.params.id as string)
     
-    // Check if the response itself is the object or if it's nested under .data
-    customer.value = response.data ? response.data : response
+    // Assign response.data so the template can access customer.name directly
+    customer.value = response.data 
   } catch (error: any) {
     console.error("Profile Load Error:", error.message)
   } finally {
