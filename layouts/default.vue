@@ -20,7 +20,6 @@
 
               <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-green-900 px-6 pb-4 ring-1 ring-white/10">
                 <div class="relative flex h-16 shrink-0 items-center">
-                  <img class="h-10 w-auto bg-white" src="C:\Users\PC1\Desktop\New folder\client\resources\Logo.png" alt="Your Company" />
                   <h1 class="ml-5 text-white text-sm">Event Management System</h1>
                 </div>
                 <nav class="relative flex flex-1 flex-col">
@@ -53,7 +52,6 @@
     <div class="hidden bg-green-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
       <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
         <div class="flex h-16 shrink-0 items-center">
-          <img class="h-10 w-auto bg-white" src="C:\Users\PC1\Desktop\New folder\client\resources\Logo.png" alt="Your Company" />
           <h1 class="ml-5 text-white text-sm">Event Management System</h1>
         </div>
         <nav class="flex flex-1 flex-col">
@@ -151,6 +149,8 @@ import {
   HomeIcon,
   UsersIcon,
   XMarkIcon,
+  ShoppingBagIcon, 
+  ChartBarIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import { useRoute } from 'vue-router'
@@ -163,8 +163,11 @@ const navigation = [
   { name: 'Projects', href: '/projects', icon: FolderIcon },
   { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
   { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '/reports', icon: ChartPieIcon },
+  { name: 'Reports', href: '/reports', icon: ChartBarIcon }, // Changed icon
+  { name: 'Products', href: '/products', icon: ShoppingBagIcon }, // Changed icon
+  { name: 'Customers', href: '/customer', icon: UsersIcon } // Changed icon
 ]
+
 
 const userNavigation = [
   { name: 'Your profile', href: '/profile' },
