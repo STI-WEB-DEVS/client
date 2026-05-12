@@ -165,6 +165,7 @@ const navigation = [
   { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
   { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
   { name: 'Reports', href: '/reports', icon: ChartPieIcon },
+  
 ]
 
 const userNavigation = [
