@@ -24,13 +24,13 @@
       <form class="mt-8 space-y-5" method="POST" @submit.prevent="handleSubmit">
         <div>
           <label for="email" class="block text-sm font-semibold text-[#6F5E54]">Email address</label>
-          <input id="email" type="email" autocomplete="email" required
+          <input id="email" v-model="email" type="email" autocomplete="email" required
             class="mt-2 block w-full rounded-xl border border-[#DCCFC7] bg-[#FBF8F6] px-4 py-2.5 text-sm text-[#4E413A] shadow-sm transition placeholder:text-[#B09C91] focus:border-[#8F7A6E] focus:outline-none focus:ring-2 focus:ring-[#E7DFDA]" />
         </div>
 
         <div>
           <label for="password" class="block text-sm font-semibold text-[#6F5E54]">Password</label>
-          <input id="password" type="password" autocomplete="current-password" required
+          <input id="password"  v-model="password" type="password" autocomplete="current-password" required
             class="mt-2 block w-full rounded-xl border border-[#DCCFC7] bg-[#FBF8F6] px-4 py-2.5 text-sm text-[#4E413A] shadow-sm transition placeholder:text-[#B09C91] focus:border-[#8F7A6E] focus:outline-none focus:ring-2 focus:ring-[#E7DFDA]" />
         </div>
 
@@ -57,7 +57,50 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: false,
+});
+ 
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
+ 
+const email = ref("");
+const password = ref("");
+const error = ref("");
+const isLoading = ref(false);
+ 
+const authService = new AuthService();
+ 
 const handleSubmit = async () => {
-  await navigateTo('/dashboard')
-}
+  error.value = "";
+  isLoading.value = true;
+ 
+  try {
+    const response = await authService.login(email.value, password.value);
+ 
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
+    }
+ 
+    // // if (response?.user.customer_uuid) {
+    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
+    // // } else if (response?.user.uuid) {
+    // //   localStorage.setItem("_uuid", response.user.uuid);
+    // // }
+ 
+    / /// if (response?.user.role) {
+    // //   localStorage.setItem("_role", response.user.role);
+    // // }
+ 
+    // await navigateTo("/admin/dashboard");
+ 
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+    );
+  } catch (err: any) {
+    error.value = err?.message || "";
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
