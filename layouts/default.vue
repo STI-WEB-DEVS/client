@@ -161,7 +161,9 @@ import {
   IconHeartRateMonitor,
   IconUser,
   IconFolderOpen,
-  IconUsersGroup
+  IconUsersGroup,
+  IconUserDollar,
+  IconShoppingCart
 } from '@tabler/icons-vue'
 
 const route = useRoute()
@@ -173,6 +175,8 @@ const navigation = [
   { name: 'Facilities', href: '/facilities', icon: IconHeartRateMonitor },
   { name: 'Students', href: '/students', icon: IconUser },
   { name: 'Team', href: '/team', icon: IconUsersGroup },
+  { name: 'Products', href: '/product', icon: IconShoppingCart }, 
+  { name: 'Customers', href: '/customers', icon: IconUserDollar }
 ]
 
 const userNavigation = [
