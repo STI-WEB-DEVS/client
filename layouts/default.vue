@@ -54,7 +54,7 @@
                 <div class="relative flex h-16 shrink-0 items-center">
                   <img
                     class="h-8 w-auto"
-                    src="D:\Laboratory\client\.nuxt\resources\logo.png"
+                    
                     alt="Your Company"
                   />
                    <span class="text-black font-semibold text-sm tracking-tight ">
@@ -115,7 +115,7 @@
         <div class="flex h-16 shrink-0 items-center">
           <img
             class="h-8 w-auto"
-            src="D:\Laboratory\client\.nuxt\resources\logo.png"
+            
             alt="Your Company"
           />
           <span class="text-black font-semibold text-sm tracking-tight">
@@ -197,7 +197,7 @@
                 <span class="sr-only">Open user menu</span>
                 <img
                   class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5"
-                  src="D:\Laboratory\client\.nuxt\resources\man-in-suit-and-tie.png"
+                  
                   alt=""
                 />
                 <span class="hidden lg:flex lg:items-center">
