@@ -226,9 +226,10 @@ const route = useRoute()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Parking Areas', href: '/projects', icon: BuildingOffice2Icon },
-  { name: 'Tickets for Parking', href: '/calendar', icon: QrCodeIcon },
+  { name: 'Customers', href: '/customer', icon: UsersIcon },
+  { name: 'Products', href: '/products', icon: ChartPieIcon },
+  { name: 'Parking Areas', href: '/project', icon: BuildingOffice2Icon },
+  { name: 'Tickets for Parking', href: '/tickets', icon: QrCodeIcon },
   { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
   { name: 'Reports', href: '/reports', icon: ChartPieIcon },
 ]
