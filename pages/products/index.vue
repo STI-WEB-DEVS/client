@@ -2,12 +2,12 @@
   <NuxtLayout>
     <div class="py-6">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 flex justify-between items-center">
-        <h1 class="text-2xl font-semibold text-gray-900">Customer Management</h1>
+        <h1 class="text-2xl font-semibold text-gray-900">Product Management</h1>
         <button 
           @click="showAddModal = true" 
           class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
-          Add Customer
+          Add Product
         </button>
       </div>
 
@@ -16,21 +16,24 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Name</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Email</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Product Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Price</th>
                 <th scope="col" class="relative px-6 py-3">
                   <span class="sr-only">Actions</span>
                 </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
-              <tr v-for="customer in customers" :key="customer.id" class="hover:bg-gray-50">
-                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ customer.name }}</td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ customer.email }}</td>
+              <tr v-for="product in products" :key="product.id" class="hover:bg-gray-50">
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ product.name }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">₱{{ product.price }}</td>
                 <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium space-x-4">
-                  <button @click="viewDetails(customer)" class="text-indigo-600 hover:text-indigo-900">View</button>
-                  <button @click="confirmDelete(customer.id)" class="text-red-600 hover:text-red-900">Delete</button>
+                  <button @click="viewDetails(product)" class="text-indigo-600 hover:text-indigo-900">View</button>
+                  <button @click="confirmDelete(product.id)" class="text-red-600 hover:text-red-900">Delete</button>
                 </td>
+              </tr>
+              <tr v-if="products.length === 0">
+                <td colspan="3" class="px-6 py-10 text-center text-gray-400 italic">No products found.</td>
               </tr>
             </tbody>
           </table>
@@ -43,14 +46,20 @@
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
               <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                <h3 class="text-base font-semibold leading-6 text-gray-900">Add New Customer</h3>
+                <h3 class="text-base font-semibold leading-6 text-gray-900">Add New Product</h3>
                 <div class="mt-4 space-y-4">
-                  <input v-model="newCustomer.name" placeholder="Full Name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
-                  <input v-model="newCustomer.email" type="email" placeholder="Email Address" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                  <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">NAME</label>
+                    <input v-model="newProduct.name" placeholder="e.g. Mouse" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">PRICE</label>
+                    <input v-model.number="newProduct.price" type="number" placeholder="0.00" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                  </div>
                 </div>
               </div>
               <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                <button @click="addCustomer" type="button" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto">Save</button>
+                <button @click="addProduct" type="button" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto">Save Product</button>
                 <button @click="showAddModal = false" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
               </div>
             </div>
@@ -65,22 +74,22 @@
             <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
               <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                 <div class="flex justify-between items-start">
-                  <h3 class="text-lg font-semibold leading-6 text-gray-900">Customer Details</h3>
+                  <h3 class="text-lg font-semibold leading-6 text-gray-900">Product Details</h3>
                   <button @click="showViewModal = false" class="text-gray-400 hover:text-gray-500 text-2xl">&times;</button>
                 </div>
                 <div class="mt-6 border-t border-gray-100">
                   <dl class="divide-y divide-gray-100">
                     <div class="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <dt class="text-sm font-medium leading-6 text-gray-900">Full name</dt>
-                      <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ selectedCustomer?.name }}</dd>
+                      <dt class="text-sm font-medium leading-6 text-gray-900">Product Name</dt>
+                      <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ selectedProduct?.name }}</dd>
                     </div>
                     <div class="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <dt class="text-sm font-medium leading-6 text-gray-900">Email address</dt>
-                      <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ selectedCustomer?.email }}</dd>
+                      <dt class="text-sm font-medium leading-6 text-gray-900">Unit Price</dt>
+                      <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">₱{{ selectedProduct?.price }}</dd>
                     </div>
                     <div class="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <dt class="text-sm font-medium leading-6 text-gray-900">Customer ID</dt>
-                      <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">#{{ selectedCustomer?.id }}</dd>
+                      <dt class="text-sm font-medium leading-6 text-gray-900">System ID</dt>
+                      <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">#{{ selectedProduct?.id }}</dd>
                     </div>
                   </dl>
                 </div>
@@ -98,68 +107,60 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import CustomerService from '@/api/customer/CustomerService';
+import ProductService from '@/api/product/ProductService';
 
 // Page States
 const showAddModal = ref(false);
 const showViewModal = ref(false);
-const selectedCustomer = ref(null);
-const customers = ref([]); // Start with an empty list
+const selectedProduct = ref(null);
+const products = ref([]);
 
 // Form State
-const newCustomer = ref({ name: '', email: '' });
+const newProduct = ref({ name: '', price: 0 });
 
-// 1. Fetch data from backend on load
-const fetchCustomers = async () => {
+// 1. Fetch data from backend
+const fetchProducts = async () => {
   try {
-    const response = await CustomerService.getAll();
-    // Assuming your BaseService/Backend returns data in a 'data' field or direct array
-    customers.value = response.data || response; 
+    const response = await ProductService.getAll();
+    products.value = response.data || response; 
   } catch (error) {
-    console.error("Failed to fetch customers:", error);
+    console.error("Failed to fetch products:", error);
   }
 };
 
 onMounted(() => {
-  fetchCustomers();
+  fetchProducts();
 });
 
-// 2. View Details (Local state is fine here)
-const viewDetails = (customer: any) => {
-  selectedCustomer.value = customer;
+// 2. View Details
+const viewDetails = (product: any) => {
+  selectedProduct.value = product;
   showViewModal.value = true;
 };
 
-// 3. Add Customer to Backend
-const addCustomer = async () => {
-  if (newCustomer.value.name && newCustomer.value.email) {
+// 3. Add Product
+const addProduct = async () => {
+  if (newProduct.value.name && newProduct.value.price >= 0) {
     try {
-      await CustomerService.create(newCustomer.value);
-      
-      // Refresh list and reset form
-      await fetchCustomers();
-      newCustomer.value = { name: '', email: '' };
+      await ProductService.create(newProduct.value);
+      await fetchProducts();
+      newProduct.value = { name: '', price: 0 };
       showAddModal.value = false;
-    } catch (error) {
-      alert("Error adding customer. Check console for details.");
-      console.error(error);
+    } catch (error: any) {
+      alert("Error adding product: " + (error.response?.data?.message || error.message));
     }
+  } else {
+    alert("Please provide a valid name and price.");
   }
 };
 
-// 4. Delete from Backend
+// 4. Delete Product
 const confirmDelete = async (id: number) => {
-  if (!id) {
-    alert("Error: Customer ID is undefined. Check your table binding.");
-    return;
-  }
-
-  if (confirm("Are you sure you want to delete this customer?")) {
+  if (confirm("Are you sure you want to delete this product?")) {
     try {
-      await CustomerService.deleteCustomer(id);
-      await fetchCustomers(); // Refresh the UI
+      await ProductService.deleteProduct(id);
+      await fetchProducts();
     } catch (error: any) {
-      // Log the full error to see if it's a 404 or something else
       console.error("Delete failed for ID " + id, error);
       alert("Backend Error: " + error.message);
     }

@@ -1,40 +1,18 @@
-import BaseService from '~/api/BaseService';
- 
+import BaseService from "../BaseService";
+
 class ProductService extends BaseService {
-    private static instance: ProductService;
- 
-    public static getInstance(): ProductService {
-        if (!ProductService.instance) {
-            ProductService.instance = new ProductService();
-        }
-        return ProductService.instance;
+    async getAll() {
+        return await this.get('/products');
     }
- 
-    private resource = '/products';
- 
-    async list(params: object = {}): Promise<any> {
-        return await this.request(this.resource, 'GET', params);
+    async create(data: object) {
+        return await this.post('/products', data);
     }
- 
-    async create(payload: object): Promise<any> {
-        return await this.request(this.resource, 'POST', payload);
+    async update(id: number, data: object) {
+        return await this.put(`/products/${id}`, data);
     }
- 
-    async show(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'GET');
-    }
- 
-    async update(uuid: string, payload: object): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'PUT', payload);
-    }
- 
-    async delete(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'DELETE');
-    }
- 
-    async restore(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}/restore`, 'POST');
+    async deleteProduct(id: number) {
+        return await this.delete(`/products/${id}`); 
     }
 }
- 
-export const productService = ProductService.getInstance();
+
+export default new ProductService();
