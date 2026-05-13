@@ -1,7 +1,7 @@
 <template>
   <div class="flex min-h-screen bg-slate-50 font-sans text-slate-900">
-    <aside class="w-72 bg-slate-900 text-white flex flex-col fixed h-full shadow-2xl z-20">
-      <div class="p-8">
+  <aside class="w-72 bg-slate-900 text-white flex flex-col fixed h-full shadow-2xl z-20">
+        <div class="p-8">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
             <span class="text-2xl font-black">P</span>
@@ -63,12 +63,17 @@
 </template>
 
 <script setup>
-// Navigation Definition (Exactly 6 Links as per Requirement 1.2)
+import { computed } from 'vue';
+import { useRoute, navigateTo } from '#app';
+
+// Navigation Definition - Updated to 8 links
 const navLinks = [
   { name: 'Dashboard', path: '/dashboard', icon: '📊' },
   { name: 'Parking Zones', path: '/zones', icon: '🗺️' },
   { name: 'Real-time Occupancy', path: '/occupancy', icon: '📡' },
-  { name: 'Team Members', path: '/team', icon: '👥' },
+  { name: 'Customers', path: '/customers', icon: '👥' },
+  { name: 'Products', path: '/products', icon: '📦' },
+  { name: 'Team Members', path: '/team', icon: '👔' },
   { name: 'System Settings', path: '/settings', icon: '⚙️' },
   { name: 'User Profile', path: '/profile', icon: '👤' }
 ];
@@ -79,9 +84,7 @@ const currentRouteName = computed(() => {
   return current ? current.name : 'Overview';
 });
 
-// Requirement 1.5: Sign Out Flow
 const handleSignOut = () => {
-  // Clear any local state here if needed
   navigateTo('/login');
 };
 </script>
@@ -98,4 +101,3 @@ const handleSignOut = () => {
   transform: translateY(5px);
 }
 </style>
-

@@ -20,7 +20,7 @@
 
 <script setup>
 // Importing the specific service requested
-import { TeamService } from '/api/Team/TeamService';
+import { TeamService } from '/api/team/TeamService';
 
 const team = ref([]);
 

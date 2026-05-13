@@ -1,16 +1,16 @@
 import BaseService from '~/api/BaseService';
 
-class TeamService extends BaseService {
-    private static instance: TeamService;
+class CustomerService extends BaseService {
+    private static instance: CustomerService;
 
-    public static getInstance(): TeamService {
-        if (!TeamService.instance) {
-            TeamService.instance = new TeamService();
+    public static getInstance(): CustomerService {
+        if (!CustomerService.instance) {
+            CustomerService.instance = new CustomerService();
         }
-        return TeamService.instance;
+        return CustomerService.instance;
     }
 
-    private resource = '/teams';
+    private resource = '/customers';
 
     async list(params: object = {}): Promise<any> {
         return await this.request(this.resource, 'GET', params);
@@ -37,4 +37,4 @@ class TeamService extends BaseService {
     }
 }
 
-export const teamService = TeamService.getInstance();
+export const customerService = CustomerService.getInstance();
