@@ -38,8 +38,9 @@
       </template>
 
       <template #cell(total_amount)="{ value }">
-        {{ formatCurrency(value) }}
+        {{ formatPrice(value) }}
       </template>
+
 
       <template #cell(created_at)="{ value }">
         {{ formatDate(value) }}
@@ -94,6 +95,68 @@
         </div>
       </template>
     </Table>
+
+    <!-- Order Details Modal -->
+    <BaseModal
+      :open="isModalOpen"
+      title="Order Details"
+      confirm-text="Close"
+      @close="closeModal"
+      @confirm="closeModal"
+    >
+      <div v-if="loadingDetail" class="flex justify-center py-8">
+        <div class="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
+      </div>
+      
+      <div v-else-if="selectedOrder" class="space-y-6">
+        <!-- Order Header Info -->
+        <div class="grid grid-cols-2 gap-4 rounded-lg bg-gray-50 p-4">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Order ID</p>
+            <p class="text-sm font-semibold text-gray-900">#ORD-{{ selectedOrder.order_id }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Date</p>
+            <p class="text-sm font-medium text-gray-900">{{ formatDate(selectedOrder.created_at) }}</p>
+          </div>
+          <div class="col-span-2">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Customer</p>
+            <p class="text-sm font-medium text-gray-900">{{ selectedOrder.customer_name }}</p>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="space-y-2">
+          <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Order Items</p>
+          <div class="overflow-hidden rounded-lg border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500">Product</th>
+                  <th class="px-4 py-2 text-center text-[10px] font-bold uppercase tracking-wider text-gray-500">Qty</th>
+                  <th class="px-4 py-2 text-right text-[10px] font-bold uppercase tracking-wider text-gray-500">Price</th>
+                  <th class="px-4 py-2 text-right text-[10px] font-bold uppercase tracking-wider text-gray-500">Total</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 bg-white">
+                <tr v-for="item in selectedOrder.order_items" :key="item.product_id">
+                  <td class="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{{ item.product_name }}</td>
+                  <td class="whitespace-nowrap px-4 py-2 text-center text-sm text-gray-600">{{ item.quantity }}</td>
+                  <td class="whitespace-nowrap px-4 py-2 text-right text-sm text-gray-600">{{ formatPrice(item.unit_price) }}</td>
+                  <td class="whitespace-nowrap px-4 py-2 text-right text-sm font-medium text-gray-900">{{ formatPrice(item.total) }}</td>
+                </tr>
+              </tbody>
+              <tfoot class="bg-gray-50">
+                <tr>
+                  <td colspan="3" class="px-4 py-2 text-right text-sm font-bold text-gray-900">Grand Total</td>
+                  <td class="px-4 py-2 text-right text-sm font-bold text-gray-900">{{ formatPrice(selectedOrder.total_amount) }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </BaseModal>
   </div>
 </template>
 
@@ -115,6 +178,11 @@ const orders = ref<any>(null);
 const pending = ref(true);
 const error = ref<any>(null);
 
+// Modal State
+const isModalOpen = ref(false);
+const loadingDetail = ref(false);
+const selectedOrder = ref<any>(null);
+
 const loadOrders = async (page = 1) => {
   pending.value = true;
   error.value = null;
@@ -129,17 +197,25 @@ const loadOrders = async (page = 1) => {
 
 onMounted(() => loadOrders());
 
-const handleView = (order: any) => {
-  // Navigation to order details
-  console.log("View order:", order.uuid);
+const handleView = async (order: any) => {
+  isModalOpen.value = true;
+  loadingDetail.value = true;
+  try {
+    const response = await orderService.show(order.uuid);
+    selectedOrder.value = response.data || response;
+  } catch (err) {
+    console.error("Failed to fetch order details:", err);
+  } finally {
+    loadingDetail.value = false;
+  }
 };
 
-const formatCurrency = (value: number | string) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(Number(value));
+const closeModal = () => {
+  isModalOpen.value = false;
+  selectedOrder.value = null;
 };
+
+const { formatPrice } = useCurrency();
 
 const formatDate = (dateString: string) => {
   if (!dateString) return "-";
@@ -150,3 +226,4 @@ const formatDate = (dateString: string) => {
   });
 };
 </script>
+

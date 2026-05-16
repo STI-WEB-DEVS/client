@@ -1,28 +1,47 @@
 <template>
-  <div class="space-y-8">
-    <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-      <Heading
-        title="Admin Dashboard"
-        description="Welcome back! Here's a quick overview of your store's performance."
-      />
+  <div class="space-y-10 pb-10">
+    <div
+      class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
+    >
+      <div>
+        <h1 class="text-3xl font-black tracking-tight text-gray-900">
+          Dashboard
+        </h1>
+        <p class="mt-1 text-sm font-medium text-gray-400">
+          Detailed overview of your store's performance metrics.
+        </p>
+      </div>
 
       <!-- Date Filter -->
-      <div class="flex items-center gap-2">
-        <div class="flex flex-col gap-1">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">From</label>
+      <div
+        class="flex items-center gap-3 rounded-2xl bg-white p-2 shadow-sm ring-1 ring-gray-100"
+      >
+        <div
+          class="flex items-center gap-2 px-3 py-1.5 transition-colors hover:bg-gray-50 rounded-xl"
+        >
+          <label
+            class="text-[10px] font-black uppercase tracking-widest text-gray-400"
+            >From</label
+          >
           <input
             v-model="dateRange.from"
             type="date"
-            class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            class="bg-transparent text-sm font-bold text-gray-900 focus:outline-none"
             @change="fetchDashboardData"
           />
         </div>
-        <div class="flex flex-col gap-1">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">To</label>
+        <div class="h-6 w-px bg-gray-100"></div>
+        <div
+          class="flex items-center gap-2 px-3 py-1.5 transition-colors hover:bg-gray-50 rounded-xl"
+        >
+          <label
+            class="text-[10px] font-black uppercase tracking-widest text-gray-400"
+            >To</label
+          >
           <input
             v-model="dateRange.to"
             type="date"
-            class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            class="bg-transparent text-sm font-bold text-gray-900 focus:outline-none"
             @change="fetchDashboardData"
           />
         </div>
@@ -30,47 +49,91 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="pending" class="flex h-64 items-center justify-center">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-900 border-t-transparent"></div>
+    <div v-if="pending" class="flex h-96 items-center justify-center">
+      <div class="relative h-12 w-12">
+        <div
+          class="absolute inset-0 animate-ping rounded-full bg-indigo-100"
+        ></div>
+        <div
+          class="relative flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-100"
+        >
+          <div
+            class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
+          ></div>
+        </div>
+      </div>
     </div>
 
     <template v-else>
       <!-- Metrics Grid -->
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <DashboardCard
-          title="Total Revenue"
+          title="Revenue"
           :value="formatPrice(stats.total_revenue)"
           :icon="BanknotesIcon"
         />
         <DashboardCard
-          title="Total Customers"
+          title="Customers"
           :value="stats.customer_count"
           :icon="UsersIcon"
         />
         <DashboardCard
-          title="Total Orders"
+          title="Orders"
           :value="stats.order_count"
           :icon="ShoppingBagIcon"
         />
-
       </div>
 
-      <!-- Charts Section -->
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <ProductChart :products="stats.top_products" />
-        
+      <!-- Main Content Grid -->
+      <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <!-- Chart takes 2 columns -->
+        <div class="lg:col-span-2">
+          <ProductChart :products="stats.top_products" />
+        </div>
+
         <!-- Recent Orders Section -->
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-base font-semibold text-gray-900">Recent Orders</h3>
-            <NuxtLink to="/admin/orders" class="text-sm font-medium text-gray-600 hover:text-gray-900">View all</NuxtLink>
+        <div
+          class="flex flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+        >
+          <div class="mb-6 flex items-center justify-between">
+            <h3 class="text-base font-bold text-gray-900">Recent Orders</h3>
+            <NuxtLink
+              to="/admin/orders"
+              class="rounded-lg bg-gray-50 px-3 py-1 text-xs font-bold text-indigo-600 transition-colors hover:bg-indigo-50"
+              >View all</NuxtLink
+            >
           </div>
-          
-          <Table :columns="orderColumns" :rows="formattedOrders">
-            <template #cell(amount)="{ value }">
-              {{ formatPrice(value) }}
-            </template>
-          </Table>
+
+          <div class="flex-1 space-y-4">
+            <div
+              v-if="formattedOrders.length === 0"
+              class="flex h-full flex-col items-center justify-center py-10 text-center"
+            >
+              <div class="rounded-full bg-gray-50 p-3">
+                <ShoppingBagIcon class="h-6 w-6 text-gray-300" />
+              </div>
+              <p class="mt-2 text-sm font-medium text-gray-400">
+                No recent orders
+              </p>
+            </div>
+            <div v-else class="divide-y divide-gray-50">
+              <div
+                v-for="order in formattedOrders"
+                :key="order.id"
+                class="flex items-center justify-between py-3"
+              >
+                <div>
+                  <p class="text-sm font-bold text-gray-900">{{ order.id }}</p>
+                  <p class="text-xs font-medium text-gray-400">
+                    {{ order.customer }}
+                  </p>
+                </div>
+                <p class="text-sm font-black text-gray-900">
+                  {{ formatPrice(order.amount) }}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </template>
@@ -88,8 +151,10 @@ import { orderService } from "~/api/order/OrderService";
 
 // Date Range State
 const dateRange = ref({
-  from: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-  to: new Date().toISOString().split('T')[0],
+  from: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+    .toISOString()
+    .split("T")[0],
+  to: new Date().toISOString().split("T")[0],
 });
 
 // Stats State
@@ -107,7 +172,12 @@ const pending = ref(false);
 const orderColumns = [
   { key: "id", label: "Order ID", headerClass: "w-32" },
   { key: "customer", label: "Customer" },
-  { key: "amount", label: "Amount", align: "right" as const, headerClass: "w-32" },
+  {
+    key: "amount",
+    label: "Amount",
+    align: "right" as const,
+    headerClass: "w-32",
+  },
 ];
 
 const formattedOrders = computed(() => {
@@ -137,7 +207,6 @@ const fetchDashboardData = async () => {
 onMounted(() => {
   fetchDashboardData();
 });
-
 
 const { formatPrice } = useCurrency();
 
