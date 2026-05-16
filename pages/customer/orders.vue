@@ -110,7 +110,7 @@ const handleLogout = async () => {
             <td class="px-6 py-4">
               <div v-if="order.items && order.items.length" class="flex flex-col gap-1">
                 <span v-for="item in order.items" :key="item.product_uuid || item.id" class="text-xs text-gray-600">
-                  {{ item.product?.name || item.product_uuid || 'Product' }} × {{ item.quantity }}
+                  {{ item.product_name || item.product_uuid || 'Product' }} × {{ item.quantity }}
                 </span>
               </div>
               <span v-else class="text-xs text-gray-400">—</span>

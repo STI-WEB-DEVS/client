@@ -31,6 +31,10 @@ class OrderService extends BaseService {
     async listByCustomer(customerUuid: string, params: object = {}): Promise<any> {
         return await this.request(`/customers/orders/${customerUuid}`, 'GET', params);
     }
+
+    async summary(from: string, to: string): Promise<any> {
+        return await this.request('/order-summary', 'GET', { from, to });
+    }
 }
 
 export const orderService = OrderService.getInstance();

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useCart } from '~/composables/useCart'
+import { orderService } from '~/api/order/OrderService'
 
 definePageMeta({
   layout: 'customer'
@@ -13,7 +14,7 @@ const isPlacing = ref(false)
 const orderSuccess = ref(false)
 const orderError = ref('')
 
-const placeOrder = () => {
+const placeOrder = async () => {
   orderError.value = ''
 
   if (isEmpty.value) {
@@ -23,25 +24,21 @@ const placeOrder = () => {
 
   isPlacing.value = true
 
-  const payload = buildOrderPayload()
-
-  console.log('══════════════════════════════════════════')
-  console.log('📦 ORDER PAYLOAD (ready to POST /api/orders)')
-  console.log('══════════════════════════════════════════')
-  console.log(JSON.stringify(payload, null, 2))
-  console.log('══════════════════════════════════════════')
-
-  setTimeout(() => {
-    isPlacing.value = false
+  try {
+    const payload = buildOrderPayload()
+    await orderService.create(payload)
     orderSuccess.value = true
     clearCart()
-  }, 800)
+  } catch (err) {
+    orderError.value = err?.message || 'Failed to place order. Please try again.'
+  } finally {
+    isPlacing.value = false
+  }
 }
 
 const goToOrders = () => {
   navigateTo('/customer/orders')
-}
-</script>
+}</script>
 
 <template>
   <section class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
@@ -111,11 +108,6 @@ const goToOrders = () => {
               ₱{{ cartTotal.toLocaleString('en-PH', { minimumFractionDigits: 2 }) }}
             </span>
           </div>
-        </div>
-
-        <div class="mt-6 rounded-2xl border border-gray-200 bg-gray-900 p-6 shadow-sm">
-          <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Payload Preview (JSON)</p>
-          <pre class="overflow-x-auto text-sm leading-relaxed text-green-400"><code>{{ JSON.stringify(buildOrderPayload(), null, 2) }}</code></pre>
         </div>
 
         <div v-if="orderError" class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
