@@ -35,23 +35,23 @@ export class BaseService {
       localStorage.setItem(this.tokenStorageKey, token);
     }
 
-    const uuid =
-      response.uuid ||
-      response.data?.uuid ||
+    const customer_uuid =
+      response.customer_uuid ||
+      response.data?.customer_uuid ||
+      response.user?.customer_uuid ||
       response.user?.uuid ||
-      response.user?.id ||
-      response.user?.data?.uuid;
+      response.data?.user?.uuid;
 
-    if (typeof uuid === 'string' && uuid.trim()) {
-      localStorage.setItem('_uuid', uuid);
-      // console.log('[BaseService] saved _uuid:', uuid);
+    if (typeof customer_uuid === 'string' && customer_uuid.trim()) {
+      localStorage.setItem('_uuid', customer_uuid);
+      console.log('[BaseService] saved uuid as _uuid:', customer_uuid);
     }
 
     /**
      * Logic Fix: Only attempt to extract a role if a token or UUID is present.
      * This prevents warnings when fetching general data like product lists.
      */
-    if (token || uuid) {
+    if (token || customer_uuid) {
       let role: any;
       if (response.role != null) {
         role = response.role;

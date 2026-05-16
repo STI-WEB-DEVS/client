@@ -7,7 +7,7 @@ definePageMeta({
   role: 'customer' 
 })
 
-const { cart, getCartTotal, updateQuantity } = useCart()
+const { cart, getCartTotal, updateQuantity, clearCart } = useCart()
 const router = useRouter()
 
 const formatCurrency = (n) => new Intl.NumberFormat('en-PH', { 
@@ -16,38 +16,50 @@ const formatCurrency = (n) => new Intl.NumberFormat('en-PH', {
 }).format(n)
 
 /**
- * Requirement 4: On Place Order, build payload first then console.log(payload)
+ * Whiteboard Requirement: Call the orders (post) creation.
+ * Fixed: Added authorization headers to resolve the 401 error.
  */
-const handlePlaceOrder = () => {
-  // Requirement 4: Validate empty cart before checkout
+const handlePlaceOrder = async () => {
+  // Validate empty cart before checkout
   if (cart.value.length === 0) {
     alert("Error: Your cart is empty. Please add items before placing an order.")
     return
   }
 
   try {
-    // Requirement 3: Build specific payload structure
+    // 1. Build specific payload structure
     const payload = {
-      // Rule: customer_uuid must come from localStorage
       "customer_uuid": localStorage.getItem('_uuid'),
       "items": cart.value.map(item => ({
-        // Rule: product_uuid must come from selected cart items
         "product_uuid": item.product_uuid,
-        // Rule: quantity must come from cart quantity
         "quantity": item.quantity
       }))
     }
 
-    // Rule: Do NOT submit to API yet - console.log the JSON result
-    console.log("Generated Order Payload:", JSON.stringify(payload, null, 2))
+    // 2. Retrieve the auth token to pass the backend sanctum middleware security check
+    const token = localStorage.getItem('_token')
+
+    // 3. Submit to API with the required Authorization Bearer token
+    const response = await $fetch('http://127.0.0.1:8000/api/orders', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: payload
+    })
+
+    // 4. Show UI success message and handle clean up
+    alert("Success! Order payload has been generated, submitted, and logged.")
     
-    // Requirement 4: Show UI success message
-    alert("Success! Order payload has been generated and logged to the console.")
+    if (clearCart) clearCart()
+    router.push('/customer/order')
     
   } catch (err) {
-    // Requirement 4: Show UI error message
-    alert("An error occurred while preparing your order.")
-    console.error(err)
+    // Show UI error message if the server blocks or crashes
+    alert("An error occurred while submitting your order over the network.")
+    console.error("Network Error Details:", err)
   }
 }
 
@@ -70,7 +82,6 @@ const goBack = () => router.push('/customer/cart')
     </div>
 
     <div class="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:items-start">
-      <!-- Requirement 3: Order Summary Section -->
       <div class="lg:col-span-4">
         <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
           <h2 class="text-lg font-bold text-gray-900 mb-6">Order Summary</h2>
@@ -109,13 +120,12 @@ const goBack = () => router.push('/customer/cart')
         </div>
       </div>
 
-      <!-- Right Card: Details & Payload Instruction -->
       <div class="mt-8 lg:col-span-8 lg:mt-0">
         <div class="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm ring-1 ring-gray-900/5 h-full flex flex-col justify-between">
           <div>
             <h2 class="text-xl font-bold text-gray-900">Details</h2>
             <p class="mt-2 text-sm text-gray-500">
-              This will only generate the JSON payload and log it to the comsole.
+              This will fire an active HTTP POST request containing your credentials directly to your backend service.
             </p>
 
             <div class="mt-16">
