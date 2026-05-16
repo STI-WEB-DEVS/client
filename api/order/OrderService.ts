@@ -1,4 +1,4 @@
-import BaseService from "~/api/BaseService";
+import BaseService from '~/api/BaseService';
 
 class OrderService extends BaseService {
   private static instance: OrderService;
@@ -10,29 +10,26 @@ class OrderService extends BaseService {
     return OrderService.instance;
   }
 
-  private resource = "/orders";
+  private resource = '/orders';
 
   async list(params: object = {}): Promise<any> {
-    return await this.request(this.resource, "GET", params);
+    return await this.request(this.resource, 'GET', params);
   }
 
   async create(payload: object): Promise<any> {
-    return await this.request(this.resource, "POST", payload);
+    return await this.request(this.resource, 'POST', payload);
   }
 
   async show(uuid: string): Promise<any> {
-    return await this.request(`${this.resource}/${uuid}`, "GET");
-  }
-
-  async listByCustomer(customerUuid: string): Promise<any> {
-    return await this.request(
-      `${this.resource}/${customerUuid}/customers`,
-      "GET",
-    );
+    return await this.request(`${this.resource}/${uuid}`, 'GET');
   }
 
   async delete(uuid: string): Promise<any> {
-    return await this.request(`${this.resource}/${uuid}`, "DELETE");
+    return await this.request(`${this.resource}/${uuid}`, 'DELETE');
+  }
+
+  async listByCustomer(customerUuid: string, params: object = {}): Promise<any> {
+    return await this.request(`/customers/orders/${customerUuid}`, 'GET', params);
   }
 }
 

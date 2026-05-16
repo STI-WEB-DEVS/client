@@ -107,9 +107,17 @@
               </MenuButton>
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
-                  <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <button v-if="item.name === 'Sign out'" @click="handleSignOut" :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full text-left px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</button>
-                    <a v-else :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
+                  <MenuItem v-slot="{ active }">
+                    <a href="#" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">Your profile</a>
+                  </MenuItem>
+                  <MenuItem v-slot="{ active }">
+                    <button
+                      type="button"
+                      @click="handleLogout"
+                      :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full text-left px-3 py-1 text-sm/6 text-gray-900']"
+                    >
+                      Sign out
+                    </button>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -153,42 +161,32 @@ import {
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { AuthService } from '~/api/auth/AuthService'
 
 const route = useRoute()
+const router = useRouter()
 
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/admin/product', icon: CubeIcon },
-  // { name: 'Projects', href: '#', icon: FolderIcon },
-  // { name: 'Calendar', href: '#', icon: CalendarIcon },
-  // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
-  // { name: 'Reports', href: '#', icon: ChartPieIcon },
-]
-
-const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Products', href: '/admin/product', icon: FolderIcon },
 ]
 
 const sidebarOpen = ref(false)
 
-import { AuthService } from '~/api/auth/AuthService'
-import { navigateTo } from '#app'
-
 const authService = new AuthService()
 
-const handleSignOut = async () => {
+const handleLogout = async () => {
   try {
     await authService.logout()
-  } catch (error) {
-    console.error('Logout failed:', error)
-  } finally {
-    localStorage.removeItem('token')
-    localStorage.removeItem('uuid')
-    localStorage.removeItem('role')
+    // Only clear token if the backend successfully deleted it
+    authService.clearToken()
+    localStorage.removeItem('_role')
+    localStorage.removeItem('_uuid')
     await navigateTo('/')
+  } catch (err) {
+    console.error('Logout failed:', err)
   }
 }
 </script>

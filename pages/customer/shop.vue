@@ -1,176 +1,111 @@
-<script setup lang="ts">
-import { ref, onMounted, inject } from "vue";
-import { productsService } from "~/api/products/ProductsService";
+<script setup>
+import { ref, onMounted, inject } from 'vue'
+import { productService } from '~/api/product/ProductService'
+import { useCart } from '~/composables/useCart'
 
 definePageMeta({
-  layout: "customer",
-});
+  layout: 'customer'
+})
 
-const router = useRouter();
+const showToast = inject('showToast', () => {})
+const { addToCart } = useCart()
 
-const products = ref<any[]>([]);
-const loading = ref(true);
-const error = ref("");
-
-const showFeedback = inject<(msg: string) => void>("showFeedback");
-const updateCartCount = inject<() => void>("updateCartCount");
+const products = ref([])
+const isLoading = ref(true)
+const error = ref('')
 
 onMounted(async () => {
   try {
-    const response = await productsService.list();
-    // Handle paginated response
-    products.value = response?.data || response || [];
-  } catch (err: any) {
-    error.value = err.message || "Failed to load products";
+    const response = await productService.list()
+    // The API returns paginated data – handle both shapes
+    products.value = response?.data || response || []
+  } catch (err) {
+    error.value = err?.message || 'Failed to load products.'
   } finally {
-    loading.value = false;
+    isLoading.value = false
   }
-});
+})
 
-const addToCart = (product: any) => {
-  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+const handleAddToCart = (product) => {
+  addToCart(product, 1)
+  showToast(`Added "${product.name}" to cart!`)
+}
 
-  const existing = cart.find((i: any) => i.uuid === product.uuid);
-
-  if (existing) {
-    existing.quantity++;
-  } else {
-    cart.push({
-      uuid: product.uuid,
-      name: product.name,
-      price: product.price,
-      quantity: 1,
-    });
-  }
-
-  localStorage.setItem("cart", JSON.stringify(cart));
-  window.dispatchEvent(new Event("cart-updated"));
-
-  if (showFeedback) {
-    showFeedback(`"${product.name}" added to cart successfully!`);
-  }
-};
-
-const buyNow = (product: any) => {
-  // Clear cart and add only this product, then go to checkout
-  const cart = [
-    {
-      uuid: product.uuid,
-      name: product.name,
-      price: product.price,
-      quantity: 1,
-    },
-  ];
-
-  localStorage.setItem("cart", JSON.stringify(cart));
-  window.dispatchEvent(new Event("cart-updated"));
-
-  router.push("/customer/checkout");
-};
+const handleBuyNow = (product) => {
+  addToCart(product, 1)
+  navigateTo('/customer/checkout')
+}
 </script>
 
 <template>
-  <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-    <div class="mb-8">
-      <h2 class="text-2xl font-bold text-gray-900">Browse Products</h2>
-      <p class="mt-1 text-sm text-gray-500">
-        Select products to add to your cart or buy now.
-      </p>
+  <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-10">
+      <p class="text-sm font-semibold uppercase tracking-widest text-indigo-600">Browse</p>
+      <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Our Products</h1>
+      <p class="mt-2 text-base text-gray-500">Select products to add to your cart, or buy one right away.</p>
     </div>
 
-    <!-- LOADING STATE -->
-    <div v-if="loading" class="flex items-center justify-center py-20">
-      <div class="text-center">
-        <svg
-          class="mx-auto h-8 w-8 animate-spin text-indigo-600"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            class="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="4"
-          />
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-          />
+    <!-- Loading State -->
+    <div v-if="isLoading" class="flex items-center justify-center py-20">
+      <div class="flex flex-col items-center gap-4">
+        <svg class="h-10 w-10 animate-spin text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
-        <p class="mt-3 text-sm text-gray-500">Loading products...</p>
+        <span class="text-sm text-gray-500">Loading products…</span>
       </div>
     </div>
 
-    <!-- ERROR STATE -->
-    <div
-      v-else-if="error"
-      class="rounded-lg border border-red-200 bg-red-50 p-6 text-center"
-    >
-      <p class="text-sm text-red-600">{{ error }}</p>
+    <!-- Error State -->
+    <div v-else-if="error" class="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
+      <p class="text-sm font-medium text-red-700">{{ error }}</p>
     </div>
 
-    <!-- EMPTY STATE -->
-    <div
-      v-else-if="products.length === 0"
-      class="rounded-lg border border-gray-200 bg-white p-12 text-center"
-    >
-      <p class="text-gray-500">No products available at the moment.</p>
+    <!-- Empty State -->
+    <div v-else-if="products.length === 0" class="py-20 text-center">
+      <p class="text-4xl">📭</p>
+      <p class="mt-4 text-lg font-medium text-gray-700">No products available yet.</p>
+      <p class="mt-1 text-sm text-gray-500">Check back later for new arrivals!</p>
     </div>
 
-    <!-- PRODUCTS GRID -->
-    <div
-      v-else
-      class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-    >
+    <!-- Product Grid -->
+    <div v-else class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <div
         v-for="product in products"
         :key="product.uuid"
-        class="group rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+        class="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
       >
         <!-- Product Image Placeholder -->
-        <div
-          class="aspect-square rounded-lg bg-gray-100 flex items-center justify-center mb-4"
-        >
-          <svg
-            class="h-12 w-12 text-gray-300"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
-            />
-          </svg>
+        <div class="relative flex h-48 items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50">
+          <span class="text-6xl opacity-60 transition-transform duration-300 group-hover:scale-110">📦</span>
+          <div class="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-bold text-indigo-600 shadow-sm backdrop-blur">
+            ₱{{ Number(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 }) }}
+          </div>
         </div>
 
         <!-- Product Info -->
-        <h3 class="text-sm font-semibold text-gray-900">{{ product.name }}</h3>
-        <p class="mt-1 text-lg font-bold text-indigo-600">
-          ₱{{ Number(product.price).toFixed(2) }}
-        </p>
+        <div class="flex flex-1 flex-col gap-4 p-5">
+          <div>
+            <h3 class="text-base font-semibold text-gray-900">{{ product.name }}</h3>
+            <p class="mt-1 text-xs text-gray-400">UUID: {{ product.uuid?.slice(0, 8) }}…</p>
+          </div>
 
-        <!-- Action Buttons -->
-        <div class="mt-4 flex gap-2">
-          <button
-            @click="addToCart(product)"
-            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-          >
-            Add to Cart
-          </button>
-          <button
-            @click="buyNow(product)"
-            class="flex-1 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition"
-          >
-            Buy Now
-          </button>
+          <!-- Action Buttons -->
+          <div class="mt-auto flex gap-2">
+            <button
+              @click="handleAddToCart(product)"
+              class="flex-1 rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 active:bg-indigo-800"
+            >
+              Add to Cart
+            </button>
+            <button
+              @click="handleBuyNow(product)"
+              class="rounded-lg border border-gray-300 px-3 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-indigo-400 hover:text-indigo-600 active:bg-indigo-50"
+            >
+              Buy Now
+            </button>
+          </div>
         </div>
       </div>
     </div>
