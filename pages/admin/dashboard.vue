@@ -126,7 +126,6 @@
               :class="[day.amount > 0 ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'bg-gray-100']"
               :style="{ height: `${Math.min((day.amount / 5000) * 100, 100)}%` }">
 
-              <!-- Tooltip -->
               <div v-if="day.amount > 0"
                 class="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] font-bold py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 whitespace-nowrap transition-all shadow-xl z-20 pointer-events-none">
                 ₱{{ Number(day.amount).toLocaleString() }}
@@ -169,7 +168,6 @@ const weekStats = computed(() => {
   if (summary.value && summary.value.sales_history) {
     summary.value.sales_history.forEach(h => {
       const date = new Date(h.date);
-      // Use UTC to avoid timezone shifts if your server returns simple YYYY-MM-DD
       const dayIndex = new Date(h.date + 'T00:00:00').getDay();
       stats[dayIndex].amount += Number(h.amount);
     });
@@ -190,46 +188,7 @@ onMounted(() => {
   fetchSummary();
 })
 
-const mockSales = [
-  { amount: 12000, date: '2026-05-10' },
-  { amount: 19000, date: '2026-05-11' },
-  { amount: 3000, date: '2026-05-12' },
-  { amount: 5000, date: '2026-05-13' },
-  { amount: 2000, date: '2026-05-14' },
-  { amount: 3000, date: '2026-05-15' },
-  { amount: 9000, date: '2026-05-16' },
-];
 
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString(undefined, { weekday: 'short' });
-}
-
-const generatePath = (history) => {
-  // Use mock data if history is empty or short to show the "mountain" look
-  const data = (history && history.length > 2)
-    ? history.map(h => Number(h.amount))
-    : [30, 45, 35, 55, 40, 70, 50]; // Mock "mountain" peaks
-
-  const points = data.map((val, i) => ({
-    x: (i / (data.length - 1)) * 100,
-    y: 35 - (val / Math.max(...data, 100)) * 30
-  }));
-
-  let d = `M ${points[0].x} ${points[0].y}`;
-
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[i];
-    const p1 = points[i + 1];
-    // Smooth curves with tension
-    const cp1x = p0.x + (p1.x - p0.x) * 0.5;
-    d += ` C ${cp1x} ${p0.y}, ${cp1x} ${p1.y}, ${p1.x} ${p1.y}`;
-  }
-
-  // Close the path for fill
-  d += ` L 100 40 L 0 40 Z`;
-  return d;
-}
 import {
   Dialog,
   DialogPanel,
