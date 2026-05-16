@@ -148,9 +148,13 @@ const handleSubmit = async () => {
       localStorage.setItem("role", response.user.role);
     }
 
+    // Persist customer UUID if provided by the API (UserResource includes customer_uuid)
+    if (response?.user?.customer_uuid) {
+      localStorage.setItem("customer_uuid", response.user.customer_uuid);
+    }
+
     const role = (response?.user?.role || "").toString().toUpperCase();
     if (role === "CUSTOMER") {
-      localStorage.removeItem("customer_uuid");
       await navigateTo("/customer/order");
     } else {
       await navigateTo("/admin/dashboard");

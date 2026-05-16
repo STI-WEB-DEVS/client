@@ -3,6 +3,8 @@ definePageMeta({
   layout: "customer",
 });
 
+import { orderService } from "~/api/order/OrderService";
+
 const { cart, totalPrice, clear } = useCart();
 
 const alert = ref<{
@@ -12,7 +14,7 @@ const alert = ref<{
 
 const readCustomerUuid = () => {
   if (!process.client) return "";
-  return (localStorage.getItem("uuid") || "").trim();
+  return (localStorage.getItem("customer_uuid") || "").trim();
 };
 
 const buildPayload = () => {
@@ -28,22 +30,26 @@ const buildPayload = () => {
   }
 
   return {
-    customer_uuid: customerUuid,
+    customer_id: customerUuid,
     items: cart.value.map((i) => ({
-      product_uuid: i.uuid,
+      product_id: i.uuid,
       quantity: i.quantity,
     })),
   };
 };
 
-const placeOrder = () => {
+const placeOrder = async () => {
   alert.value = null;
 
   try {
     const payload = buildPayload();
-    console.log(payload);
+    // Send to API
+    const response = await orderService.create(payload);
+    console.log("Order created response:", response);
+    alert.value = { variant: "success", message: "Order placed successfully." };
     clear();
   } catch (e: any) {
+    console.error("Order create error:", e);
     alert.value = {
       variant: "error",
       message: e?.message || "Unable to place order.",
@@ -149,7 +155,9 @@ const formatMoney = (value: number) => {
           </div>
 
           <div class="border-t border-gray-200 pt-4">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div
+              class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+            >
               <p class="text-3xl font-bold tracking-tight text-gray-900">
                 {{ formatMoney(totalPrice) }}
               </p>
