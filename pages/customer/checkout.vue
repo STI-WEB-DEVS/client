@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useCartStore } from '~/stores/cart'
 import { useOrdersStore } from '~/stores/order'   
+import { useOrderStore } from '~/stores/orderEvents'
 import { useRoute } from 'vue-router'
 import { CheckCircleIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
 
@@ -10,6 +11,7 @@ definePageMeta({ layout: 'customer' })
 const route = useRoute()
 const cart = useCartStore()
 const ordersStore = useOrdersStore()
+const orderEventStore = useOrderStore()
 
 // Direct purchase query params
 const directUuid = route.query.direct_uuid as string
@@ -88,6 +90,9 @@ async function placeOrder() {
       orderItems.value,
       totalPrice.value
     )
+
+    // Notify dashboard of order completion
+    orderEventStore.notifyOrderCompleted()
 
     if (!isDirectBuy) {
       cart.clearCart()
