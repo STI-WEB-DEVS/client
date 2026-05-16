@@ -9,4 +9,7 @@
 definePageMeta({
   layout: 'default'
 })
+
+// Redirect to admin dashboard
+navigateTo('/admin/dashboard');
 </script>

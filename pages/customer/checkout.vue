@@ -36,7 +36,8 @@ const removeItem = (item) => {
 
 const placeOrder = () => {
   // Get customer UUID from localStorage
-  const customerUuid = localStorage.getItem('uuid');
+  // The user uuid is stored as 'uuid', but we also need the actual customer uuid
+  const customerUuid = localStorage.getItem('customer_uuid') || localStorage.getItem('uuid');
 
   if (!customerUuid) {
     alert('Customer UUID not found. Please log in again.');
@@ -76,16 +77,25 @@ const closeOrderSummary = () => {
   showOrderSummary.value = false;
 };
 
-const confirmOrder = () => {
-  // Clear cart after order
-  cart.value = [];
-  showOrderSummary.value = false;
-  
-  // Show success message
-  alert('Order placed successfully! (Payload logged to console)');
-  
-  // Redirect to orders page
-  navigateTo('/customer/orders');
+import BaseService from '~/api/BaseService';
+
+const confirmOrder = async () => {
+  try {
+    const api = new BaseService();
+    await api.request('/orders', 'POST', orderPayload.value);
+
+    // Clear cart after order
+    cart.value = [];
+    showOrderSummary.value = false;
+    
+    // Show success message
+    alert('Order placed successfully!');
+    
+    // Redirect to orders page
+    navigateTo('/customer/orders');
+  } catch (error) {
+    alert('Failed to place order: ' + (error.message || 'Unknown error'));
+  }
 };
 </script>
 

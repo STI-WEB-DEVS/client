@@ -174,7 +174,7 @@ const handleSignOut = async () => {
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
   { name: 'Products', href: '/admin/product', icon: ShoppingBagIcon},
   // { name: 'Calendar', href: '#', icon: CalendarIcon },

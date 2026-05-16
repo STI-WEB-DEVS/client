@@ -38,6 +38,9 @@ class AuthService extends BaseService {
     localStorage.setItem('_token', response.token);
     localStorage.setItem('uuid', response.user.uuid);
     localStorage.setItem('role', response.user.role);
+    if ((response.user as any).customer_uuid) {
+      localStorage.setItem('customer_uuid', (response.user as any).customer_uuid);
+    }
 
     return response;
   }
