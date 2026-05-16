@@ -47,7 +47,7 @@ export class CartService {
             this._items.value.push({
                 ...product,
                 quantity: 1,
-                selected: true // Default to selected
+                selected: true
             });
         }
         this.save();

@@ -141,7 +141,7 @@
         </div>
       </div>
 
-      <main class="py-10">
+      <main class="py-10 bg-gray-100 min-h-screen">
         <div class="px-4 sm:px-6 lg:px-8">
           <slot></slot>
         </div>
