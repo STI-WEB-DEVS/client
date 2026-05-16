@@ -188,27 +188,31 @@ const placeOrder = async () => {
     return
   }
 
-  // Build items array with integer product IDs
+  // Build items array with product_uuid and unit_price
   const items = []
+  let totalAmount = 0
+  
   for (const item of cartItems.value) {
-    // Get product_id (integer) from localStorage or product data
-    const productId = localStorage.getItem(`product_id_${item.product_uuid}`) || item.product_id
-    
-    if (!productId) {
-      console.error('Missing product_id for:', item.name)
-      alert(`Missing product ID for ${item.name}. Please refresh and try again.`)
+    if (!item.product_uuid) {
+      console.error('Missing product_uuid for:', item.name)
+      alert(`Missing product UUID for ${item.name}. Please refresh and try again.`)
       return
     }
     
+    const itemTotal = item.price * item.quantity
+    totalAmount += itemTotal
+    
     items.push({
-      product_id: Number(productId),
-      quantity: item.quantity
+      product_uuid: item.product_uuid,
+      quantity: item.quantity,
+      unit_price: item.price
     })
   }
 
   // Build correct payload
   const payload = {
     customer_id: Number(customerId),
+    total_amount: totalAmount,
     items: items
   }
 

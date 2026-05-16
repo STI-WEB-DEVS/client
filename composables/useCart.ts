@@ -66,10 +66,9 @@ export const useCart = () => {
             console.log('Updated existing. New quantity:', cartItemsRef.value[existingIndex].quantity)
             showNotification(`Updated ${product.name} to ${cartItemsRef.value[existingIndex].quantity}`, 'success')
         } else {
-            // Add new item with both UUID and integer ID
+            // Add new item with UUID for API
             const newItem = {
                 product_uuid: product.uuid,
-                product_id: product.id,  // Store integer ID for API
                 name: product.name,
                 price: product.price,
                 quantity: quantity,
@@ -77,7 +76,7 @@ export const useCart = () => {
             }
             cartItemsRef.value.push(newItem)
             console.log('Added new. Total items now:', cartItemsRef.value.length)
-            console.log('Stored with product_id:', newItem.product_id)
+            console.log('Stored with product_uuid:', newItem.product_uuid)
             showNotification(`Added ${product.name} to cart!`, 'success')
         }
         
