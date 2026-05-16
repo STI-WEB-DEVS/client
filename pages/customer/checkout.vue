@@ -165,20 +165,19 @@ const placeOrder = async () => {
   isLoading.value = true;
 
   try {
-    const customerUUID = localStorage.getItem('_customer_uuid');
+const customerId = localStorage.getItem('_customer_id');
 
-    if (!customerUUID) {
-      throw new Error('No customer UUID found in localStorage. Please log in again.');
-    }
+if (!customerId) {
+  throw new Error('No customer ID found in localStorage. Please log in again.');
+}
 
-    // ✅ Build payload with items array using product_uuid
-    const payload = {
-      customer_id: customerUUID, // repository resolves this UUID to customer
-      items: cart.value.map(item => ({
-        product_uuid: item.uuid,   // use UUID instead of numeric id
-        quantity: item.quantity,
-      })),
-    };
+const payload = {
+  customer_id: Number(customerId),
+  items: cart.value.map((item: any) => ({
+    product_uuid: item.uuid,
+    quantity: Number(item.quantity),
+  })),
+};
 
     console.log('Sending payload:', payload);
 
