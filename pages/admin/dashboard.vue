@@ -39,7 +39,7 @@
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <DashboardCard
           title="Total Revenue"
-          :value="formatCurrency(stats.total_revenue)"
+          :value="formatPrice(stats.total_revenue)"
           :icon="BanknotesIcon"
         />
         <DashboardCard
@@ -48,10 +48,11 @@
           :icon="UsersIcon"
         />
         <DashboardCard
-          title="Active Orders"
-          :value="stats.recent_orders.length"
+          title="Total Orders"
+          :value="stats.order_count"
           :icon="ShoppingBagIcon"
         />
+
       </div>
 
       <!-- Charts Section -->
@@ -67,7 +68,7 @@
           
           <Table :columns="orderColumns" :rows="formattedOrders">
             <template #cell(amount)="{ value }">
-              {{ formatCurrency(value) }}
+              {{ formatPrice(value) }}
             </template>
           </Table>
         </div>
@@ -83,6 +84,7 @@ import {
   UsersIcon,
   ShoppingBagIcon,
 } from "@heroicons/vue/24/outline";
+import { orderService } from "~/api/order/OrderService";
 
 // Date Range State
 const dateRange = ref({
@@ -94,9 +96,11 @@ const dateRange = ref({
 const stats = ref({
   total_revenue: 0,
   customer_count: 0,
+  order_count: 0,
   top_products: [],
   recent_orders: [],
 });
+
 const pending = ref(false);
 
 // Table Config
@@ -118,16 +122,11 @@ const formattedOrders = computed(() => {
 const fetchDashboardData = async () => {
   pending.value = true;
   try {
-    const data = await $fetch('/api/orders/summary', {
-      params: {
-        from: dateRange.value.from,
-        to: dateRange.value.to,
-      },
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('_token')}`,
-      }
+    const data = await orderService.summary({
+      from: dateRange.value.from,
+      to: dateRange.value.to,
     });
-    stats.value = data;
+    stats.value = data.data || data;
   } catch (error) {
     console.error("Failed to fetch dashboard data:", error);
   } finally {
@@ -139,10 +138,15 @@ onMounted(() => {
   fetchDashboardData();
 });
 
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(value);
+
+const { formatPrice } = useCurrency();
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return "-";
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 };
 </script>

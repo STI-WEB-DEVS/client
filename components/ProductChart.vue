@@ -10,8 +10,9 @@
         <div
           v-for="(product, index) in products"
           :key="index"
-          class="group relative flex flex-1 flex-col items-center"
+          class="group relative flex h-full flex-1 flex-col items-center justify-end"
         >
+
           <!-- Tooltip -->
           <div
             class="absolute -top-10 z-10 hidden rounded bg-gray-900 px-2 py-1 text-[10px] font-medium text-white group-hover:block"
@@ -21,8 +22,9 @@
 
           <!-- Bar -->
           <div
-            class="w-full max-w-[40px] rounded-t-lg bg-gray-900 transition-all duration-500 ease-out group-hover:bg-gray-700"
-            :style="{ height: (product.total_purchased / maxPurchased) * 100 + '%' }"
+            class="w-full max-w-[40px] rounded-t-lg transition-all duration-500 ease-out"
+            :class="colors[index % colors.length]"
+            :style="{ height: (Number(product.total_purchased) / maxPurchased) * 100 + '%' }"
           ></div>
 
           <!-- Label -->
@@ -54,8 +56,16 @@ const props = defineProps<{
   products: Product[];
 }>();
 
+const colors = [
+  'bg-indigo-500 hover:bg-indigo-600',
+  'bg-emerald-500 hover:bg-emerald-600',
+  'bg-amber-500 hover:bg-amber-600',
+  'bg-rose-500 hover:bg-rose-600',
+  'bg-sky-500 hover:bg-sky-600',
+];
+
 const maxPurchased = computed(() => {
-  const max = Math.max(...props.products.map(p => p.total_purchased));
+  const max = Math.max(...props.products.map(p => Number(p.total_purchased)));
   return max > 0 ? max : 1;
 });
 </script>

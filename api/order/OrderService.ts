@@ -35,6 +35,11 @@ class OrderService extends BaseService {
     async restore(uuid: string): Promise<any> {
         return await this.request(`${this.resource}/${uuid}/restore`, 'POST');
     }
+
+    async summary(params: { from?: string; to?: string } = {}): Promise<any> {
+        return await this.request(`${this.resource}/summary`, 'GET', params);
+    }
 }
+
 
 export const orderService = OrderService.getInstance();
