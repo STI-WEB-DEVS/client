@@ -30,7 +30,7 @@ export class BaseService {
       // 3. Automatically save the token if this was a login/auth request
       // Assuming your API returns the token in a field called 'token' or 'access_token'
       if ((url.includes('login') || url.includes('register')) && (response as any).token) {
-        localStorage.setItem('auth_token', (response as any).token);
+        localStorage.setItem('_token', (response as any).token);
       }
 
       return response;
@@ -44,9 +44,10 @@ export class BaseService {
       // 4. Automatically clear the key if the token is expired/unauthorized (401)
       if (status === 401) {
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('token');
-          localStorage.removeItem('uuid');
-          localStorage.removeItem('role');
+          localStorage.removeItem('_token');
+          localStorage.removeItem('_uuid');
+          localStorage.removeItem('_role');
+          localStorage.removeItem('_customer_uuid');
         }
         throw new Error("Unauthenticated");
       }
