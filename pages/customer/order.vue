@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import BaseService from '~/api/BaseService'
 
 definePageMeta({
   layout: 'customer'
@@ -7,13 +8,15 @@ definePageMeta({
 
 const orders = ref([])
 const pending = ref(true)
+const baseService = new BaseService()
 
 const fetchOrders = async () => {
   pending.value = true
   try {
-    orders.value = []
-  } catch (error) {
-    console.error('Error fetching orders:', error)
+      const customerId = localStorage.getItem('customer_id')
+      const customerUuid = localStorage.getItem('customer_uuid') || localStorage.getItem('user_uuid')
+      const query = customerId ? `customer_id=${customerId}` : `customer_uuid=${customerUuid}`
+      const response = await baseService.request(`/orders?${query}`, 'GET')
   } finally {
     pending.value = false
   }
@@ -21,6 +24,14 @@ const fetchOrders = async () => {
 
 const formatPrice = (price) => {
   return price.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+const formatDate = (value) => {
+  if (!value) return ''
+  return new Date(value).toLocaleString('en-PH', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
 }
 
 onMounted(() => {

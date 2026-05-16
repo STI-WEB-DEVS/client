@@ -130,6 +130,8 @@ const handleSubmit = async () => {
     
     if (response?.user) {
       localStorage.setItem('user_uuid', response.user.uuid);
+      localStorage.setItem('customer_id', response.user.customer_id ? String(response.user.customer_id) : '');
+      localStorage.setItem('customer_uuid', response.user.customer_uuid || '');
       localStorage.setItem('user_role', response.user.role || 'customer');
     }
 

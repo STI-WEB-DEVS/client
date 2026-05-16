@@ -53,9 +53,11 @@ export const useCart = () => {
     const addItem = (product, quantity = 1) => {
         console.log('=== ADDING ITEM ===')
         console.log('Product:', product.name)
+        console.log('Product ID (integer):', product.id)
+        console.log('Product UUID:', product.uuid)
         console.log('Current cart before:', [...cartItemsRef.value])
         
-        // Check if product exists
+        // Check if product exists by UUID
         const existingIndex = cartItemsRef.value.findIndex(item => item.product_uuid === product.uuid)
         
         if (existingIndex !== -1) {
@@ -64,9 +66,10 @@ export const useCart = () => {
             console.log('Updated existing. New quantity:', cartItemsRef.value[existingIndex].quantity)
             showNotification(`Updated ${product.name} to ${cartItemsRef.value[existingIndex].quantity}`, 'success')
         } else {
-            // Add new
+            // Add new item with both UUID and integer ID
             const newItem = {
                 product_uuid: product.uuid,
+                product_id: product.id,  // Store integer ID for API
                 name: product.name,
                 price: product.price,
                 quantity: quantity,
@@ -74,13 +77,14 @@ export const useCart = () => {
             }
             cartItemsRef.value.push(newItem)
             console.log('Added new. Total items now:', cartItemsRef.value.length)
+            console.log('Stored with product_id:', newItem.product_id)
             showNotification(`Added ${product.name} to cart!`, 'success')
         }
         
         // Force reactivity by creating a new reference
         cartItemsRef.value = [...cartItemsRef.value]
         
-        console.log('Cart after add:', cartItemsRef.value.map(i => `${i.name} (${i.quantity})`))
+        console.log('Cart after add:', cartItemsRef.value.map(i => `${i.name} (ID: ${i.product_id}, Qty: ${i.quantity})`))
         saveCart()
         
         return true

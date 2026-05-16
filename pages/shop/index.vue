@@ -75,6 +75,7 @@ const addToCart = (product) => {
   console.log('Current cart before add:', cartItems.value.map(i => i.name))
   
   addItem({ 
+    id: product.id,
     uuid: product.uuid, 
     name: product.name, 
     price: Number(product.price) 
@@ -87,6 +88,7 @@ const buyNow = (product) => {
   console.log('Buy now:', product.name)
   clearCart()
   addItem({ 
+    id: product.id,
     uuid: product.uuid, 
     name: product.name, 
     price: Number(product.price) 

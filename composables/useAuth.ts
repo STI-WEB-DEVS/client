@@ -13,11 +13,12 @@ export const useAuth = () => {
       localStorage.setItem(tokenKey, token)
       if (userData) {
         localStorage.setItem(userKey, JSON.stringify(userData))
-      }
-    }
-  
-    const getUser = (): any | null => {
-      if (typeof window === 'undefined') return null
+        if (userData.customer_id !== undefined) {
+          localStorage.setItem('customer_id', String(userData.customer_id))
+        }
+        if (userData.customer_uuid) {
+          localStorage.setItem('customer_uuid', userData.customer_uuid)
+        }
       const userStr = localStorage.getItem(userKey)
       return userStr ? JSON.parse(userStr) : null
     }
@@ -39,6 +40,8 @@ export const useAuth = () => {
       if (typeof window === 'undefined') return
       localStorage.removeItem(tokenKey)
       localStorage.removeItem(userKey)
+      localStorage.removeItem('customer_id')
+      localStorage.removeItem('customer_uuid')
     }
   
     return {

@@ -23,6 +23,8 @@ export class AuthService {
             
             if (data.user) {
                 localStorage.setItem('user_uuid', data.user.uuid);
+                localStorage.setItem('customer_id', data.user.customer_id ? String(data.user.customer_id) : '');
+                localStorage.setItem('customer_uuid', data.user.customer_uuid || '');
                 localStorage.setItem('user_role', data.user.role || 'customer');
             }
             
@@ -38,6 +40,8 @@ export class AuthService {
         // Clear everything regardless of API call outcome
         localStorage.removeItem('_token');
         localStorage.removeItem('user_uuid');  
+        localStorage.removeItem('customer_id');
+        localStorage.removeItem('customer_uuid');
         localStorage.removeItem('user_role');  
         
         if (!token) {
@@ -71,6 +75,10 @@ export class AuthService {
 
     getUserRole(): string | null {
         return localStorage.getItem('user_role');
+    }
+
+    getCustomerId(): string | null {
+        return localStorage.getItem('customer_id');
     }
 
     isAuthenticated(): boolean {

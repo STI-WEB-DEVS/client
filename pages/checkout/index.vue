@@ -50,7 +50,7 @@
                       class="text-red-600 hover:text-red-800 text-sm"
                     >Remove</button>
                   </td>
-                </tr>
+                 </tr>
                 <tr v-if="cartItems.length === 0">
                   <td colspan="5" class="px-6 py-16 text-center">
                     <p class="text-gray-500">Your cart is empty</p>
@@ -58,7 +58,7 @@
                       Continue Shopping
                     </NuxtLink>
                   </td>
-                </tr>
+                 </tr>
               </tbody>
             </table>
           </div>
@@ -134,10 +134,17 @@
             <h3 class="text-lg font-semibold text-white">Order Payload</h3>
           </div>
           <div class="p-6">
-            <pre class="max-h-96 overflow-auto bg-gray-900 p-4 rounded text-sm text-green-400">{{ JSON.stringify(payloadData, null, 2) }}</pre>
+            <div class="mb-4">
+              <h4 class="text-sm font-semibold text-gray-700 mb-2">Request Payload</h4>
+              <pre class="max-h-64 overflow-auto bg-gray-900 p-4 rounded text-sm text-green-400">{{ JSON.stringify(payloadData, null, 2) }}</pre>
+            </div>
+            <div v-if="responseData" class="mb-4">
+              <h4 class="text-sm font-semibold text-gray-700 mb-2">Response</h4>
+              <pre class="max-h-64 overflow-auto bg-gray-900 p-4 rounded text-sm text-blue-300">{{ JSON.stringify(responseData, null, 2) }}</pre>
+            </div>
             <div class="mt-6 flex justify-end gap-3">
-              <button @click="showPayloadModal = false" class="px-4 py-2 border rounded-md">Close</button>
-              <button @click="copyToClipboard" class="px-4 py-2 bg-blue-600 text-white rounded-md">Copy JSON</button>
+              <button @click="showPayloadModal = false" class="px-4 py-2 border rounded-md hover:bg-gray-100">Close</button>
+              <button @click="copyToClipboard" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Copy JSON</button>
             </div>
           </div>
         </div>
@@ -148,9 +155,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import BaseService from '~/api/BaseService'
 import { useCart } from '~/composables/useCart'
 
 definePageMeta({ layout: 'customer' })
+
+const baseService = new BaseService()
 
 const { 
   cartItems, 
@@ -165,29 +175,62 @@ const {
 
 const showPayloadModal = ref(false)
 const payloadData = ref(null)
+const responseData = ref(null)
 
 const formatPrice = (price) => price.toLocaleString('en-PH', { minimumFractionDigits: 2 })
 
-const placeOrder = () => {
-  const customerUuid = localStorage.getItem('user_uuid')
+const placeOrder = async () => {
+  // Get customer ID from localStorage (should be integer)
+  const customerId = localStorage.getItem('customer_id')
   
-  const payload = {
-    customer_uuid: customerUuid,
-    order_date: new Date().toISOString(),
-    total_items: totalItems.value,
-    total_amount: totalPrice.value,
-    items: cartItems.value.map(item => ({
-      product_uuid: item.product_uuid,
-      product_name: item.name,
-      quantity: item.quantity,
-      unit_price: item.price,
-      subtotal: item.price * item.quantity
-    }))
+  if (!customerId) {
+    alert('Unable to place order. Please sign in again.')
+    return
   }
-  
+
+  // Build items array with integer product IDs
+  const items = []
+  for (const item of cartItems.value) {
+    // Get product_id (integer) from localStorage or product data
+    const productId = localStorage.getItem(`product_id_${item.product_uuid}`) || item.product_id
+    
+    if (!productId) {
+      console.error('Missing product_id for:', item.name)
+      alert(`Missing product ID for ${item.name}. Please refresh and try again.`)
+      return
+    }
+    
+    items.push({
+      product_id: Number(productId),
+      quantity: item.quantity
+    })
+  }
+
+  // Build correct payload
+  const payload = {
+    customer_id: Number(customerId),
+    items: items
+  }
+
+  console.log('Sending payload:', payload)
   payloadData.value = payload
-  console.log('Order Payload:', JSON.stringify(payload, null, 2))
-  showPayloadModal.value = true
+
+  try {
+    const response = await baseService.request('/orders', 'POST', payload)
+    responseData.value = response
+    console.log('Order Response:', response)
+    
+    // Show success message
+    alert(`Order placed successfully! Order ID: ${response.data?.id || 'N/A'}`)
+    showPayloadModal.value = true
+    
+    // Clear cart after successful order
+    clearCart()
+    
+  } catch (error) {
+    console.error('Order creation failed:', error)
+    alert(error.message || 'Failed to place order. Please try again.')
+  }
 }
 
 const copyToClipboard = () => {

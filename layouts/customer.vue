@@ -137,6 +137,8 @@ const handleLogout = async () => {
     // 4. Double clear all auth data
     localStorage.removeItem('_token')
     localStorage.removeItem('user_uuid')
+    localStorage.removeItem('customer_id')
+    localStorage.removeItem('customer_uuid')
     localStorage.removeItem('user_role')
     
     // 5. Verify cart is cleared
