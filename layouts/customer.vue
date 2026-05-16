@@ -77,7 +77,11 @@
             </div>
 
             <div class="rounded-2xl bg-gray-200 p-8">
-              <div class="aspect-[4/3] rounded-xl bg-gray-300" />
+              <img
+                src="https://contents.pep.ph/images2/inset/1465915687-Jose-Manalo-fall.jpg"
+                alt="jose"
+                class="aspect-[4/3] w-full rounded-xl object-cover"
+              />
             </div>
           </div>
         </div>
