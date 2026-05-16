@@ -2,7 +2,10 @@ export interface LoginResponse {
   token: string;
   user: {
     uuid: string;
+    customer_uuid?: string;
     role: string;
+    name?: string;
+    email?: string;
   };
 }
 

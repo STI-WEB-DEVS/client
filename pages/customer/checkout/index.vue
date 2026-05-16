@@ -128,6 +128,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useCart } from '~/composables/useCart'
+import { orderService } from '~/api/order/OrderService'
 
 definePageMeta({
   layout: 'customer'
@@ -154,14 +155,15 @@ const totalQuantity = computed(() => {
 
 // User Context
 const userUuid = computed(() => process.client ? (localStorage.getItem('_uuid') || '') : '')
+const customerUuid = computed(() => process.client ? (localStorage.getItem('_customer_uuid') || '') : '')
 const userName = computed(() => process.client ? (localStorage.getItem('_name') || '') : '')
 const userEmail = computed(() => process.client ? (localStorage.getItem('_email') || '') : '')
 
 // Payload Generation
 const orderPayload = computed(() => {
-  if (!userUuid.value) return null
+  if (!customerUuid.value) return null
   return {
-    customer_uuid: userUuid.value,
+    customer_uuid: customerUuid.value,
     items: activeItems.value.map(item => ({
       product_uuid: item.product_uuid,
       quantity: item.quantity
@@ -186,13 +188,11 @@ const handlePlaceOrder = async () => {
   try {
     const payload = orderPayload.value
 
-    console.log('%c=== POST /api/orders PAYLOAD ===', 'color: #10b981; font-weight: bold; font-size: 14px;')
-    console.log(JSON.stringify(payload, null, 2))
-    console.table(payload?.items)
-    console.log('%c================================', 'color: #10b981; font-weight: bold;')
+    if (!payload) {
+      throw new Error("Payload is missing.")
+    }
 
-    // Simulate API delay
-    await new Promise(r => setTimeout(r, 800))
+    await orderService.create(payload)
 
     orderPlaced.value = true
     

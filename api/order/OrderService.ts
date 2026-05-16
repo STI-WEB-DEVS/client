@@ -24,6 +24,10 @@ class OrderService extends BaseService {
         return await this.request(`${this.resource}/${uuid}`, 'GET');
     }
 
+    async summary(params: { from: string, to: string }): Promise<any> {
+        return await this.request(`${this.resource}/summary`, 'GET', params);
+    }
+
     async listByCustomer(customerUuid: string, params: object = {}): Promise<any> {
         return await this.request(`/customers/orders/${customerUuid}`, 'GET', params);
     }
