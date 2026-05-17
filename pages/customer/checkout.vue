@@ -117,10 +117,7 @@ const goToOrders = () => {
           </div>
         </div>
 
-        <div class="mt-6 rounded-2xl border border-gray-200 bg-gray-900 p-6 shadow-sm">
-          <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Payload Preview (JSON)</p>
-          <pre class="overflow-x-auto text-sm leading-relaxed text-green-400"><code>{{ JSON.stringify(buildOrderPayload(), null, 2) }}</code></pre>
-        </div>
+
 
         <div v-if="orderError" class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
           {{ orderError }}

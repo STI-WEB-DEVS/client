@@ -171,6 +171,7 @@ const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
   { name: 'Products', href: '/admin/product', icon: FolderIcon },
+  { name: 'Order Summary', href: '/admin/order/summary', icon: ChartPieIcon },
 ]
 
 const sidebarOpen = ref(false)

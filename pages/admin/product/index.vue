@@ -120,7 +120,7 @@
         :open="showFormModal"
         :entityName="'Product'"
         :fields="fields"
-        :service="productService"
+        :service="productsService"
         :initialData="editingEntity"
         :isEdit="!!editingEntity"
         :uuid="editingEntity?.uuid"
@@ -158,7 +158,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline';
-import { productService } from '~/api/product/ProductService';
+import { productsService } from '~/api/products/ProductsService';
 import FeedbackModal from '~/components/FeedbackModal.vue';
 import CrudFormModal from '~/components/CrudFormModal.vue';
 import ConfirmModal from '~/components/ConfirmModal.vue';
@@ -192,7 +192,7 @@ const fetchProducts = async () => {
   pending.value = true;
   error.value = null;
   try {
-    products.value = await productService.list();
+    products.value = await productsService.list();
   } catch (err: any) {
     error.value = err;
   } finally {
@@ -259,7 +259,7 @@ const confirmDelete = async () => {
   if (!deletingEntity.value) return;
   deleteLoading.value = true;
   try {
-    await productService.delete(deletingEntity.value.uuid);
+    await productsService.delete(deletingEntity.value.uuid);
     closeConfirmModal();
     openFeedbackModal('Product deleted successfully!', 'success');
     fetchProducts();
