@@ -56,7 +56,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
-import { productService } from '~/api/product/ProductService';
+import { productsService } from '~/api/product/ProductsService';
 
 const route = useRoute();
 const router = useRouter();
@@ -69,7 +69,7 @@ const loading = ref(false);
 onMounted(async () => {
   loading.value = true;
   try {
-    const response = await productService.show(uuid.value);
+    const response = await productsService.show(uuid.value);
     product.value = response.data || response;
   } catch (err) {
     console.error('Failed to fetch product', err);

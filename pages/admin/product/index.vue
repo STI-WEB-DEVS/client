@@ -48,7 +48,7 @@
 
             <tbody class="divide-y divide-gray-100 bg-white">
               <tr
-                v-for="product in products?.data"
+                v-for="product in products"
                 :key="product.uuid"
                 class="transition hover:bg-gray-50"
               >
@@ -93,7 +93,7 @@
                 </td>
               </tr>
 
-              <tr v-if="!products?.data?.length">
+              <tr v-if="!products.length">
                 <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
                   No products found.
                 </td>
@@ -105,11 +105,11 @@
         <div class="border-t border-gray-200 bg-gray-50 px-6 py-4">
           <p class="text-sm text-gray-500">
             Showing
-            <span class="font-medium text-gray-900">{{ products?.meta?.from ?? 0 }}</span>
+            <span class="font-medium text-gray-900">{{ productsMeta.from ?? 0 }}</span>
             to
-            <span class="font-medium text-gray-900">{{ products?.meta?.to ?? 0 }}</span>
+            <span class="font-medium text-gray-900">{{ productsMeta.to ?? 0 }}</span>
             of
-            <span class="font-medium text-gray-900">{{ products?.meta?.total ?? 0 }}</span>
+            <span class="font-medium text-gray-900">{{ productsMeta.total ?? 0 }}</span>
             products
           </p>
         </div>
@@ -120,7 +120,7 @@
         :open="showFormModal"
         :entityName="'Product'"
         :fields="fields"
-        :service="productService"
+        :service="productsService"
         :initialData="editingEntity"
         :isEdit="!!editingEntity"
         :uuid="editingEntity?.uuid"
@@ -158,14 +158,15 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline';
-import { productService } from '~/api/product/ProductService';
+import { productsService } from '~/api/product/ProductsService';
 import FeedbackModal from '~/components/FeedbackModal.vue';
 import CrudFormModal from '~/components/CrudFormModal.vue';
 import ConfirmModal from '~/components/ConfirmModal.vue';
 
 const router = useRouter();
 
-const products = ref<any>(null);
+const products = ref<any[]>([]);
+const productsMeta = ref<any>({});
 const pending = ref(true);
 const error = ref<any>(null);
 
@@ -192,7 +193,14 @@ const fetchProducts = async () => {
   pending.value = true;
   error.value = null;
   try {
-    products.value = await productService.list();
+    const response = await productsService.list();
+    if (response?.data) {
+      products.value = response.data;
+      productsMeta.value = response.meta ?? {};
+    } else {
+      products.value = response || [];
+      productsMeta.value = {};
+    }
   } catch (err: any) {
     error.value = err;
   } finally {
@@ -259,7 +267,7 @@ const confirmDelete = async () => {
   if (!deletingEntity.value) return;
   deleteLoading.value = true;
   try {
-    await productService.delete(deletingEntity.value.uuid);
+    await productsService.delete(deletingEntity.value.uuid);
     closeConfirmModal();
     openFeedbackModal('Product deleted successfully!', 'success');
     fetchProducts();

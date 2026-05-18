@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useCart } from '~/composables/useCart'
+import { orderService } from '~/api/order/OrderService'
 
 definePageMeta({
   layout: 'customer'
@@ -13,7 +14,7 @@ const isPlacing = ref(false)
 const orderSuccess = ref(false)
 const orderError = ref('')
 
-const placeOrder = () => {
+const placeOrder = async () => {
   orderError.value = ''
 
   if (isEmpty.value) {
@@ -24,13 +25,21 @@ const placeOrder = () => {
   isPlacing.value = true
 
   const payload = buildOrderPayload()
-  console.log('📦 ORDER (ready to POST /api/orders)')
-  console.log(JSON.stringify(payload, null, 2))
-  setTimeout(() => {
-    isPlacing.value = false
+
+  try {
+    const response = await orderService.create(payload)
+
+    if (!response || !response?.data) {
+      throw new Error('Order could not be placed. Please try again.')
+    }
+
     orderSuccess.value = true
     clearCart()
-  }, 800)
+  } catch (err) {
+    orderError.value = err?.message || 'Failed to place order. Please try again.'
+  } finally {
+    isPlacing.value = false
+  }
 }
 
 const goToOrders = () => {
@@ -52,7 +61,7 @@ const goToOrders = () => {
       </div>
       <div>
         <h2 class="text-2xl font-bold text-green-800">Order Placed Successfully!</h2>
-        <p class="mt-2 text-sm text-green-600">Your order payload has been logged to the console. Check DevTools → Console.</p>
+        <p class="mt-2 text-sm text-green-600">Your order has been placed. You can view it in your order history.</p>
       </div>
       <button
         @click="goToOrders"
@@ -107,6 +116,8 @@ const goToOrders = () => {
             </span>
           </div>
         </div>
+
+
 
         <div v-if="orderError" class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
           {{ orderError }}

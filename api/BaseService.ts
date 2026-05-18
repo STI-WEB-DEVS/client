@@ -1,5 +1,4 @@
-// ~/api/BaseService.ts
-export default class BaseService {
+export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
     const token = localStorage.getItem('_token');
@@ -21,17 +20,37 @@ export default class BaseService {
     if (method.toUpperCase() === 'GET') {
       config.params = params;
     } else {
-      config.body = params;
+      config.body = JSON.stringify(params);
+      headers['Content-Type'] = 'application/json';
     }
 
     try {
-      return await $fetch<T>(url, config);
+      const response = await $fetch<T>(url, config);
+
+      // 3. Automatically save the token if this was a login/auth request
+      // Assuming your API returns the token in a field called 'token' or 'access_token'
+      if ((url.includes('login') || url.includes('register')) && (response as any).token) {
+        localStorage.setItem('_token', (response as any).token);
+      }
+
+      return response;
     } catch (error: any) {
       const status = error?.response?.status;
       const message =
         error?.response?._data?.message ||
         error?.data?.message ||
         error?.message;
+
+      // 4. Automatically clear the key if the token is expired/unauthorized (401)
+      if (status === 401) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('_token');
+          localStorage.removeItem('_uuid');
+          localStorage.removeItem('_role');
+          localStorage.removeItem('_customer_uuid');
+        }
+        throw new Error("Unauthenticated");
+      }
 
       switch (status) {
         case 400:
@@ -48,3 +67,5 @@ export default class BaseService {
     }
   }
 }
+
+export default BaseService;

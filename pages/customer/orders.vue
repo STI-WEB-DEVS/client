@@ -10,7 +10,7 @@ definePageMeta({
 const orders = ref([])
 const isLoading = ref(true)
 const error = ref('')
-const showLogoutConfirm = ref(false)
+
 
 onMounted(async () => {
   await fetchOrders()
@@ -126,69 +126,8 @@ const handleLogout = async () => {
       </table>
     </div>
 
-    <div class="mt-12 rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-      <h3 class="text-lg font-semibold text-gray-900">Want to logout?</h3>
-      <p class="mt-1 text-sm text-gray-500">You'll be redirected back to the login page.</p>
-      <div class="mt-6 flex items-center justify-center gap-4">
-        <NuxtLink
-          to="/customer/shop"
-          class="rounded-lg border border-gray-300 px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-        >
-          No, Keep Shopping
-        </NuxtLink>
-        <button
-          @click="showLogoutConfirm = true"
-          class="rounded-lg bg-red-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
-        >
-          Yes, Logout
-        </button>
-      </div>
-    </div>
 
-    <Teleport to="body">
-      <Transition
-        enter-active-class="transition ease-out duration-200"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition ease-in duration-150"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
-      >
-        <div v-if="showLogoutConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" @click.self="showLogoutConfirm = false">
-          <Transition
-            enter-active-class="transition ease-out duration-200 transform"
-            enter-from-class="scale-95 opacity-0"
-            enter-to-class="scale-100 opacity-100"
-            leave-active-class="transition ease-in duration-150 transform"
-            leave-from-class="scale-100 opacity-100"
-            leave-to-class="scale-95 opacity-0"
-          >
-            <div v-if="showLogoutConfirm" class="w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl">
-              <div class="text-center">
-                <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-2xl">
-                  👋
-                </div>
-                <h3 class="text-lg font-bold text-gray-900">Confirm Logout</h3>
-                <p class="mt-2 text-sm text-gray-500">Are you sure you want to sign out?</p>
-              </div>
-              <div class="mt-6 flex gap-3">
-                <button
-                  @click="showLogoutConfirm = false"
-                  class="flex-1 rounded-lg border border-gray-300 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  @click="handleLogout"
-                  class="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          </Transition>
-        </div>
-      </Transition>
-    </Teleport>
+
+
   </section>
 </template>

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, inject } from 'vue'
-import { productService } from '~/api/product/ProductService'
+import { productsService } from '~/api/product/ProductsService'
 import { useCart } from '~/composables/useCart'
 
 definePageMeta({
@@ -16,7 +16,7 @@ const error = ref('')
 
 onMounted(async () => {
   try {
-    const response = await productService.list()
+    const response = await productsService.list()
     // The API returns paginated data – handle both shapes
     products.value = response?.data || response || []
   } catch (err) {
