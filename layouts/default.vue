@@ -157,6 +157,7 @@ import {
   HomeIcon,
   ShoppingBagIcon,
   UserGroupIcon,
+  ShoppingCartIcon,
   XMarkIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline'
@@ -175,6 +176,7 @@ const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
   { name: 'Products', href: '/admin/products', icon: ShoppingBagIcon },
+  //{name : 'Shop Now', href: '/customer/order', icon: ShoppingCartIcon },
 ]
 
 const userNavigation = [

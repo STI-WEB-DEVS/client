@@ -122,10 +122,23 @@ const handleSubmit = async () => {
   isLoading.value = true;
 
   try {
-    await authService.login(email.value, password.value);
-    await navigateTo('/admin/dashboard');
+    const response = await authService.login(email.value, password.value);
+    
+    // 1. Extract roles from the response
+    const roles = response.user.roles; 
+
+    // 2. Conditional Redirection Logic
+    if (roles.includes('admin')) {
+      await navigateTo('/admin/dashboard');
+    } else if (roles.includes('customer')) {
+      await navigateTo('/customer/landingpage');
+    } else {
+      // Optional: Fallback for users with no specific role
+      await navigateTo('/');
+    }
+
   } catch (err: any) {
-    error.value = err?.message || 'Login failed';
+    error.value = err.message;
   } finally {
     isLoading.value = false;
   }

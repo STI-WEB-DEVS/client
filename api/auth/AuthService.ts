@@ -1,7 +1,8 @@
 export interface User {
-  uuid:  string;
-  name:  string;
-  email: string;
+  uuid:           string;
+  customer_uuid?: string;
+  name:           string;
+  email:          string;
 }
 
 export interface LoginResponse {
@@ -22,10 +23,11 @@ export class AuthService {
       });
 
       if (import.meta.client) {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('uuid',  response.user.uuid);
-        localStorage.setItem('roles', JSON.stringify(response.user.roles));
-        localStorage.setItem('user',  JSON.stringify(response.user));
+        localStorage.setItem('token',         response.token);
+        localStorage.setItem('uuid',          response.user.uuid);
+        localStorage.setItem('customer_uuid', response.user.customer_uuid || '');
+        localStorage.setItem('roles',         JSON.stringify(response.user.roles));
+        localStorage.setItem('user',          JSON.stringify(response.user));
       }
 
       return response;

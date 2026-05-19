@@ -1,24 +1,30 @@
 export class BaseService {
   async request<T>(url: string, method: string, params: object = {}): Promise<T> {
     const runtimeConfig = useRuntimeConfig();
-    const token = localStorage.getItem('token');
-
+    
+    // Initialize headers
     const headers: Record<string, string> = {
-      Accept: 'application/json',
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
     };
 
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
+    // 1. Safe Token Access: Only access localStorage on the client side
+    if (import.meta.client) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
     }
 
     const config: any = {
       baseURL: runtimeConfig.public.apiBaseURL,
-      method,
+      method: method.toUpperCase(),
       headers,
     };
 
-    if (method.toUpperCase() === 'GET') {
-      config.params = params;
+    // 2. Body vs Params handling
+    if (config.method === 'GET') {
+      config.query = params;
     } else {
       config.body = params;
     }
@@ -26,23 +32,27 @@ export class BaseService {
     try {
       return await $fetch<T>(url, config);
     } catch (error: any) {
-      const status = error?.response?.status;
-      const message =
-        error?.response?._data?.message ||
-        error?.data?.message ||
+      // 3. Robust Error Extraction
+      // Nuxt $fetch puts server responses in error.data
+      const status = error?.status || error?.response?.status;
+      const message = 
+        error?.data?.message || 
+        error?.response?._data?.message || 
         error?.message;
+
+      console.error(`[API Error ${status}]:`, message);
 
       switch (status) {
         case 400:
-        case 401:
+        case 401: // Unauthorized
+        case 403: // Forbidden (The error you are seeing)
         case 404:
-        case 422:
-        case 429:
-          throw new Error(message || 'Validation or Request Error');
+        case 422: // Validation
+          throw new Error(message || 'Request failed. Please check your permissions.');
         case 500:
-          throw new Error('Server error. Please try again or contact the administrator.');
+          throw new Error('Server error. Please try again later.');
         default:
-          throw new Error(message || 'Something went wrong. Please try again.');
+          throw new Error(message || 'An unexpected error occurred.');
       }
     }
   }
