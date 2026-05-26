@@ -167,12 +167,12 @@ import {
 const route = useRoute()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Cataloging', href: '/cataloging', icon: IconBooks },
-  { name: 'Borrowing', href: '/borrowing', icon: IconHandStop },
-  { name: 'Facilities', href: '/facilities', icon: IconHeartRateMonitor },
-  { name: 'Students', href: '/students', icon: IconUser },
-  { name: 'Team', href: '/team', icon: IconUsersGroup },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Cataloging', href: '/admin/cataloging', icon: IconBooks },
+  { name: 'Borrowing', href: '/admin/borrowing', icon: IconHandStop },
+  { name: 'Facilities', href: '/admin/facilities', icon: IconHeartRateMonitor },
+  { name: 'Students', href: '/admin/students', icon: IconUser },
+  { name: 'Team', href: '/admin/team', icon: IconUsersGroup },
 ]
 
 const userNavigation = [

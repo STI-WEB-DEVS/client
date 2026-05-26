@@ -1,3 +1,4 @@
+<!-- pages/login.vue -->
 <template>
   <div class="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
@@ -104,6 +105,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useState } from "#app";
 import { AuthService } from "~/api/auth/AuthService";
 
 definePageMeta({
@@ -117,6 +119,9 @@ const isLoading = ref(false);
 
 const authService = new AuthService();
 
+// Shared runtime application state matching your cart consumption setup
+const userState = useState<any>('auth-user', () => null);
+
 const handleSubmit = async () => {
   error.value = "";
   isLoading.value = true;
@@ -124,16 +129,37 @@ const handleSubmit = async () => {
   try {
     const response = await authService.login(email.value, password.value);
 
+    // Sync validation tokens safely
     if (response?.token) {
       localStorage.setItem("_token", response.token);
+      
+      const tokenCookie = useCookie('auth_token');
+      tokenCookie.value = response.token;
+    }
+    
+    // Resolve dynamic fallback properties for user identity tracking matching Eloquent responses
+    const customerUuid = response?.user?.customer_uuid || response?.user?.uuid || '';
+    
+    if (customerUuid) {
+      localStorage.setItem("_uuid", customerUuid);
+      
+      // Save entire user profile payload to persistent cookies to survive page navigation steps
+      const userCookie = useCookie('auth_user', { maxAge: 60 * 60 * 24 * 7 });
+      userCookie.value = { ...response.user, customer_uuid: customerUuid };
+      
+      // Rehydrate local in-memory execution thread array states reactively
+      userState.value = { ...response.user, customer_uuid: customerUuid };
+    }
+    
+    if (response?.user?.role) {
+      localStorage.setItem("_role", response.user.role);
     }
 
-    // Redirect based on role
-    const targetPath = response.user.role === "admin" ? "/admin/dashboard" : "/dashboard";
+    // Redirect context based on system role authorizations
+    const targetPath = response.user.role === "admin" ? "/admin/dashboard" : "/customer";
     await navigateTo(targetPath);
     
   } catch (err: any) {
-    // Capture the error message from your AuthService switch statement
     error.value = err?.message || "Invalid credentials. Please try again.";
   } finally {
     isLoading.value = false;

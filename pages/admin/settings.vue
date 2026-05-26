@@ -1,7 +1,5 @@
 <template>
-    <NuxtLayout>
         <Settings/>
-    </NuxtLayout>
 </template>
 
 <script setup lang="ts">

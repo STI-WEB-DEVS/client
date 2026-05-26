@@ -1,7 +1,5 @@
 <template>
-    <NuxtLayout>
         <Students/>
-    </NuxtLayout>
 </template>
 
 <script setup lang="ts">

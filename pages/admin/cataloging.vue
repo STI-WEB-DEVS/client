@@ -1,7 +1,5 @@
 <template>
-    <NuxtLayout>
         <Cataloging/>
-    </NuxtLayout>
 </template>
 
 <script setup lang="ts">
