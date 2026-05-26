@@ -69,19 +69,16 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useCart } from '~/composables/useCart'
 import { orderService } from '~/api/order/OrderService'
-import { AuthService } from '~/api/auth/AuthService'
 
 definePageMeta({
   layout: 'customer'
 })
 
-const { cart, subtotal, clearCart } = useCart()
-const authService = new AuthService()
+const { cart, subtotal, removeFromCart, updateQuantity, clearCart } = useCart()
 const isSubmitting = ref(false)
 
 const handleCheckout = async () => {
@@ -89,15 +86,18 @@ const handleCheckout = async () => {
 
   isSubmitting.value = true
   try {
-    // 1. Fetch the real UUID of the currently logged in customer straight from the database
-    const customerResponse = await authService.getCurrentUser()
-    const customerUuid = customerResponse?.uuid || customerResponse?.data?.uuid
-
+    // 1. Fetch customer UUID directly from localStorage safely (handling SSR)
+    let customerUuid = null
+    if (process.client) {
+    const rawUuid = localStorage.getItem('_uuid')
+    // Strip any wrapping quotes that JSON.stringify might have appended
+    customerUuid = rawUuid ? rawUuid.replace(/^"|"$/g, '') : null
+    }
     if (!customerUuid) {
-      throw new Error('Could not retrieve your customer identification key. Please re-login.')
+      throw new Error('Could not find your session data. Please log in again.')
     }
 
-    // 2. Build the order payload with the real customer UUID
+    // 2. Build the exact order payload matching your backend expectations
     const payload = {
       customer_uuid: customerUuid,
       items: cart.value.map(item => ({
@@ -106,10 +106,12 @@ const handleCheckout = async () => {
       }))
     }
 
-    // 3. Create the order using the order service
+    // 3. Send payload to your Laravel createOrder endpoint via the service
+    console.log('Sending Payload to Backend:', JSON.stringify(payload, null, 2))
     await orderService.create(payload)
     
-    // 4. Reset checkout parameters on success
+    
+    // 4. Success handling
     clearCart()
     alert('Order placed successfully!')
     navigateTo('/customer/orders')
