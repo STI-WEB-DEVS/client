@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout>
         <div class="mb-8">
             <div class="flex justify-between items-center mb-6">
                 <div>
@@ -7,7 +6,7 @@
                     <p class="text-gray-600">Manage and track all your customer information</p>
                 </div>
                 <button @click="openAddModal" class="bg-[#2E4DA7] text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-                    + Add Customer
+                    + Add customer
                 </button>
             </div>
         </div>
@@ -222,7 +221,6 @@
         ]">
             {{ toastMessage }}
         </div>
-    </NuxtLayout>
 </template>
 
 <script setup lang="ts">

@@ -1,10 +1,9 @@
 <template>
-    <NuxtLayout>
 
         <div class="mb-8">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h1 class="text-3xl font-bold text-[#2E4DA7] mb-2">Products</h1>
+                    <h1 class="text-3xl font-bold text-[#2E4DA7] mb-2">products</h1>
                     <p class="text-gray-600">Manage and track all your products</p>
                 </div>
 
@@ -196,14 +195,12 @@
 
         </div>
 
-    </NuxtLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { productService } from '~/api/product/ProductService'
 
-// State
 const searchQuery = ref('')
 const products = ref<any[]>([])
 const loading = ref(false)

@@ -156,18 +156,18 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customer', href: '/Customer', icon: UsersIcon },
-  { name: 'Products', href: '/Products', icon: UsersIcon },
-  { name: 'Projects', href: '/Projects', icon: FolderIcon },
-  { name: 'Calendar', href: '/Calendar', icon: CalendarIcon },
-  { name: 'Documents', href: '/Documents', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '/Reports', icon: ChartPieIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customer', href: '/admin/Customer', icon: UsersIcon },
+  { name: 'Products', href: '/admin/Products', icon: UsersIcon },
+  { name: 'Projects', href: '/admin/Projects', icon: FolderIcon },
+  { name: 'Calendar', href: '/admin/Calendar', icon: CalendarIcon },
+  { name: 'Documents', href: '/admin/Documents', icon: DocumentDuplicateIcon },
+  { name: 'Reports', href: '/admin/Reports', icon: ChartPieIcon },
 
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '/Profile' },
+  { name: 'Your profile', href: '/admin/Profile' },
   { name: 'Sign out', href: '/' },
 ]
 
