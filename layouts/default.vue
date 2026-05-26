@@ -161,7 +161,9 @@ import {
   IconHeartRateMonitor,
   IconUser,
   IconFolderOpen,
-  IconUsersGroup
+  IconUsersGroup,
+  IconUserDollar,
+  IconShoppingCart
 } from '@tabler/icons-vue'
 
 const route = useRoute()
