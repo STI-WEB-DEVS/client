@@ -225,13 +225,13 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customer', icon: UsersIcon },
-  { name: 'Products', href: '/products', icon: ChartPieIcon },
-  { name: 'Parking Areas', href: '/project', icon: BuildingOffice2Icon },
-  { name: 'Tickets for Parking', href: '/tickets', icon: QrCodeIcon },
-  { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '/reports', icon: ChartPieIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customers', href: '/admin/customer', icon: UsersIcon },
+  { name: 'Products', href: '/admin/products', icon: ChartPieIcon },
+  { name: 'Parking Areas', href: '/admin/Parking', icon: BuildingOffice2Icon },
+  { name: 'Tickets for Parking', href: '/admin/tickets', icon: QrCodeIcon },
+  { name: 'Documents', href: '/admin/documents', icon: DocumentDuplicateIcon },
+  { name: 'Reports', href: '/admin/reports', icon: ChartPieIcon },
 ]
 
 const navItemClass = (href) => [

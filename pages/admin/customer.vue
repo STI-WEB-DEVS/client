@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout>
         <!-- Header -->
         <div
             class="bg-gradient-to-r from-[#8F7A6E] to-[#6F5E54] rounded-2xl p-6 mb-6 text-white shadow-lg">
@@ -337,7 +336,6 @@
 >
     {{ toastMessage }}
 </div>
-    </NuxtLayout>
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'

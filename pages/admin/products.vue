@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout>
 
         <!-- HEADER -->
         <div
@@ -284,8 +283,6 @@
             </div>
 
         </div>
-
-    </NuxtLayout>
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'

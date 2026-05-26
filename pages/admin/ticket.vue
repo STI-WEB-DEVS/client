@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <p class="text-xs font-semibold uppercase tracking-widest text-amber-600">Parking</p>
       <h1 class="mt-2 text-3xl font-bold text-slate-900">Tickets for Parking</h1>
@@ -64,7 +63,6 @@
         </div>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
