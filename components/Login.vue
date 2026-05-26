@@ -135,7 +135,7 @@ const handleSubmit = async () => {
       const role = response.user?.role;
       if (role) localStorage.setItem("_role", role);
 
-      await navigateTo(role === "admin" ? "/admin/dashboard" : "/dashboard");
+      await navigateTo(role === "admin" ? "/admin/dashboard" : "/customer/order");
     } else {
       throw new Error("Login failed: No token received.");
     }

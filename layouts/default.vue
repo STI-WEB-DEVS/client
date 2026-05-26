@@ -157,9 +157,9 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Customers', href: '/customers', icon: UsersIcon },
-  { name: 'Products', href: '/products', icon: RectangleStackIcon }
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customers', href: '/admin/customers', icon: UsersIcon },
+  { name: 'Products', href: '/admin/products', icon: RectangleStackIcon }
 ]
 
 const userNavigation = [
