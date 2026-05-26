@@ -150,6 +150,7 @@ import {
   DocumentDuplicateIcon,
   FolderIcon,
   HomeIcon,
+  ShoppingBagIcon, // Imported ShoppingBagIcon for the Products page
   UsersIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
@@ -162,11 +163,11 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Team', href: '/team', icon: UsersIcon },
   { name: 'Customers', href: '/customers', icon: UsersIcon },
+  { name: 'Products', href: '/products', icon: ShoppingBagIcon }, // Added Products route link
   { name: 'Projects', href: '/project', icon: FolderIcon },
   { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
   { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
   { name: 'Reports', href: '/reports', icon: ChartPieIcon },
-  
 ]
 
 const userNavigation = [
