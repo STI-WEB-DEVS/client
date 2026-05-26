@@ -281,7 +281,6 @@ const submitOrder = async () => {
       }))
     };
  
-    // The token handles validation, and Laravel finds the customer table UUID for you!
     const response = await orderService.create(orderPayload);
  
     console.log("Database Order Saved Successfully:", response);

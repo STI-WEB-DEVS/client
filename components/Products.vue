@@ -138,7 +138,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { productService } from '~/api/ProductService'; 
+import { productService } from '~/api/product/ProductService'; 
 
 // State Management
 const products = ref<any[]>([]);
