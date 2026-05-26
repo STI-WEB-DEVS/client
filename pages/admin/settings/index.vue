@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="mb-10 border-b border-gray-100 pb-6">
       <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">System Settings</h1>
       <p class="mt-2 text-sm text-gray-500 font-medium">Configure library rules, manage your profile, and set notification preferences.</p>
@@ -65,7 +64,6 @@
         </section>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

@@ -257,18 +257,18 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
-  { name: "Team", href: "/team", icon: UsersIcon },
-  { name: "Customers", href: "/customers", icon: UserGroupIcon },
-  { name: "Products", href: "/products", icon: ShoppingBagIcon },
-  { name: "Projects", href: "/projects", icon: FolderIcon },
-  { name: "Calendar", href: "/calendar", icon: CalendarIcon },
-  { name: "Documents", href: "/documents", icon: DocumentDuplicateIcon },
-  { name: "Reports", href: "/reports", icon: ChartPieIcon },
+  { name: "Dashboard", href: "/admin/dashboard", icon: HomeIcon },
+  { name: "Team", href: "/admin/team", icon: UsersIcon },
+  { name: "Customers", href: "/admin/customers", icon: UserGroupIcon },
+  { name: "Products", href: "/admin/products", icon: ShoppingBagIcon },
+  { name: "Projects", href: "/admin/projects", icon: FolderIcon },
+  { name: "Calendar", href: "/admin/calendar", icon: CalendarIcon },
+  { name: "Documents", href: "/admin/documents", icon: DocumentDuplicateIcon },
+  { name: "Reports", href: "/admin/reports", icon: ChartPieIcon },
 ];
 
 const userNavigation = [
-  { name: "Your profile", href: "/profile"  },
+  { name: "Your profile", href: "/admin/profile"  },
   { name: "Sign out", href: "/" },
 ];
 

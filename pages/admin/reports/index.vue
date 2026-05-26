@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="mb-10 sm:flex sm:items-center sm:justify-between border-b border-gray-100 pb-6">
       <div>
         <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">Analytics & Reports</h1>
@@ -75,7 +74,6 @@
         </table>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

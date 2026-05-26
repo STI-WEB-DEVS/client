@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-8">
       <div>
         <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">Library Overview</h1>
@@ -43,7 +42,6 @@
         </div>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup>
