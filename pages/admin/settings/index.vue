@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout>
       <div class="p-6 md:p-8 bg-gray-50 min-h-screen">
         <div class="mb-8">
           <h1 class="text-3xl font-bold text-gray-900">Settings</h1>
@@ -49,5 +48,4 @@
           </div>
         </div>
       </div>
-    </NuxtLayout>
   </template>

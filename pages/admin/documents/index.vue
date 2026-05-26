@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout>
       <div class="p-6 md:p-8 bg-gray-50 min-h-screen">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
@@ -38,7 +37,6 @@
           </table>
         </div>
       </div>
-    </NuxtLayout>
   </template>
   
   <script setup>

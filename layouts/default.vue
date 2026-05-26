@@ -158,14 +158,14 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '/projects', icon: FolderIcon },
-  { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
-  { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '/reports', icon: ChartBarIcon }, // Changed icon
-  { name: 'Products', href: '/products', icon: ShoppingBagIcon }, // Changed icon
-  { name: 'Customers', href: '/customer', icon: UsersIcon } // Changed icon
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Team', href: '/admin/team', icon: UsersIcon },
+  { name: 'Projects', href: '/admin/projects', icon: FolderIcon },
+  { name: 'Calendar', href: '/admin/calendar', icon: CalendarIcon },
+  { name: 'Documents', href: '/admin/documents', icon: DocumentDuplicateIcon },
+  { name: 'Reports', href: '/admin/reports', icon: ChartBarIcon }, // Changed icon
+  { name: 'Products', href: '/admin/products', icon: ShoppingBagIcon }, // Changed icon
+  { name: 'Customers', href: '/admin/customer', icon: UsersIcon } // Changed icon
 ]
 
 
