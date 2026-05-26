@@ -128,7 +128,6 @@ const handleSubmit = async () => {
       localStorage.setItem("_role", response.user.role);
     }
  
-    await navigateTo("/admin/dashboard");
  
     await navigateTo(
       response.user.role === "admin" ? "/admin/dashboard" : "/customer/Order",
