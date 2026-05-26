@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout>
+
     <div class="p-8 bg-gray-50 min-h-screen">
       <div class="max-w-4xl mx-auto">
         <button 
@@ -61,7 +61,7 @@
         </div>
       </div>
     </div>
-  </NuxtLayout>
+
 </template>
 
 <script setup lang="ts">

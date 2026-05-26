@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="max-w-3xl mx-auto py-10">
       <div class="flex items-center gap-6 pb-8 border-b border-gray-100">
         <div class="h-24 w-24 rounded-2xl bg-black flex items-center justify-center text-white text-3xl font-bold shadow-sm">
@@ -43,5 +42,4 @@
         </div>
       </div>
     </div>
-  </NuxtLayout>
 </template>

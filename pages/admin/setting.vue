@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="mb-8 border-b border-gray-100 pb-4">
       <h1 class="text-2xl font-bold text-gray-900">System Settings</h1>
       <p class="mt-1 text-sm text-gray-500">Manage your profile and preferences.</p>
@@ -47,7 +46,6 @@
       <button class="text-sm font-bold text-gray-500 hover:text-black">Cancel</button>
       <button class="rounded-lg bg-black px-6 py-2 text-sm font-bold text-white hover:bg-gray-800 shadow-md">Save Changes</button>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

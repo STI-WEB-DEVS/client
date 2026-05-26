@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout>
+
     <div class="mb-8 flex items-center justify-between border-b border-[#d0d4c9] pb-6">
       <div>
         <h1 class="text-3xl font-extrabold tracking-tight text-[#2d4123]">March 2026</h1>
@@ -49,7 +49,6 @@
         </div>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

@@ -132,8 +132,9 @@ const handleSubmit = async () => {
     }
 
     // Redirect based on role
-    const targetPath = response.user.role === "admin" ? "/admin/dashboard" : "/dashboard";
+    const targetPath = response.user.role === "admin" ? "/admin/dashboard" : "/customer/shop";
     await navigateTo(targetPath);
+    
     
   } catch (err: any) {
     // Handle error messages from your API

@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="mb-8 border-b border-[#d0d4c9] pb-4">
       <h1 class="text-2xl font-bold text-[#2d4123]">Projects</h1>
       <p class="mt-1 text-sm text-gray-600">Manage your hiking projects and initiatives.</p>
@@ -61,7 +60,6 @@
         </table>
       </div>
     </section>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

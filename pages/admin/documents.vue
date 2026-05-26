@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="mb-8 border-b border-gray-100 pb-4">
       <h1 class="text-2xl font-bold text-gray-900">Hiking Documents</h1>
       <p class="mt-1 text-sm text-gray-500">Manage trail guides, permits, and hiking reports.</p>
@@ -50,7 +49,6 @@
         </table>
       </div>
     </section>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
