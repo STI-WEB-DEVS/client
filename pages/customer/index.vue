@@ -1,6 +1,6 @@
 <script setup>
 definePageMeta({
-  layout: 'customer'
+  layout: 'customer',
 })
 </script>
  
