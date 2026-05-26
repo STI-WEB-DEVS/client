@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout>
 
         <div class="mb-8">
             <div class="flex justify-between items-center mb-6">
@@ -196,14 +195,12 @@
 
         </div>
 
-    </NuxtLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { productService } from '~/api/product/ProductService'
 
-// State
 const searchQuery = ref('')
 const products = ref<any[]>([])
 const loading = ref(false)

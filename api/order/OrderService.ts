@@ -1,16 +1,16 @@
 import BaseService from '~/api/BaseService';
 
-class CustomerService extends BaseService {
-    private static instance: CustomerService;
+class OrderService extends BaseService {
+    private static instance: OrderService;
 
-    public static getInstance(): CustomerService {
-        if (!CustomerService.instance) {
-            CustomerService.instance = new CustomerService();
+    public static getInstance(): OrderService {
+        if (!OrderService.instance) {
+            OrderService.instance = new OrderService();
         }
-        return CustomerService.instance;
+        return OrderService.instance;
     }
 
-    private resource = '/customers';
+    private resource = '/orders';
 
     async list(params: object = {}): Promise<any> {
         return await this.request(this.resource, 'GET', params);
@@ -35,10 +35,6 @@ class CustomerService extends BaseService {
     async restore(uuid: string): Promise<any> {
         return await this.request(`${this.resource}/${uuid}/restore`, 'POST');
     }
-        // CURRENT LOGGED-IN CUSTOMER
-        async me(): Promise<any> {
-            return await this.request(`${this.resource}/me`, 'GET');
-        }
 }
 
-export const customerService = CustomerService.getInstance();
+export const orderService = OrderService.getInstance();

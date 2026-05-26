@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout name="default">
       <div class="max-w-6xl mx-auto p-6">
         <div class="mb-8">
           <h1 class="text-3xl font-bold text-[#2E4DA7]">Settings</h1>
@@ -57,7 +56,6 @@
           </div>
         </div>
       </div>
-    </NuxtLayout>
   </template>
   
   <script setup lang="ts">

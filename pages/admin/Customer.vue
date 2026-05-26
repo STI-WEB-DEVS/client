@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout>
         <div class="mb-8">
             <div class="flex justify-between items-center mb-6">
                 <div>
@@ -222,7 +221,6 @@
         ]">
             {{ toastMessage }}
         </div>
-    </NuxtLayout>
 </template>
 
 <script setup lang="ts">
