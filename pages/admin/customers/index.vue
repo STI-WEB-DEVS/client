@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout name="default">
         <div class="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 px-4 py-10 sm:px-6 lg:px-8">
 
             <div class="mx-auto max-w-7xl">
@@ -8,21 +7,21 @@
                     <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                         <div>
                             <p class="text-sm font-bold uppercase tracking-widest text-blue-200">
-                                Product Inventory
+                                Customer Management
                             </p>
 
                             <h1 class="mt-2 text-4xl font-black text-white">
-                                Products
+                                Customers
                             </h1>
 
-                            <p class="mt-3 max-w-2xl text-green-100">
-                                Manage product inventory, pricing, and stock availability in one place.
+                            <p class="mt-3 max-w-2xl text-blue-100">
+                                Manage customer records, contact details, and profile information in one place.
                             </p>
                         </div>
 
                         <button @click="openAddModal"
                             class="rounded-2xl bg-white px-6 py-4 font-black text-[#0f2573] shadow-lg transition hover:scale-105 hover:bg-blue-50">
-                            + Add Product
+                            + Add Customer
                         </button>
                     </div>
                 </div>
@@ -33,13 +32,17 @@
                             🔍
                         </div>
 
-                        <input v-model="search" type="text" placeholder="Search by product name, price, or stock..."
+                        <input v-model="search" type="text" placeholder="Search by name, email, or phone..."
                             class="w-full border-0 bg-transparent px-2 py-3 text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-0" />
                     </div>
                 </div>
 
-                <div v-if="filteredProducts.length" class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    <div v-for="product in filteredProducts" :key="product.id"
+                <div v-if="pending" class="text-center py-12 text-[#0f2573] font-bold">
+                    Loading customer data...
+                </div>
+
+                <div v-else-if="filteredCustomers.length" class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    <div v-for="customer in filteredCustomers" :key="customer.id"
                         class="group relative overflow-hidden rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-xl">
                         <div class="absolute right-0 top-0 h-24 w-24 rounded-bl-full bg-blue-50"></div>
 
@@ -47,16 +50,16 @@
                             <div class="mb-5 flex items-center gap-4">
                                 <div
                                     class="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0f2573] text-2xl font-black text-white shadow">
-                                    {{ getProductInitials(product.name) }}
+                                    {{ getInitials(customer.name) }}
                                 </div>
 
                                 <div>
                                     <h2 class="text-xl font-black text-gray-900">
-                                        {{ product.name }}
+                                        {{ customer.name }}
                                     </h2>
 
                                     <p class="text-sm font-medium text-gray-400">
-                                        Product ID: {{ product.id }}
+                                        Customer ID: {{ customer.id }}
                                     </p>
                                 </div>
                             </div>
@@ -64,32 +67,32 @@
                             <div class="space-y-3">
                                 <div class="rounded-2xl bg-slate-50 p-4">
                                     <p class="text-xs font-bold uppercase tracking-wide text-gray-400">
-                                        Price
+                                        Email
                                     </p>
 
-                                    <p class="mt-1 text-sm font-semibold text-gray-700">
-                                        ₱ {{ formatPrice(product.price) }}
+                                    <p class="mt-1 break-words text-sm font-semibold text-gray-700">
+                                        {{ customer.email }}
                                     </p>
                                 </div>
 
                                 <div class="rounded-2xl bg-slate-50 p-4">
                                     <p class="text-xs font-bold uppercase tracking-wide text-gray-400">
-                                        Stock
+                                        Phone
                                     </p>
 
                                     <p class="mt-1 text-sm font-semibold text-gray-700">
-                                        {{ product.stock }} item/s available
+                                        {{ customer.phone }}
                                     </p>
                                 </div>
                             </div>
 
                             <div class="mt-6 flex gap-3">
-                                <button @click="editProduct(product)"
+                                <button @click="editCustomer(customer)"
                                     class="flex-1 rounded-2xl bg-blue-100 px-4 py-3 text-sm font-black text-blue-700 transition hover:bg-blue-200">
                                     Edit
                                 </button>
 
-                                <button @click="openDeleteModal(product)"
+                                <button @click="openDeleteModal(customer)"
                                     class="flex-1 rounded-2xl bg-red-100 px-4 py-3 text-sm font-black text-red-700 transition hover:bg-red-200">
                                     Delete
                                 </button>
@@ -100,16 +103,16 @@
 
                 <div v-else class="rounded-3xl bg-white p-12 text-center shadow-sm ring-1 ring-slate-200">
                     <div
-                        class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-4xl">
-                        📦
+                        class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-blue-100 text-4xl">
+                        👤
                     </div>
 
                     <h3 class="text-2xl font-black text-gray-900">
-                        No products found
+                        No customers found
                     </h3>
 
                     <p class="mt-2 text-gray-500">
-                        Try changing your search or add a new product.
+                        Try changing your search or add a new customer.
                     </p>
                 </div>
 
@@ -121,40 +124,40 @@
 
                     <div class="bg-[#0f2573] px-8 py-6">
                         <h2 class="text-2xl font-black text-white">
-                            {{ isEditing ? 'Edit Product' : 'Add Product' }}
+                            {{ isEditing ? 'Edit Customer' : 'Add Customer' }}
                         </h2>
 
-                        <p class="mt-1 text-sm text-green-100">
-                            {{ isEditing ? 'Update existing product details.' : 'Create a new product record.' }}
+                        <p class="mt-1 text-sm text-blue-100">
+                            {{ isEditing ? 'Update existing customer details.' : 'Create a new customer record.' }}
                         </p>
                     </div>
 
                     <div class="space-y-5 p-8">
                         <div>
                             <label class="mb-2 block text-sm font-bold text-gray-700">
-                                Product Name
+                                Customer Name
                             </label>
 
-                            <input v-model="form.name" type="text" placeholder="Enter product name"
-                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-green-700 focus:bg-white focus:ring-4 focus:ring-green-100" />
+                            <input v-model="form.name" type="text" placeholder="Enter customer name"
+                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-[#0f2573] focus:bg-white focus:ring-4 focus:ring-blue-100" />
                         </div>
 
                         <div>
                             <label class="mb-2 block text-sm font-bold text-gray-700">
-                                Price
+                                Email Address
                             </label>
 
-                            <input v-model="form.price" type="number" min="0" placeholder="Enter price"
-                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-green-700 focus:bg-white focus:ring-4 focus:ring-green-100" />
+                            <input v-model="form.email" type="email" placeholder="Enter email address"
+                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-[#0f2573] focus:bg-white focus:ring-4 focus:ring-blue-100" />
                         </div>
 
                         <div>
                             <label class="mb-2 block text-sm font-bold text-gray-700">
-                                Stock
+                                Phone Number
                             </label>
 
-                            <input v-model="form.stock" type="number" min="0" placeholder="Enter stock"
-                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-green-700 focus:bg-white focus:ring-4 focus:ring-green-100" />
+                            <input v-model="form.phone" type="text" placeholder="Enter phone number"
+                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-[#0f2573] focus:bg-white focus:ring-4 focus:ring-blue-100" />
                         </div>
 
                         <div class="flex justify-end gap-3 pt-4">
@@ -163,9 +166,9 @@
                                 Cancel
                             </button>
 
-                            <button @click="isEditing ? updateProduct() : addProduct()"
-                                class="rounded-2xl bg-[#0f2573] px-5 py-3 font-black text-white shadow transition hover:bg-green-800">
-                                {{ isEditing ? 'Update Product' : 'Save Product' }}
+                            <button @click="isEditing ? updateCustomer() : addCustomer()"
+                                class="rounded-2xl bg-[#0f2573] px-5 py-3 font-black text-white shadow transition hover:bg-[#1a3a8a]">
+                                {{ isEditing ? 'Update Customer' : 'Save Customer' }}
                             </button>
                         </div>
                     </div>
@@ -179,7 +182,7 @@
 
                     <div class="bg-red-600 px-8 py-6">
                         <h2 class="text-2xl font-black text-white">
-                            Delete Product
+                            Delete Customer
                         </h2>
 
                         <p class="mt-1 text-sm text-red-100">
@@ -200,13 +203,13 @@
                                 </p>
 
                                 <h3 class="text-lg font-black text-gray-900">
-                                    {{ selectedProduct?.name }}
+                                    {{ selectedCustomer?.name }}
                                 </h3>
                             </div>
                         </div>
 
                         <p class="text-sm font-semibold leading-6 text-gray-600">
-                            This action will remove the product from the list. Are you sure you want to continue?
+                            This action will remove the customer from the list. Are you sure you want to continue?
                         </p>
 
                         <div class="mt-8 flex justify-end gap-3">
@@ -215,7 +218,7 @@
                                 Cancel
                             </button>
 
-                            <button @click="confirmDeleteProduct"
+                            <button @click="confirmDeleteCustomer"
                                 class="rounded-2xl bg-red-600 px-5 py-3 font-black text-white shadow transition hover:bg-red-700">
                                 Yes, Delete
                             </button>
@@ -226,161 +229,165 @@
             </div>
 
         </div>
-    </NuxtLayout>
+
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
+
+const runtimeConfig = useRuntimeConfig()
 
 const showModal = ref(false)
 const showDeleteModal = ref(false)
 const isEditing = ref(false)
 const editId = ref(null)
 const search = ref('')
-const selectedProduct = ref(null)
-
-const products = ref([
-    {
-        id: 1,
-        name: 'Laptop',
-        price: 35000,
-        stock: 10
-    }
-])
+const selectedCustomer = ref(null)
 
 const form = ref({
     name: '',
-    price: '',
-    stock: ''
+    email: '',
+    phone: ''
 })
 
-const filteredProducts = computed(() => {
+// 1. Live Fetch from your Laravel Server
+// Adjust '/customers' to match your actual Laravel API endpoint route
+const { data: customerResponse, pending, refresh } = await useFetch('/customers', {
+    baseURL: runtimeConfig.public.apiBaseURL,
+    headers: {
+        Accept: 'application/json'
+    }
+})
+
+// Safely map the backend data array (handles nesting if Laravel returns it inside data: [])
+const customersList = computed(() => {
+    if (!customerResponse.value) return []
+    return Array.isArray(customerResponse.value) ? customerResponse.value : (customerResponse.value.data || [])
+})
+
+// 2. Client Side Filtered Search
+const filteredCustomers = computed(() => {
     const keyword = search.value.toLowerCase().trim()
 
     if (!keyword) {
-        return products.value
+        return customersList.value
     }
 
-    return products.value.filter((product) => {
+    return customersList.value.filter((customer) => {
         return (
-            product.name.toLowerCase().includes(keyword) ||
-            String(product.price).toLowerCase().includes(keyword) ||
-            String(product.stock).toLowerCase().includes(keyword)
+            (customer.name?.toLowerCase().includes(keyword)) ||
+            (customer.email?.toLowerCase().includes(keyword)) ||
+            (customer.phone?.toLowerCase().includes(keyword))
         )
     })
 })
 
 const openAddModal = () => {
-    form.value = {
-        name: '',
-        price: '',
-        stock: ''
-    }
-
+    form.value = { name: '', email: '', phone: '' }
     isEditing.value = false
     editId.value = null
     showModal.value = true
 }
 
-const addProduct = () => {
-    if (!form.value.name || form.value.price === '' || form.value.stock === '') {
+// 3. Add to Database via API
+const addCustomer = async () => {
+    if (!form.value.name || !form.value.email || !form.value.phone) {
         alert('Please fill in all fields.')
         return
     }
 
-    products.value.push({
-        id: Date.now(),
-        name: form.value.name,
-        price: Number(form.value.price),
-        stock: Number(form.value.stock)
-    })
-
-    resetForm()
+    try {
+        await $fetch('/customers', {
+            baseURL: runtimeConfig.public.apiBaseURL,
+            method: 'POST',
+            headers: { Accept: 'application/json' },
+            body: form.value
+        })
+        
+        await refresh() // Refetch from backend instantly populating the cards
+        resetForm()
+    } catch (error) {
+        alert(error?.data?.message || 'Failed to add customer records.')
+    }
 }
 
-const editProduct = (product) => {
+const editCustomer = (customer) => {
     isEditing.value = true
-    editId.value = product.id
+    editId.value = customer.id
 
     form.value = {
-        name: product.name,
-        price: product.price,
-        stock: product.stock
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone
     }
 
     showModal.value = true
 }
 
-const updateProduct = () => {
-    if (!form.value.name || form.value.price === '' || form.value.stock === '') {
+// 4. Update existing Database Record
+const updateCustomer = async () => {
+    if (!form.value.name || !form.value.email || !form.value.phone) {
         alert('Please fill in all fields.')
         return
     }
 
-    const index = products.value.findIndex((product) => {
-        return product.id === editId.value
-    })
+    try {
+        await $fetch(`/customers/${editId.value}`, {
+            baseURL: runtimeConfig.public.apiBaseURL,
+            method: 'PUT', // or 'PATCH' depending on your api preference
+            headers: { Accept: 'application/json' },
+            body: form.value
+        })
 
-    if (index !== -1) {
-        products.value[index] = {
-            id: editId.value,
-            name: form.value.name,
-            price: Number(form.value.price),
-            stock: Number(form.value.stock)
-        }
+        await refresh() // Sync interface with updated data
+        resetForm()
+    } catch (error) {
+        alert(error?.data?.message || 'Failed to update customer details.')
     }
-
-    resetForm()
 }
 
-const openDeleteModal = (product) => {
-    selectedProduct.value = product
+const openDeleteModal = (customer) => {
+    selectedCustomer.value = customer
     showDeleteModal.value = true
 }
 
 const closeDeleteModal = () => {
-    selectedProduct.value = null
+    selectedCustomer.value = null
     showDeleteModal.value = false
 }
 
-const confirmDeleteProduct = () => {
-    if (!selectedProduct.value) {
-        return
+// 5. Delete completely from the Database
+const confirmDeleteCustomer = async () => {
+    if (!selectedCustomer.value) return
+
+    try {
+        await $fetch(`/customers/${selectedCustomer.value.id}`, {
+            baseURL: runtimeConfig.public.apiBaseURL,
+            method: 'DELETE',
+            headers: { Accept: 'application/json' }
+        })
+
+        await refresh() // UI live sync
+        closeDeleteModal()
+    } catch (error) {
+        alert(error?.data?.message || 'Failed to delete customer.')
     }
-
-    products.value = products.value.filter((product) => {
-        return product.id !== selectedProduct.value.id
-    })
-
-    closeDeleteModal()
 }
 
 const resetForm = () => {
-    form.value = {
-        name: '',
-        price: '',
-        stock: ''
-    }
-
+    form.value = { name: '', email: '', phone: '' }
     showModal.value = false
     isEditing.value = false
     editId.value = null
 }
 
-const getProductInitials = (name) => {
-    if (!name) {
-        return '?'
-    }
-
+const getInitials = (name) => {
+    if (!name) return '?'
     return name
         .split(' ')
         .map((word) => word.charAt(0))
         .join('')
         .substring(0, 2)
         .toUpperCase()
-}
-
-const formatPrice = (price) => {
-    return Number(price).toLocaleString('en-PH')
 }
 </script>

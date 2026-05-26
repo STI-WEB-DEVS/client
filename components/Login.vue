@@ -140,20 +140,20 @@ const handleSubmit = async () => {
       localStorage.setItem("_token", response.token);
     }
 
-    // // if (response?.user.customer_uuid) {
-    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
-    // // } else if (response?.user.uuid) {
-    // //   localStorage.setItem("_uuid", response.user.uuid);
-    // // }
+    if (response?.user.customer_uuid) {
+    localStorage.setItem("_uuid", response.user.customer_uuid);
+    } else if (response?.user.uuid) {
+    localStorage.setItem("_uuid", response.user.uuid);
+    }
 
-    / /// if (response?.user.role) {
-    // //   localStorage.setItem("_role", response.user.role);
-    // // }
+    if (response?.user.role) {
+    localStorage.setItem("_role", response.user.role);
+    }
 
-    // await navigateTo("/admin/dashboard");
+    await navigateTo("/admin/dashboard");
 
     await navigateTo(
-      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+      response.user.role === "admin" ? "/admin/dashboard" : "/customer/order",
     );
   } catch (err: any) {
     error.value = err?.message || "";

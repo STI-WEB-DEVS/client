@@ -174,14 +174,14 @@ const router = useRouter()
 const sidebarOpen = ref(false)
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Customers', href: '/customers', icon: UsersIcon },
-  { name: 'Products', href: '/products', icon: CubeIcon },
-  { name: 'Projects', href: '/projects', icon: FolderIcon },
-  { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
-  { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '/reports', icon: ChartPieIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Team', href: '/admin/team', icon: UsersIcon },
+  { name: 'Customers', href: '/admin/customers', icon: UsersIcon },
+  { name: 'Products', href: '/admin/products', icon: CubeIcon },
+  { name: 'Projects', href: '/admin/projects', icon: FolderIcon },
+  { name: 'Calendar', href: '/admin/calendar', icon: CalendarIcon },
+  { name: 'Documents', href: '/admin/documents', icon: DocumentDuplicateIcon },
+  { name: 'Reports', href: '/admin/reports', icon: ChartPieIcon },
 ]
 
 const userNavigation = [

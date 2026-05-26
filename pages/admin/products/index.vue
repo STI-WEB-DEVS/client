@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout name="default">
         <div class="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 px-4 py-10 sm:px-6 lg:px-8">
 
             <div class="mx-auto max-w-7xl">
@@ -8,39 +7,38 @@
                     <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                         <div>
                             <p class="text-sm font-bold uppercase tracking-widest text-blue-200">
-                                Customer Management
+                                Product Inventory
                             </p>
 
                             <h1 class="mt-2 text-4xl font-black text-white">
-                                Customers
+                                Products
                             </h1>
 
-                            <p class="mt-3 max-w-2xl text-blue-100">
-                                Manage customer records, contact details, and profile information in one place.
+                            <p class="mt-3 max-w-2xl text-green-100">
+                                Manage product inventory, pricing, and stock availability in one place.
                             </p>
                         </div>
 
                         <button @click="openAddModal"
                             class="rounded-2xl bg-white px-6 py-4 font-black text-[#0f2573] shadow-lg transition hover:scale-105 hover:bg-blue-50">
-                            + Add Customer
+                            + Add Product
                         </button>
                     </div>
                 </div>
 
-                <!-- Search -->
                 <div class="mb-8 rounded-3xl bg-white/80 p-4 shadow-sm ring-1 ring-slate-200 backdrop-blur">
                     <div class="flex items-center gap-3">
                         <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-xl">
                             🔍
                         </div>
 
-                        <input v-model="search" type="text" placeholder="Search by name, email, or phone..."
+                        <input v-model="search" type="text" placeholder="Search by product name, price, or stock..."
                             class="w-full border-0 bg-transparent px-2 py-3 text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-0" />
                     </div>
                 </div>
 
-                <div v-if="filteredCustomers.length" class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    <div v-for="customer in filteredCustomers" :key="customer.id"
+                <div v-if="filteredProducts.length" class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    <div v-for="product in filteredProducts" :key="product.id"
                         class="group relative overflow-hidden rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-xl">
                         <div class="absolute right-0 top-0 h-24 w-24 rounded-bl-full bg-blue-50"></div>
 
@@ -48,16 +46,16 @@
                             <div class="mb-5 flex items-center gap-4">
                                 <div
                                     class="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0f2573] text-2xl font-black text-white shadow">
-                                    {{ getInitials(customer.name) }}
+                                    {{ getProductInitials(product.name) }}
                                 </div>
 
                                 <div>
                                     <h2 class="text-xl font-black text-gray-900">
-                                        {{ customer.name }}
+                                        {{ product.name }}
                                     </h2>
 
                                     <p class="text-sm font-medium text-gray-400">
-                                        Customer ID: {{ customer.id }}
+                                        Product ID: {{ product.id }}
                                     </p>
                                 </div>
                             </div>
@@ -65,32 +63,32 @@
                             <div class="space-y-3">
                                 <div class="rounded-2xl bg-slate-50 p-4">
                                     <p class="text-xs font-bold uppercase tracking-wide text-gray-400">
-                                        Email
+                                        Price
                                     </p>
 
-                                    <p class="mt-1 break-words text-sm font-semibold text-gray-700">
-                                        {{ customer.email }}
+                                    <p class="mt-1 text-sm font-semibold text-gray-700">
+                                        ₱ {{ formatPrice(product.price) }}
                                     </p>
                                 </div>
 
                                 <div class="rounded-2xl bg-slate-50 p-4">
                                     <p class="text-xs font-bold uppercase tracking-wide text-gray-400">
-                                        Phone
+                                        Stock
                                     </p>
 
                                     <p class="mt-1 text-sm font-semibold text-gray-700">
-                                        {{ customer.phone }}
+                                        {{ product.stock }} item/s available
                                     </p>
                                 </div>
                             </div>
 
                             <div class="mt-6 flex gap-3">
-                                <button @click="editCustomer(customer)"
+                                <button @click="editProduct(product)"
                                     class="flex-1 rounded-2xl bg-blue-100 px-4 py-3 text-sm font-black text-blue-700 transition hover:bg-blue-200">
                                     Edit
                                 </button>
 
-                                <button @click="openDeleteModal(customer)"
+                                <button @click="openDeleteModal(product)"
                                     class="flex-1 rounded-2xl bg-red-100 px-4 py-3 text-sm font-black text-red-700 transition hover:bg-red-200">
                                     Delete
                                 </button>
@@ -101,16 +99,16 @@
 
                 <div v-else class="rounded-3xl bg-white p-12 text-center shadow-sm ring-1 ring-slate-200">
                     <div
-                        class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-blue-100 text-4xl">
-                        👤
+                        class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-4xl">
+                        📦
                     </div>
 
                     <h3 class="text-2xl font-black text-gray-900">
-                        No customers found
+                        No products found
                     </h3>
 
                     <p class="mt-2 text-gray-500">
-                        Try changing your search or add a new customer.
+                        Try changing your search or add a new product.
                     </p>
                 </div>
 
@@ -122,40 +120,40 @@
 
                     <div class="bg-[#0f2573] px-8 py-6">
                         <h2 class="text-2xl font-black text-white">
-                            {{ isEditing ? 'Edit Customer' : 'Add Customer' }}
+                            {{ isEditing ? 'Edit Product' : 'Add Product' }}
                         </h2>
 
-                        <p class="mt-1 text-sm text-blue-100">
-                            {{ isEditing ? 'Update existing customer details.' : 'Create a new customer record.' }}
+                        <p class="mt-1 text-sm text-green-100">
+                            {{ isEditing ? 'Update existing product details.' : 'Create a new product record.' }}
                         </p>
                     </div>
 
                     <div class="space-y-5 p-8">
                         <div>
                             <label class="mb-2 block text-sm font-bold text-gray-700">
-                                Customer Name
+                                Product Name
                             </label>
 
-                            <input v-model="form.name" type="text" placeholder="Enter customer name"
-                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-[#0f2573] focus:bg-white focus:ring-4 focus:ring-blue-100" />
+                            <input v-model="form.name" type="text" placeholder="Enter product name"
+                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-green-700 focus:bg-white focus:ring-4 focus:ring-green-100" />
                         </div>
 
                         <div>
                             <label class="mb-2 block text-sm font-bold text-gray-700">
-                                Email Address
+                                Price
                             </label>
 
-                            <input v-model="form.email" type="email" placeholder="Enter email address"
-                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-[#0f2573] focus:bg-white focus:ring-4 focus:ring-blue-100" />
+                            <input v-model="form.price" type="number" min="0" placeholder="Enter price"
+                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-green-700 focus:bg-white focus:ring-4 focus:ring-green-100" />
                         </div>
 
                         <div>
                             <label class="mb-2 block text-sm font-bold text-gray-700">
-                                Phone Number
+                                Stock
                             </label>
 
-                            <input v-model="form.phone" type="text" placeholder="Enter phone number"
-                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-[#0f2573] focus:bg-white focus:ring-4 focus:ring-blue-100" />
+                            <input v-model="form.stock" type="number" min="0" placeholder="Enter stock"
+                                class="w-full rounded-2xl border border-gray-200 bg-slate-50 px-4 py-3 font-semibold text-gray-800 outline-none transition focus:border-green-700 focus:bg-white focus:ring-4 focus:ring-green-100" />
                         </div>
 
                         <div class="flex justify-end gap-3 pt-4">
@@ -164,9 +162,9 @@
                                 Cancel
                             </button>
 
-                            <button @click="isEditing ? updateCustomer() : addCustomer()"
-                                class="rounded-2xl bg-[#0f2573] px-5 py-3 font-black text-white shadow transition hover:bg-[#1a3a8a]">
-                                {{ isEditing ? 'Update Customer' : 'Save Customer' }}
+                            <button @click="isEditing ? updateProduct() : addProduct()"
+                                class="rounded-2xl bg-[#0f2573] px-5 py-3 font-black text-white shadow transition hover:bg-green-800">
+                                {{ isEditing ? 'Update Product' : 'Save Product' }}
                             </button>
                         </div>
                     </div>
@@ -180,7 +178,7 @@
 
                     <div class="bg-red-600 px-8 py-6">
                         <h2 class="text-2xl font-black text-white">
-                            Delete Customer
+                            Delete Product
                         </h2>
 
                         <p class="mt-1 text-sm text-red-100">
@@ -201,13 +199,13 @@
                                 </p>
 
                                 <h3 class="text-lg font-black text-gray-900">
-                                    {{ selectedCustomer?.name }}
+                                    {{ selectedProduct?.name }}
                                 </h3>
                             </div>
                         </div>
 
                         <p class="text-sm font-semibold leading-6 text-gray-600">
-                            This action will remove the customer from the list. Are you sure you want to continue?
+                            This action will remove the product from the list. Are you sure you want to continue?
                         </p>
 
                         <div class="mt-8 flex justify-end gap-3">
@@ -216,7 +214,7 @@
                                 Cancel
                             </button>
 
-                            <button @click="confirmDeleteCustomer"
+                            <button @click="confirmDeleteProduct"
                                 class="rounded-2xl bg-red-600 px-5 py-3 font-black text-white shadow transition hover:bg-red-700">
                                 Yes, Delete
                             </button>
@@ -227,7 +225,6 @@
             </div>
 
         </div>
-    </NuxtLayout>
 </template>
 
 <script setup>
@@ -238,35 +235,35 @@ const showDeleteModal = ref(false)
 const isEditing = ref(false)
 const editId = ref(null)
 const search = ref('')
-const selectedCustomer = ref(null)
+const selectedProduct = ref(null)
 
-const customers = ref([
+const products = ref([
     {
         id: 1,
-        name: 'Sean Kenneth Axalan',
-        email: 'seankennethaxalan@gmail.com',
-        phone: '09356067082'
+        name: 'Laptop',
+        price: 35000,
+        stock: 10
     }
 ])
 
 const form = ref({
     name: '',
-    email: '',
-    phone: ''
+    price: '',
+    stock: ''
 })
 
-const filteredCustomers = computed(() => {
+const filteredProducts = computed(() => {
     const keyword = search.value.toLowerCase().trim()
 
     if (!keyword) {
-        return customers.value
+        return products.value
     }
 
-    return customers.value.filter((customer) => {
+    return products.value.filter((product) => {
         return (
-            customer.name.toLowerCase().includes(keyword) ||
-            customer.email.toLowerCase().includes(keyword) ||
-            customer.phone.toLowerCase().includes(keyword)
+            product.name.toLowerCase().includes(keyword) ||
+            String(product.price).toLowerCase().includes(keyword) ||
+            String(product.stock).toLowerCase().includes(keyword)
         )
     })
 })
@@ -274,8 +271,8 @@ const filteredCustomers = computed(() => {
 const openAddModal = () => {
     form.value = {
         name: '',
-        email: '',
-        phone: ''
+        price: '',
+        stock: ''
     }
 
     isEditing.value = false
@@ -283,74 +280,74 @@ const openAddModal = () => {
     showModal.value = true
 }
 
-const addCustomer = () => {
-    if (!form.value.name || !form.value.email || !form.value.phone) {
+const addProduct = () => {
+    if (!form.value.name || form.value.price === '' || form.value.stock === '') {
         alert('Please fill in all fields.')
         return
     }
 
-    customers.value.push({
+    products.value.push({
         id: Date.now(),
         name: form.value.name,
-        email: form.value.email,
-        phone: form.value.phone
+        price: Number(form.value.price),
+        stock: Number(form.value.stock)
     })
 
     resetForm()
 }
 
-const editCustomer = (customer) => {
+const editProduct = (product) => {
     isEditing.value = true
-    editId.value = customer.id
+    editId.value = product.id
 
     form.value = {
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone
+        name: product.name,
+        price: product.price,
+        stock: product.stock
     }
 
     showModal.value = true
 }
 
-const updateCustomer = () => {
-    if (!form.value.name || !form.value.email || !form.value.phone) {
+const updateProduct = () => {
+    if (!form.value.name || form.value.price === '' || form.value.stock === '') {
         alert('Please fill in all fields.')
         return
     }
 
-    const index = customers.value.findIndex((customer) => {
-        return customer.id === editId.value
+    const index = products.value.findIndex((product) => {
+        return product.id === editId.value
     })
 
     if (index !== -1) {
-        customers.value[index] = {
+        products.value[index] = {
             id: editId.value,
             name: form.value.name,
-            email: form.value.email,
-            phone: form.value.phone
+            price: Number(form.value.price),
+            stock: Number(form.value.stock)
         }
     }
 
     resetForm()
 }
 
-const openDeleteModal = (customer) => {
-    selectedCustomer.value = customer
+const openDeleteModal = (product) => {
+    selectedProduct.value = product
     showDeleteModal.value = true
 }
 
 const closeDeleteModal = () => {
-    selectedCustomer.value = null
+    selectedProduct.value = null
     showDeleteModal.value = false
 }
 
-const confirmDeleteCustomer = () => {
-    if (!selectedCustomer.value) {
+const confirmDeleteProduct = () => {
+    if (!selectedProduct.value) {
         return
     }
 
-    customers.value = customers.value.filter((customer) => {
-        return customer.id !== selectedCustomer.value.id
+    products.value = products.value.filter((product) => {
+        return product.id !== selectedProduct.value.id
     })
 
     closeDeleteModal()
@@ -359,8 +356,8 @@ const confirmDeleteCustomer = () => {
 const resetForm = () => {
     form.value = {
         name: '',
-        email: '',
-        phone: ''
+        price: '',
+        stock: ''
     }
 
     showModal.value = false
@@ -368,7 +365,7 @@ const resetForm = () => {
     editId.value = null
 }
 
-const getInitials = (name) => {
+const getProductInitials = (name) => {
     if (!name) {
         return '?'
     }
@@ -379,5 +376,9 @@ const getInitials = (name) => {
         .join('')
         .substring(0, 2)
         .toUpperCase()
+}
+
+const formatPrice = (price) => {
+    return Number(price).toLocaleString('en-PH')
 }
 </script>
