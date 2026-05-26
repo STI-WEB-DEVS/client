@@ -53,7 +53,7 @@
                       </ul>
                     </li>
                     <li class="mt-auto">
-                      <a href="/settings"
+                      <a href="/admin/settings"
                         class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-[#ADE25D] hover:bg-[#3B7080] hover:text-[#CFFFB3] transition-colors">
                         <Cog6ToothIcon class="size-5 shrink-0" aria-hidden="true" />
                         Settings
@@ -98,7 +98,7 @@
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="/settings"
+              <a href="/admin/settings"
                 class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-[#ADE25D] hover:bg-[#3B7080] hover:text-[#CFFFB3] transition-colors">
                 <Cog6ToothIcon class="size-5 shrink-0" aria-hidden="true" />
                 Settings
@@ -190,32 +190,32 @@ const navigationGroups = [
   {
     label: 'Overview',
     items: [
-      { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-      { name: 'Reports', href: '/reports', icon: ChartPieIcon },
+      { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+      { name: 'Reports', href: '/admin/reports', icon: ChartPieIcon },
     ],
   },
   {
     label: 'Management',
     items: [
-      { name: 'Organizers', href: '/organizers', icon: FolderIcon },
-      { name: 'Hikers', href: '/hikers', icon: UsersIcon },
-      { name: 'Customers', href: '/customers', icon: UserGroupIcon }, // Added Customers
-      { name: 'Team', href: '/team', icon: ClipboardDocumentListIcon },
+      { name: 'Organizers', href: '/admin/organizers', icon: FolderIcon },
+      { name: 'Hikers', href: '/admin/hikers', icon: UsersIcon },
+      { name: 'Customers', href: '/admin/customers', icon: UserGroupIcon }, // Added Customers
+      { name: 'Team', href: '/admin/team', icon: ClipboardDocumentListIcon },
     ],
   },
   {
     label: 'Operations',
     items: [
-      { name: 'Hiking Tours', href: '/tours', icon: MapIcon },
-      { name: 'Products', href: '/products', icon: TagIcon }, // Added Products
-      { name: 'Sales & Commission', href: '/commission', icon: CurrencyDollarIcon },
-      { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
+      { name: 'Hiking Tours', href: '/admin/tours', icon: MapIcon },
+      { name: 'Products', href: '/admin/products', icon: TagIcon }, // Added Products
+      { name: 'Sales & Commission', href: '/admin/commission', icon: CurrencyDollarIcon },
+      { name: 'Documents', href: '/admin/documents', icon: DocumentDuplicateIcon },
     ],
   },
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '/profile' },
+  { name: 'Your profile', href: '/admin/profile' },
   { name: 'Sign out', href: '/' },
 ]
 

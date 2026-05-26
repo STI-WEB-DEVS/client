@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="max-w-5xl mx-auto space-y-10">
         <div>
         <h1 class="text-2xl font-bold leading-7 text-[#CFFFB3] sm:truncate sm:text-3xl sm:tracking-tight">Settings</h1>
@@ -76,5 +75,4 @@
         </div>
         </div>
     </div>
-  </NuxtLayout>
 </template>

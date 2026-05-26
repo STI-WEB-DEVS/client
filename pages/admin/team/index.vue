@@ -1,21 +1,19 @@
 <template>
-  <NuxtLayout>
-    <div class="p-8 space-y-4">
-      <h1 class="font-['DM_Mono'] text-[40px] font-medium tracking-[0.15em] uppercase text-[#ADE25D] mb-3.5">Team Members</h1>
+  <div class="p-8 space-y-4">
+    <h1 class="font-['DM_Mono'] text-[40px] font-medium tracking-[0.15em] uppercase text-[#ADE25D] mb-3.5">Team Members</h1>
 
-      <div v-if="isLoading" class="text-gray-500">Loading team...</div>
+    <div v-if="isLoading" class="text-gray-500">Loading team...</div>
 
-      <div v-else-if="error" class="text-red-500">{{ error }}</div>
+    <div v-else-if="error" class="text-red-500">{{ error }}</div>
 
-      <div v-else class="grid gap-6 md:grid-cols-2">
-        <UserProfile
-          v-for="user in teams"
-          :key="user.id"
-          :user="user"
-        />
-      </div>
+    <div v-else class="grid gap-6 md:grid-cols-2">
+      <UserProfile
+        v-for="user in teams"
+        :key="user.id"
+        :user="user"
+      />
     </div>
-  </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -46,4 +46,7 @@ export class AuthService extends BaseService {
   async logout(): Promise<void> {
     await this.request<void>("/logout", "DELETE");
   }
+  async getCurrentUser(): Promise<any> {
+    return await this.request('/user', 'GET');
+  }
 }
