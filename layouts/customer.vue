@@ -11,6 +11,8 @@
         >
           My Store
         </NuxtLink>
+        
+                <!-- NAVIGATION -->
 
         <!-- NAVIGATION -->
         <div class="hidden items-center gap-8 text-sm font-semibold md:flex">
