@@ -138,7 +138,7 @@ const handleSubmit = async () => {
     if (response?.token) localStorage.setItem("_token", response.token);
     
     // Simple role-based routing
-    const target = response.user?.role === "admin" ? "/admin/dashboard" : "/dashboard";
+    const target = response.user?.role === "admin" ? "/admin/dashboard" : "/customer/order";
     await navigateTo(target);
   } catch (err: any) {
     error.value = err?.response?.data?.message || err?.message || "Login failed.";

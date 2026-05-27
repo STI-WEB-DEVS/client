@@ -1,7 +1,5 @@
 <template>
-    <NuxtLayout>
         <Documents/>
-    </NuxtLayout>
 </template>
 
 

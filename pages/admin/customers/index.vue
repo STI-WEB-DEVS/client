@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="p-8 bg-gray-50 min-h-screen">
       <div class="max-w-6xl mx-auto">
         <h1 class="text-2xl font-bold text-[#2d4123] mb-8">Customer Management</h1>
@@ -74,7 +73,6 @@
         </div>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
