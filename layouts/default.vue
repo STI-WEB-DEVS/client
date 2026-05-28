@@ -1,44 +1,37 @@
 <template>
   <div>
+    <!-- Mobile Sidebar -->
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
-        <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="" leave="transition-opacity ease-linear duration-300" leave-from="" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-900/80"></div>
+        <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="transition-opacity ease-linear duration-300" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-900/80" />
         </TransitionChild>
-
         <div class="fixed inset-0 flex">
           <TransitionChild as="template" enter="transition ease-in-out duration-300 transform" enter-from="-translate-x-full" enter-to="translate-x-0" leave="transition ease-in-out duration-300 transform" leave-from="translate-x-0" leave-to="-translate-x-full">
             <DialogPanel class="relative mr-16 flex w-full max-w-xs flex-1">
-              <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0" enter-to="" leave="ease-in-out duration-300" leave-from="" leave-to="opacity-0">
-                <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
-                  <button type="button" class="-m-2.5 p-2.5" @click="sidebarOpen = false">
-                    <span class="sr-only">Close sidebar</span>
-                    <XMarkIcon class="size-6 text-white" aria-hidden="true" />
-                  </button>
+              <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
+                <button type="button" class="-m-2.5 p-2.5" @click="sidebarOpen = false">
+                  <XMarkIcon class="size-6 text-white" />
+                </button>
+              </div>
+              <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-green-900 px-6 pb-4">
+                <div class="flex h-16 items-center gap-3">
+                  <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                    <ShoppingBagIcon class="w-5 h-5 text-white" />
+                  </div>
+                  <span class="text-white font-semibold">Admin Panel</span>
                 </div>
-              </TransitionChild>
-
-              <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
-                <div class="relative flex h-16 shrink-0 items-center">
-                  <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
-                </div>
-                <nav class="relative flex flex-1 flex-col">
-                  <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                <nav class="flex flex-1 flex-col">
+                  <ul class="flex flex-1 flex-col gap-y-7">
                     <li>
-                      <ul role="list" class="-mx-2 space-y-1">
+                      <ul class="-mx-2 space-y-1">
                         <li v-for="item in navigation" :key="item.name">
-                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
-                            <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
+                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/10 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold']">
+                            <component :is="item.icon" class="size-5 shrink-0" />
                             {{ item.name }}
                           </NuxtLink>
                         </li>
                       </ul>
-                    </li>
-                    <li class="mt-auto">
-                      <a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
-                        <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                        Settings
-                      </a>
                     </li>
                   </ul>
                 </nav>
@@ -49,79 +42,65 @@
       </Dialog>
     </TransitionRoot>
 
-    <div class="hidden bg-gray-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-      <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
-        <div class="flex h-16 shrink-0 items-center">
-          <h1 class= "bg-white/5 text-white">NaSeRy</h1>
+    <!-- Desktop Sidebar -->
+    <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+      <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-green-900 px-6 pb-4">
+        <div class="flex h-16 items-center gap-3">
+          <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+            <ShoppingBagIcon class="w-5 h-5 text-white" />
+          </div>
+          <span class="text-white font-semibold text-sm">Admin Panel</span>
         </div>
         <nav class="flex flex-1 flex-col">
-          <ul role="list" class="flex flex-1 flex-col gap-y-7">
+          <ul class="flex flex-1 flex-col gap-y-7">
             <li>
-              <ul role="list" class="-mx-2 space-y-1">
+              <p class="text-xs font-semibold text-green-400 uppercase tracking-wider mb-2">Main</p>
+              <ul class="-mx-2 space-y-1">
                 <li v-for="item in navigation" :key="item.name">
-                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold']">
-                    <component :is="item.icon" class="size-6 shrink-0" aria-hidden="true" />
+                  <NuxtLink :to="item.href" :class="[route.path.startsWith(item.href) ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/10 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold transition']">
+                    <component :is="item.icon" class="size-5 shrink-0" />
                     {{ item.name }}
                   </NuxtLink>
                 </li>
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="sysSettings" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
-                <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
-                Settings
-              </a>
+              <button @click="logout" class="group -mx-2 flex w-full gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-white/10 hover:text-white transition">
+                <ArrowRightOnRectangleIcon class="size-5 shrink-0" />
+                Sign out
+              </button>
             </li>
           </ul>
         </nav>
       </div>
     </div>
 
-    <div class="lg:pl-72">
-      <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-        <button type="button" class="-m-2.5 p-2.5 text-gray-700 hover:text-gray-900 lg:hidden" @click="sidebarOpen = true">
-          <span class="sr-only">Open sidebar</span>
-          <Bars3Icon class="size-6" aria-hidden="true" />
+    <!-- Main Content -->
+    <div class="lg:pl-64">
+      <!-- Top Bar -->
+      <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:px-6 lg:px-8">
+        <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
+          <Bars3Icon class="size-6" />
         </button>
-
-        <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true"></div>
-
+        <div class="h-6 w-px bg-gray-900/10 lg:hidden" />
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <div class="flex flex-1"></div> <div class="flex items-center gap-x-4 lg:gap-x-6">
-            <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
-              <span class="sr-only">View notifications</span>
-              <BellIcon class="size-6" aria-hidden="true" />
-            </button>
-
-            <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true"></div>
-
-            <Menu as="div" class="relative">
-              <MenuButton class="relative flex items-center">
-                <span class="absolute -inset-1.5"></span>
-                <span class="sr-only">Open user menu</span>
-                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
-                <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Admin1</span>
-                  <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
-                </span>
-              </MenuButton>
-              <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
-                <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
-                  <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
-                  </MenuItem>
-                </MenuItems>
-              </transition>
-            </Menu>
+          <div class="flex flex-1 items-center">
+            <span class="text-sm font-medium text-gray-500">
+              Admin Dashboard
+            </span>
+          </div>
+          <div class="flex items-center gap-x-4 lg:gap-x-6">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-bold">A</div>
+              <span class="hidden lg:block text-sm font-semibold text-gray-900">Admin</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <main class="py-10">
+      <main class="py-8">
         <div class="px-4 sm:px-6 lg:px-8">
-            <slot>
-
-            </slot>
+          <slot />
         </div>
       </main>
     </div>
@@ -129,47 +108,30 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
+import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import {
-  Dialog,
-  DialogPanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  TransitionChild,
-  TransitionRoot,
-} from '@headlessui/vue'
-import {
-  Bars3Icon,
-  BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
-  Cog6ToothIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UsersIcon,
-  XMarkIcon,
-} from '@heroicons/vue/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
-import { useRoute } from 'vue-router'
+  Bars3Icon, HomeIcon, UsersIcon, ShoppingBagIcon,
+  ClipboardDocumentListIcon, XMarkIcon, ArrowRightOnRectangleIcon,
+} from '@heroicons/vue/24/outline';
+import { useRoute } from 'vue-router';
 
-const route = useRoute()
+definePageMeta({ middleware: 'auth' });
+
+const route = useRoute();
+const sidebarOpen = ref(false);
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'EventView', href: '/wipeventview', icon: Bars3Icon },
-  { name: 'InquryView', href: '/wipinquryview', icon: Bars3Icon },
-  { name: 'ProfileView', href: '/wipprofileview', icon: Bars3Icon },
-  { name: 'ReportView', href: '/wipreportsview', icon: Bars3Icon }
-]
+  { name: 'Dashboard',  href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Products',   href: '/admin/products',  icon: ShoppingBagIcon },
+  { name: 'Customers',  href: '/admin/customer',  icon: UsersIcon },
+  { name: 'Orders',     href: '/admin/orders',    icon: ClipboardDocumentListIcon },
+];
 
-const userNavigation = [
-  { name: 'Your profile', href: 'yourprofile' },
-  { name: 'Sign out', href: 'login' },
-]
-
-const sidebarOpen = ref(false)
+const logout = async () => {
+  localStorage.removeItem('_token');
+  localStorage.removeItem('_role');
+  localStorage.removeItem('_uuid');
+  await navigateTo('/');
+};
 </script>
