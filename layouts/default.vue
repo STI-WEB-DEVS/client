@@ -84,15 +84,14 @@
         </button>
         <div class="h-6 w-px bg-gray-900/10 lg:hidden" />
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <div class="flex flex-1 items-center">
-            <span class="text-sm font-medium text-gray-500">
-              Admin Dashboard
-            </span>
+          <div class="flex flex-1 flex-col justify-center">
+            <p class="text-sm font-medium text-gray-500">Welcome back</p>
+            <p class="text-base font-semibold text-gray-900">{{ userName }}</p>
           </div>
           <div class="flex items-center gap-x-4 lg:gap-x-6">
             <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-bold">A</div>
-              <span class="hidden lg:block text-sm font-semibold text-gray-900">Admin</span>
+              <div class="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-xs font-bold">{{ userInitials }}</div>
+              <span class="hidden lg:block text-sm font-semibold text-gray-900">{{ userName }}</span>
             </div>
           </div>
         </div>
@@ -108,7 +107,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import {
   Bars3Icon, HomeIcon, UsersIcon, ShoppingBagIcon,
@@ -120,6 +119,20 @@ definePageMeta({ middleware: 'auth' });
 
 const route = useRoute();
 const sidebarOpen = ref(false);
+const userName = ref('Admin');
+const userInitials = computed(() => {
+  const name = userName.value.trim();
+  if (!name) return 'U';
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'U';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+});
+
+onMounted(() => {
+  const storedName = localStorage.getItem('_name') || localStorage.getItem('_role') || 'Admin';
+  userName.value = storedName;
+});
 
 const navigation = [
   { name: 'Dashboard',  href: '/admin/dashboard', icon: HomeIcon },

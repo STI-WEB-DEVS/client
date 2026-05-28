@@ -100,8 +100,8 @@
 
           <!-- User avatar -->
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">C</div>
-            <span class="hidden lg:block text-sm font-semibold text-gray-900">Customer</span>
+            <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">{{ userInitials }}</div>
+            <span class="hidden lg:block text-sm font-semibold text-gray-900">{{ userName }}</span>
           </div>
         </div>
       </div>
@@ -132,6 +132,15 @@ import { cartService } from '~/api/cart/CartService';
 const route = useRoute();
 const sidebarOpen = ref(false);
 const cartCount = ref(0);
+const userName = ref('Customer');
+const userInitials = computed(() => {
+  const name = userName.value.trim();
+  if (!name) return 'U';
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'U';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+});
 
 const navigation = [
   { name: 'Shop',        href: '/customer/products', icon: ShoppingBagIcon },
@@ -154,6 +163,8 @@ const logout = async () => {
 onMounted(() => {
   refreshCart();
   window.addEventListener('cart-updated', refreshCart);
+  const storedName = localStorage.getItem('_name') || localStorage.getItem('_role') || 'Customer';
+  userName.value = storedName;
 });
 
 onUnmounted(() => {
