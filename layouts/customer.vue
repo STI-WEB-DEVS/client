@@ -352,11 +352,65 @@ const cartTotal = computed(() => {
   return cartItems.value.reduce((total, item) => total + (Number(item.price) * item.quantity), 0).toFixed(2)
 })
 
-const handleOrder = () => {
-  alert('Order placed successfully!')
-  // Clear cart out of storage and update layout state
-  localStorage.removeItem('shopping-cart')
-  updateCartFromStorage()
+import { orderService } from '~/api/order/OrderService'
+
+const handleOrder = async () => {
+  try {
+
+    // 1. CHECK CART
+    if (!cartItems.value.length) {
+      alert('Your cart is empty')
+      return
+    }
+
+    // 2. GET CUSTOMER UUID
+    let customerUuid = ''
+
+    if (typeof window !== 'undefined') {
+      customerUuid = localStorage.getItem('_uuid') || ''
+    }
+
+    if (!customerUuid) {
+      alert('You must be logged in to place an order')
+      return
+    }
+
+    // 3. FORMAT ITEMS FOR BACKEND
+    const items = cartItems.value.map(item => ({
+      product_uuid: item.uuid,
+      quantity: item.quantity
+    }))
+
+    // 4. FINAL PAYLOAD
+    const payload = {
+      customer_uuid: customerUuid,
+      items
+    }
+
+    console.log('ORDER PAYLOAD:', payload)
+
+    // 5. SEND TO LARAVEL API
+    const response = await orderService.create(payload)
+
+    console.log('ORDER RESPONSE:', response)
+
+    // 6. SUCCESS
+    alert('Order placed successfully!')
+
+    // 7. CLEAR CART AFTER SUCCESS
+    localStorage.removeItem('shopping-cart')
+    updateCartFromStorage()
+
+  } catch (error) {
+
+    console.error('ORDER FAILED:', error)
+
+    alert(
+      error?.response?._data?.message ||
+      error?.message ||
+      'Failed to place order'
+    )
+  }
 }
   
 const navigation = [
@@ -389,7 +443,7 @@ const userNavigation = [
   },
   {
     name: 'Orders',
-    href: '/orders',
+    href: '/customer/orders',
   },
   {
     name: 'Logout',
