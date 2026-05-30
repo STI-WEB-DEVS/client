@@ -43,7 +43,7 @@
                 id="email"
                 autocomplete="email"
                 required="true"
-                placeholder=" "
+                placeholder=""
                 class="block w-full rounded-md px-3 py-1.5 text-base sm:text-sm/6"
                 style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 10px; outline: none; padding: 0.75rem 1rem; font-size: 0.9rem; transition: border-color 0.2s, box-shadow 0.2s;"
                 onfocus="this.style.borderColor='#e74c3c'; this.style.boxShadow='0 0 0 3px rgba(231,76,60,0.15)'"
@@ -64,7 +64,7 @@
                 id="password"
                 autocomplete="current-password"
                 required="true"
-                placeholder=""
+                placeholder=" "
                 class="block w-full rounded-md px-3 py-1.5 text-base sm:text-sm/6"
                 style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 10px; outline: none; padding: 0.75rem 1rem; font-size: 0.9rem; transition: border-color 0.2s, box-shadow 0.2s;"
                 onfocus="this.style.borderColor='#e74c3c'; this.style.boxShadow='0 0 0 3px rgba(231,76,60,0.15)'"
@@ -165,8 +165,50 @@
 </template>
 
 <script setup lang="ts">
-    const handleSubmit = async () => {
-    // Since there is no BE, we just trigger the redirect immediately
-    await navigateTo('/dashboard') 
+definePageMeta({
+  layout: false,
+});
+ 
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
+ 
+const email = ref("");
+const password = ref("");
+const error = ref("");
+const isLoading = ref(false);
+ 
+const authService = new AuthService();
+ 
+const handleSubmit = async () => {
+  error.value = "";
+  isLoading.value = true;
+ 
+  try {
+    const response = await authService.login(email.value, password.value);
+ 
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
     }
+ 
+    // // if (response?.user.customer_uuid) {
+    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
+    // // } else if (response?.user.uuid) {
+    // //   localStorage.setItem("_uuid", response.user.uuid);
+    // // }
+ 
+    / /// if (response?.user.role) {
+    // //   localStorage.setItem("_role", response.user.role);
+    // // }
+ 
+   //  await navigateTo("/admin/dashboard");
+ 
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+    );
+  } catch (err: any) {
+    error.value = err?.message || "";
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
