@@ -68,8 +68,13 @@
             <span class="text-sm font-semibold text-indigo-600">
               ₱{{ Number(product.price).toFixed(2) }}
             </span>
+            <!-- View Button -->
+            <button @click="openModal(product)"
+              class="text-xs text-gray-500 hover:text-gray-700 font-medium">
+              View
+            </button>
             <!-- Edit Button -->
-            <button @click="startEdit(product)" 
+            <button @click="startEdit(product)"
               class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
               Edit
             </button>
@@ -84,6 +89,74 @@
       </ul>
     </div>
   </div>
+
+  <!-- View Modal -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition ease-out duration-200"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition ease-in duration-150"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div v-if="viewingProduct" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900/60" @click="closeModal" />
+
+        <!-- Panel -->
+        <Transition
+          enter-active-class="transition ease-out duration-200"
+          enter-from-class="opacity-0 scale-95"
+          enter-to-class="opacity-100 scale-100"
+          leave-active-class="transition ease-in duration-150"
+          leave-from-class="opacity-100 scale-100"
+          leave-to-class="opacity-0 scale-95"
+        >
+          <div v-if="viewingProduct" class="relative w-full max-w-sm bg-white rounded-xl shadow-xl px-6 py-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-5">
+              <h3 class="text-sm font-semibold text-gray-900">Product Details</h3>
+              <button @click="closeModal" class="text-gray-400 hover:text-gray-600 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Details -->
+            <dl class="space-y-4">
+              <div class="flex flex-col gap-0.5">
+                <dt class="text-xs font-medium text-gray-500">Product Name</dt>
+                <dd class="text-sm text-gray-900">{{ viewingProduct.name }}</dd>
+              </div>
+              <div class="flex flex-col gap-0.5">
+                <dt class="text-xs font-medium text-gray-500">Price</dt>
+                <dd class="text-sm font-semibold text-indigo-600">₱{{ Number(viewingProduct.price).toFixed(2) }}</dd>
+              </div>
+              <div class="flex flex-col gap-0.5">
+                <dt class="text-xs font-medium text-gray-500">UUID</dt>
+                <dd class="text-xs text-gray-400 break-all font-mono">{{ viewingProduct.uuid }}</dd>
+              </div>
+              <!-- Add more fields here as needed -->
+            </dl>
+
+            <!-- Footer -->
+            <div class="mt-6 flex gap-3">
+              <button @click="startEdit(viewingProduct); closeModal()"
+                class="flex-1 justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500">
+                Edit
+              </button>
+              <button @click="closeModal"
+                class="flex-1 justify-center rounded-md bg-gray-100 px-3 py-1.5 text-sm/6 font-semibold text-gray-700 shadow-sm hover:bg-gray-200">
+                Close
+              </button>
+            </div>
+          </div>
+        </Transition>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -91,83 +164,25 @@ definePageMeta({
   layout: false,
 });
 
-import { ref, onMounted } from "vue";
-import { productService } from "~/api/product/ProductService";
+import { useProduct } from '~/composables/product/product';
 
-const name = ref("");
-const price = ref("");
-const error = ref("");
-const isLoading = ref(false);
-const isLoadingList = ref(false);
-const deletingUuid = ref<string | null>(null);
-const editingProduct = ref<any | null>(null);
-const products = ref<any[]>([]);
-
-const fetchProducts = async () => {
-  isLoadingList.value = true;
-  try {
-    const response = await productService.list();
-    products.value = response?.data ?? response ?? [];
-  } catch (err: any) {
-    console.error("Failed to fetch products:", err?.message);
-  } finally {
-    isLoadingList.value = false;
-  }
-};
-
-const startEdit = (product: any) => {
-  editingProduct.value = product;
-  name.value = product.name;
-  price.value = product.price;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-const cancelEdit = () => {
-  editingProduct.value = null;
-  name.value = "";
-  price.value = "";
-  error.value = "";
-};
-
-const handleSubmit = async () => {
-  error.value = "";
-  isLoading.value = true;
-
-  try {
-    if (editingProduct.value) {
-      // Update
-      await productService.update(editingProduct.value.uuid, {
-        name: name.value,
-        price: price.value,
-      });
-      cancelEdit();
-    } else {
-      // Create
-      await productService.create({ name: name.value, price: price.value });
-      name.value = "";
-      price.value = "";
-    }
-    await fetchProducts();
-  } catch (err: any) {
-    error.value = err?.message || "Something went wrong.";
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const handleDelete = async (uuid: string) => {
-  if (!confirm("Are you sure you want to delete this product?")) return;
-
-  deletingUuid.value = uuid;
-  try {
-    await productService.delete(uuid);
-    await fetchProducts();
-  } catch (err: any) {
-    error.value = err?.message || "Failed to delete product.";
-  } finally {
-    deletingUuid.value = null;
-  }
-};
+const {
+  products,
+  isLoadingList,
+  error,
+  name,
+  price,
+  editingProduct,
+  viewingProduct,
+  deletingUuid,
+  fetchProducts,
+  openModal,
+  closeModal,
+  startEdit,
+  cancelEdit,
+  handleSubmit,
+  handleDelete,
+} = useProduct();
 
 onMounted(fetchProducts);
 </script>

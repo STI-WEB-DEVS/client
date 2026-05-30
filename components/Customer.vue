@@ -65,6 +65,10 @@
             <p class="text-xs text-gray-500 mt-0.5">{{ customer.email }}</p>
           </div>
           <div class="flex items-center gap-3">
+            <button @click="openModal(customer)"
+              class="text-xs text-gray-500 hover:text-gray-700 font-medium">
+              View
+            </button>
             <!-- Edit Button -->
             <button @click="startEdit(customer)"
               class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
@@ -81,6 +85,73 @@
       </ul>
     </div>
   </div>
+
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition ease-out duration-200"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition ease-in duration-150"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div v-if="viewingCustomer" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900/60" @click="closeModal" />
+
+        <!-- Panel -->
+        <Transition
+          enter-active-class="transition ease-out duration-200"
+          enter-from-class="opacity-0 scale-95"
+          enter-to-class="opacity-100 scale-100"
+          leave-active-class="transition ease-in duration-150"
+          leave-from-class="opacity-100 scale-100"
+          leave-to-class="opacity-0 scale-95"
+        >
+          <div v-if="viewingCustomer" class="relative w-full max-w-sm bg-white rounded-xl shadow-xl px-6 py-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-5">
+              <h3 class="text-sm font-semibold text-gray-900">Customer Details</h3>
+              <button @click="closeModal" class="text-gray-400 hover:text-gray-600 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Details -->
+            <dl class="space-y-4">
+              <div class="flex flex-col gap-0.5">
+                <dt class="text-xs font-medium text-gray-500">Customer Name</dt>
+                <dd class="text-sm text-gray-900">{{ viewingCustomer.name }}</dd>
+              </div>
+              <div class="flex flex-col gap-0.5">
+                <dt class="text-xs font-medium text-gray-500">Email</dt>
+                <dd class="text-sm text-gray-900">{{ viewingCustomer.email }}</dd>
+              </div>
+              <div class="flex flex-col gap-0.5">
+                <dt class="text-xs font-medium text-gray-500">UUID</dt>
+                <dd class="text-xs text-gray-400 break-all font-mono">{{ viewingCustomer.uuid }}</dd>
+              </div>
+              <!-- Add more fields here as needed -->
+            </dl>
+
+            <!-- Footer -->
+            <div class="mt-6 flex gap-3">
+              <button @click="startEdit(viewingCustomer); closeModal()"
+                class="flex-1 justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500">
+                Edit
+              </button>
+              <button @click="closeModal"
+                class="flex-1 justify-center rounded-md bg-gray-100 px-3 py-1.5 text-sm/6 font-semibold text-gray-700 shadow-sm hover:bg-gray-200">
+                Close
+              </button>
+            </div>
+          </div>
+        </Transition>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -88,83 +159,26 @@ definePageMeta({
   layout: false,
 });
 
-import { ref, onMounted } from "vue";
-import { customerService } from "~/api/customer/CustomerService";
+import { useCustomer } from "~/composables/customer/customer";
 
-const name = ref("");
-const email = ref("");
-const error = ref("");
-const isLoading = ref(false);
-const isLoadingList = ref(false);
-const deletingUuid = ref<string | null>(null);
-const editingCustomer = ref<any | null>(null);
-const customers = ref<any[]>([]);
-
-const fetchCustomers = async () => {
-  isLoadingList.value = true;
-  try {
-    const response = await customerService.list();
-    customers.value = response?.data ?? response ?? [];
-  } catch (err: any) {
-    console.error("Failed to fetch customers:", err?.message);
-  } finally {
-    isLoadingList.value = false;
-  }
-};
-
-const startEdit = (customer: any) => {
-  editingCustomer.value = customer;
-  name.value = customer.name;
-  email.value = customer.email;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-const cancelEdit = () => {
-  editingCustomer.value = null;
-  name.value = "";
-  email.value = "";
-  error.value = "";
-};
-
-const handleSubmit = async () => {
-  error.value = "";
-  isLoading.value = true;
-
-  try {
-    if (editingCustomer.value) {
-      // Update
-      await customerService.update(editingCustomer.value.uuid, {
-        name: name.value,
-        email: email.value,
-      });
-      cancelEdit();
-    } else {
-      // Create
-      await customerService.create({ name: name.value, email: email.value });
-      name.value = "";
-      email.value = "";
-    }
-    await fetchCustomers();
-  } catch (err: any) {
-    error.value = err?.message || "Something went wrong.";
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const handleDelete = async (uuid: string) => {
-  if (!confirm("Are you sure you want to delete this customer?")) return;
-
-  deletingUuid.value = uuid;
-  try {
-    await customerService.delete(uuid);
-    await fetchCustomers();
-  } catch (err: any) {
-    error.value = err?.message || "Failed to delete customer.";
-  } finally {
-    deletingUuid.value = null;
-  }
-};
+const { 
+  name,
+  email,
+  error,
+  customers,
+  isLoadingList,
+  viewingCustomer,
+  editingCustomer,
+  deletingUuid,
+  fetchCustomers,
+  handleSubmit,
+  handleDelete,
+  openModal,
+  closeModal,
+  startEdit,
+  cancelEdit,
+} = useCustomer();
 
 onMounted(fetchCustomers);
+
 </script>

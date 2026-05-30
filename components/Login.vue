@@ -84,12 +84,6 @@
           </div>
         </div>
       </div>
-
-      <p class="mt-10 text-center text-sm/6 text-gray-500">
-        Not a member?
-        {{ ' ' }}
-        <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Start a 14 day free trial</a>
-      </p>
     </div>
   </div>
 </template>
@@ -99,46 +93,14 @@ definePageMeta({
   layout: false,
 });
  
-import { ref } from "vue";
-import { AuthService } from "~/api/auth/AuthService";
- 
-const email = ref("email");
-const password = ref("password");
-const error = ref("");
-const isLoading = ref(false);
- 
-const authService = new AuthService();
- 
-const handleSubmit = async () => {
-  error.value = "";
-  isLoading.value = true;
- 
-  try {
-    const response = await authService.login(email.value, password.value);
- 
-    if (response?.token) {
-      localStorage.setItem("_token", response.token);
-    }
- 
-    // // if (response?.user.customer_uuid) {
-    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
-    // // } else if (response?.user.uuid) {
-    // //   localStorage.setItem("_uuid", response.user.uuid);
-    // // }
- 
-    / /// if (response?.user.role) {
-    // //   localStorage.setItem("_role", response.user.role);
-    // // }
- 
-    // await navigateTo("/admin/dashboard");
- 
-    await navigateTo(
-      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
-    );
-  } catch (err: any) {
-    error.value = err?.message || "";
-  } finally {
-    isLoading.value = false;
-  }
-};
+import { useAuthentication } from "~/composables/auth/authentication";
+
+const {
+  email,
+  password,
+  error,
+  isLoading,
+  handleSubmit,
+} = useAuthentication();
+
 </script>
