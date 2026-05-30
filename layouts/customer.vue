@@ -106,17 +106,26 @@
               ₱{{ Number(product.price || 0).toLocaleString() }}
             </p>
 
+            <p
+              class="mt-1 text-sm font-medium"
+              :class="product.quantity > 0 ? 'text-green-600' : 'text-red-500'"
+            >
+              {{ product.quantity > 0 ? product.quantity + ' in stock' : 'Out of stock' }}
+            </p>
+
             <div class="mt-4 grid grid-cols-2 gap-2">
               <button
                 @click="handleAddToCart(product)"
-                class="rounded-md border border-indigo-600 px-4 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50"
+                :disabled="product.quantity === 0"
+                class="rounded-md border border-indigo-600 px-4 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Add to Cart
               </button>
 
               <button
                 @click="openBuyNowModal(product)"
-                class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+                :disabled="product.quantity === 0"
+                class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Buy Now
               </button>

@@ -13,12 +13,16 @@ export const setCart = (cart: any[]) => {
 export const addToCart = (product: any) => {
   if (process.server) return;
 
+  if (product.quantity <= 0) return;
+
   const cart = getCart();
 
   const existingItem = cart.find((item: any) => item.uuid === product.uuid);
 
   if (existingItem) {
-    existingItem.quantity += 1;
+    if (existingItem.quantity < product.quantity) {
+      existingItem.quantity += 1;
+    }
   } else {
     cart.push({
       ...product,

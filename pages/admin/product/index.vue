@@ -21,6 +21,7 @@
               <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500">ID</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500">Name</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500">Price</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500">Qty</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500">Actions</th>
             </tr>
           </thead>
@@ -29,6 +30,7 @@
               <td class="px-6 py-4">{{ product.id }}</td>
               <td class="px-6 py-4">{{ product.name }}</td>
               <td class="px-6 py-4">{{ product.price }}</td>
+              <td class="px-6 py-4">{{ product.quantity }}</td>
               <td class="px-6 py-4 text-right">
                 <button @click="handleView(product)" class="px-3 py-1 border rounded">View</button>
                 <button @click="handleEdit(product)" class="px-3 py-1 border rounded">Edit</button>
@@ -36,7 +38,7 @@
               </td>
             </tr>
             <tr v-if="!products?.data?.length">
-              <td colspan="4" class="px-6 py-10 text-center text-gray-500">No products found.</td>
+              <td colspan="5" class="px-6 py-10 text-center text-gray-500">No products found.</td>
             </tr>
           </tbody>
         </table>

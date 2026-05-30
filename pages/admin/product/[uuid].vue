@@ -8,7 +8,9 @@
         <p><strong>ID:</strong> {{ product.id }}</p>
         <p><strong>UUID:</strong> {{ product.uuid }}</p>
         <p><strong>Name:</strong> {{ product.name }}</p>
+        <p><strong>Description:</strong> {{ product.description || '—' }}</p>
         <p><strong>Price:</strong> {{ product.price }}</p>
+        <p><strong>Quantity:</strong> {{ product.quantity }}</p>
         <p><strong>Created At:</strong> {{ product.created_at }}</p>
         <p><strong>Updated At:</strong> {{ product.updated_at }}</p>
       </div>
