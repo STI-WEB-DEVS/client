@@ -136,8 +136,8 @@ definePageMeta({
 import { ref } from "vue";
 import { AuthService } from "~/api/auth/AuthService";
 
-const email = ref("email");
-const password = ref("password");
+const email = ref("");
+const password = ref("");
 const error = ref("");
 const isLoading = ref(false);
 
