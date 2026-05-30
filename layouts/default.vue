@@ -168,6 +168,8 @@ const navigation = [
   { name: 'Appointments', href: '/appointment', icon: CalendarIcon },
   { name: 'Inventory', href: '/inventory', icon: DocumentDuplicateIcon },
   { name: 'Reports', href: '/report', icon: ChartPieIcon },
+  { name: 'Customer', href: '/Customer', icon: UsersIcon },
+  { name: 'Product', href: '/Product', icon: ChartPieIcon },
 ]
 
 const userNavigation = [
