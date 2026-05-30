@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     public: {
       // This acts as the default fallback. 
       // It will automatically be overwritten by NUXT_PUBLIC_API_BASE_URL from your .env
-      apiBaseURL: 'http://localhost:3000/' 
+      apiBaseURL: 'http://localhost:8000/' 
     }
   }
 })

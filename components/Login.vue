@@ -1,12 +1,4 @@
 <template>
-  <!--
-    This example requires updating your template:
-
-    ```
-    <html class="h-full bg-gray-50">
-    <body class="h-full">
-    ```
-  -->
   <div class="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <img class="mx-auto h-40 w-auto" src="" alt="Your Company" />
@@ -19,14 +11,14 @@
           <div>
             <label for="email" class="block text-sm/6 font-medium text-blue-900">Email address</label>
             <div class="mt-2">
-              <input v-model="email" type="email" name="email" id="email" autocomplete="email" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+              <input v-model="email" type="email" name="email" id="email" autocomplete="email" required class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
             </div>
           </div>
 
           <div>
             <label for="password" class="block text-sm/6 font-medium text-blue-900">Password</label>
             <div class="mt-2">
-              <input v-model="password" type="password" name="password" id="password" autocomplete="current-password" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+              <input v-model="password" type="password" name="password" id="password" autocomplete="current-password" required class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
             </div>
           </div>
 
@@ -92,45 +84,43 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: false,
-});
- 
+// definePageMeta({
+//   layout: false,
+// });
+
 import { ref } from "vue";
-import { AuthService } from "c:/Users/PC1/Desktop/Arce/client/api/auth/Auth-Service";
- 
+import { AuthService } from "~/api/auth/AuthService";
+
 const email = ref("");
 const password = ref("");
 const error = ref("");
 const isLoading = ref(false);
- 
+
 const authService = new AuthService();
- 
+
 const handleSubmit = async () => {
   error.value = "";
   isLoading.value = true;
- 
+
   try {
     const response = await authService.login(email.value, password.value);
- 
+
     if (response?.token) {
       localStorage.setItem("_token", response.token);
     }
- 
-    // // if (response?.user.customer_uuid) {
-    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
-    // // } else if (response?.user.uuid) {
-    // //   localStorage.setItem("_uuid", response.user.uuid);
-    // // }
- 
-    / /// if (response?.user.role) {
-    // //   localStorage.setItem("_role", response.user.role);
-    // // }
- 
-    // await navigateTo("/admin/dashboard");
- 
+
+    if (response?.user.customer_uuid) {
+      localStorage.setItem("_uuid", response.user.customer_uuid);
+    } else if (response?.user.uuid) {
+      localStorage.setItem("_uuid", response.user.uuid);
+    }
+
+    if (response?.user.role) {
+      localStorage.setItem("_role", response.user.role);
+    }
+
     await navigateTo(
-      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+      response.user.role === "admin" ? "/admin/dashboard" : "/customer/order",
     );
   } catch (err: any) {
     error.value = err?.message || "";

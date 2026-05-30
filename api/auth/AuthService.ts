@@ -14,7 +14,7 @@ export class AuthService extends BaseService {
     const runtimeConfig = useRuntimeConfig();
  
     try {
-      return await $fetch<LoginResponse>("/login", {
+      return await $fetch<LoginResponse>("/api/login", {
         baseURL: runtimeConfig.public.apiBaseURL,
         method: "POST",
         headers: {
