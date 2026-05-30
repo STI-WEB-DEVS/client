@@ -10,19 +10,25 @@ export const setCart = (cart: any[]) => {
   localStorage.setItem('_cart', JSON.stringify(cart));
 };
 
-export const addToCart = (product: any) => {
+export const addToCart = (product: any, quantityToAdd: number = 1) => {
   if (process.server) return;
+
+  if (product.quantity <= 0 || quantityToAdd <= 0) return;
 
   const cart = getCart();
 
   const existingItem = cart.find((item: any) => item.uuid === product.uuid);
 
   if (existingItem) {
-    existingItem.quantity += 1;
+    if (existingItem.quantity + quantityToAdd <= product.quantity) {
+      existingItem.quantity += quantityToAdd;
+    } else {
+      existingItem.quantity = product.quantity;
+    }
   } else {
     cart.push({
       ...product,
-      quantity: 1,
+      quantity: quantityToAdd > product.quantity ? product.quantity : quantityToAdd,
     });
   }
 

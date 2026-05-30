@@ -29,6 +29,13 @@
             <p class="font-bold text-indigo-600">
               ₱{{ Number(product?.price || 0).toLocaleString() }}
             </p>
+
+            <p
+              class="text-sm font-medium"
+              :class="(product?.quantity ?? 0) > 0 ? 'text-green-600' : 'text-red-500'"
+            >
+              {{ (product?.quantity ?? 0) > 0 ? product.quantity + ' in stock' : 'Out of stock' }}
+            </p>
           </div>
         </div>
 
@@ -102,7 +109,9 @@ watch(() => props.modelValue, (val) => {
   if (val) qty.value = 1;
 });
 
-const increase = () => qty.value++;
+const increase = () => {
+  if (qty.value < (props.product?.quantity ?? 0)) qty.value++;
+};
 const decrease = () => {
   if (qty.value > 1) qty.value--;
 };

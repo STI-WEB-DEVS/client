@@ -4,6 +4,7 @@
       <h2 class="text-lg font-semibold mb-4">Edit Product</h2>
       <ProductForm
         :product="product"
+        :isEdit="true"
         submitLabel="Save"
         @submit="updateProduct"
         @cancel="$emit('close')"
