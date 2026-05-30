@@ -87,21 +87,39 @@ const handleBuyNow = (product) => {
         <!-- Product Info -->
         <div class="flex flex-1 flex-col gap-4 p-5">
           <div>
-            <h3 class="text-base font-semibold text-gray-900">{{ product.name }}</h3>
-            <p class="mt-1 text-xs text-gray-400">UUID: {{ product.uuid?.slice(0, 8) }}…</p>
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="text-base font-semibold text-gray-900 leading-snug">{{ product.name }}</h3>
+              <span
+                v-if="product.stock > 0"
+                class="shrink-0 inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/10"
+              >
+                {{ product.stock }} in stock
+              </span>
+              <span
+                v-else
+                class="shrink-0 inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-700 ring-1 ring-inset ring-rose-600/10"
+              >
+                Out of stock
+              </span>
+            </div>
+            <p v-if="product.description" class="mt-3 line-clamp-2 text-sm text-gray-500 leading-relaxed">
+              {{ product.description }}
+            </p>
           </div>
 
           <!-- Action Buttons -->
           <div class="mt-auto flex gap-2">
             <button
               @click="handleAddToCart(product)"
-              class="flex-1 rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 active:bg-indigo-800"
+              :disabled="product.stock <= 0"
+              class="flex-1 rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 active:bg-indigo-800 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
             >
-              Add to Cart
+              {{ product.stock > 0 ? 'Add to Cart' : 'Out of Stock' }}
             </button>
             <button
+              v-if="product.stock > 0"
               @click="handleBuyNow(product)"
-              class="rounded-lg border border-gray-300 px-3 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-indigo-400 hover:text-indigo-600 active:bg-indigo-50"
+              class="rounded-lg border border-gray-300 px-3 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-indigo-400 hover:text-indigo-600 active:bg-indigo-50"
             >
               Buy Now
             </button>

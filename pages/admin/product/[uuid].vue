@@ -32,8 +32,16 @@
             <p class="mt-1 text-sm text-gray-900">{{ product.name }}</p>
           </div>
           <div class="px-6 py-4">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Description</p>
+            <p class="mt-1 text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">{{ product.description || 'No description provided.' }}</p>
+          </div>
+          <div class="px-6 py-4">
             <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Price</p>
             <p class="mt-1 text-sm text-gray-900">${{ product.price }}</p>
+          </div>
+          <div class="px-6 py-4">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Stock Quantity</p>
+            <p class="mt-1 text-sm text-gray-900">{{ product.stock }}</p>
           </div>
           <div v-if="product.created_at" class="px-6 py-4">
             <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Created At</p>

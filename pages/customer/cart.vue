@@ -53,27 +53,32 @@ const handleCheckout = () => {
           <!-- Product Info -->
           <div class="flex-1">
             <h3 class="text-sm font-semibold text-gray-900">{{ item.name }}</h3>
-            <p class="mt-0.5 text-xs text-gray-400">UUID: {{ item.product_uuid?.slice(0, 8) }}…</p>
             <p class="mt-1 text-sm font-medium text-indigo-600">
               ₱{{ Number(item.price).toLocaleString('en-PH', { minimumFractionDigits: 2 }) }} each
             </p>
           </div>
 
           <!-- Quantity Controls -->
-          <div class="flex items-center gap-2">
-            <button
-              @click="updateQuantity(item.product_uuid, item.quantity - 1)"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-100 active:bg-gray-200"
-            >
-              −
-            </button>
-            <span class="w-8 text-center text-sm font-semibold text-gray-900">{{ item.quantity }}</span>
-            <button
-              @click="updateQuantity(item.product_uuid, item.quantity + 1)"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-100 active:bg-gray-200"
-            >
-              +
-            </button>
+          <div class="flex flex-col items-center gap-1">
+            <div class="flex items-center gap-2">
+              <button
+                @click="updateQuantity(item.product_uuid, item.quantity - 1)"
+                class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-100 active:bg-gray-200"
+              >
+                −
+              </button>
+              <span class="w-8 text-center text-sm font-semibold text-gray-900">{{ item.quantity }}</span>
+              <button
+                @click="updateQuantity(item.product_uuid, item.quantity + 1)"
+                :disabled="item.quantity >= item.stock"
+                class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-100 active:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                +
+              </button>
+            </div>
+            <span v-if="item.quantity >= item.stock" class="text-[10px] font-medium text-amber-600">
+              Limit reached ({{ item.stock }} available)
+            </span>
           </div>
 
           <!-- Subtotal -->

@@ -38,6 +38,9 @@
                   Price
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Stock
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Created At
                 </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -57,6 +60,9 @@
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   ${{ product.price }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
+                  {{ product.stock }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                   {{ product.created_at?.split('T')[0] }}
@@ -94,7 +100,7 @@
               </tr>
 
               <tr v-if="!products?.data?.length">
-                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
+                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
                   No products found.
                 </td>
               </tr>
@@ -185,7 +191,9 @@ const feedbackType = ref<'success' | 'error' | 'info'>('info');
 
 const fields = [
   { name: 'name', label: 'Product Name', placeholder: 'e.g. Premium Widget', required: true },
-  { name: 'price', label: 'Price', type: 'number', placeholder: '0.00', required: true },
+  { name: 'description', label: 'Description', type: 'textarea', placeholder: 'Enter product description here...', required: false },
+  { name: 'price', label: 'Price', type: 'number', placeholder: '0.00', required: true, min: 0.01, step: 'any' },
+  { name: 'stock', label: 'Stock Quantity', type: 'number', placeholder: '0', required: true, min: 0, step: 1 },
 ];
 
 const fetchProducts = async () => {

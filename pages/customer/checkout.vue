@@ -100,7 +100,7 @@ const goToOrders = () => {
                 <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-lg">📦</div>
                 <div>
                   <p class="text-sm font-semibold text-gray-900">{{ item.name }}</p>
-                  <p class="text-xs text-gray-400">{{ item.product_uuid?.slice(0, 8) }}… × {{ item.quantity }}</p>
+                  <p class="text-xs text-gray-400">Qty: {{ item.quantity }}</p>
                 </div>
               </div>
               <p class="text-sm font-semibold text-gray-900">
