@@ -22,7 +22,7 @@
         </div>
 
         <!-- Form -->
-        <form class="space-y-5" @submit.prevent="handleSubmit">
+        <form class="space-y-5" method="POST" @submit.prevent="handleSubmit">
 
           <!-- Email -->
           <div>
@@ -195,25 +195,97 @@
   </div>
 </template>
 
+
+// definePageMeta({
+//   layout: false,
+// });
+ 
+// import { ref } from "vue";
+// import { AuthService } from "~/api/auth/AuthService";
+ 
+// const email = ref("");
+// const password = ref("");
+// const error = ref("");
+// const isLoading = ref(false);
+ 
+// const authService = new AuthService();
+ 
+// const handleSubmit = async () => {
+//   error.value = "";
+//   isLoading.value = true;
+ 
+//   try {
+//     const response = await authService.login(email.value, password.value);
+ 
+//     if (response?.token) {
+//       localStorage.setItem("_token", response.token);
+//     }
+ 
+//     // // if (response?.user.customer_uuid) {
+//     // //   localStorage.setItem("_uuid", response.user.customer_uuid);
+//     // // } else if (response?.user.uuid) {
+//     // //   localStorage.setItem("_uuid", response.user.uuid);
+//     // // }
+ 
+//     / /// if (response?.user.role) {
+//     // //   localStorage.setItem("_role", response.user.role);
+//     // // }
+ 
+//     // await navigateTo("/admin/dashboard");
+ 
+//     await navigateTo(
+//       response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+//     );
+//   } catch (err: any) {
+//     error.value = err?.message || "";
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
+
+
 <script setup lang="ts">
-import { ref } from 'vue'
-import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
+definePageMeta({
+  layout: false,
+});
 
-definePageMeta({ layout: false })
+import { ref, reactive } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
 
-const loading = ref(false)
-const showPassword = ref(false)
+// 1. Define 'form' as a reactive object to match v-model
+const form = reactive({
+  email: "",
+  password: "",
+  remember: false, // Required by the template checkbox
+});
 
-const form = ref({
-  email: '',
-  password: '',
-  remember: false,
-})
+// 2. Add the missing refs used in the template
+const showPassword = ref(false);
+const loading = ref(false);
+const error = ref("");
+
+const authService = new AuthService();
 
 const handleSubmit = async () => {
-  loading.value = true
-  // No BE — redirect immediately
-  await navigateTo('/dashboard')
-  loading.value = false
-}
+  error.value = "";
+  loading.value = true;
+
+  try {
+    
+    const response = await authService.login(form.email, form.password);
+
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
+    }
+
+    
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+    );
+  } catch (err: any) {
+    error.value = err?.message || "Invalid credentials";
+  } finally {
+    loading.value = false;
+  }
+};
 </script>

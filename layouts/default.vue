@@ -152,6 +152,8 @@ const navigation = [
   { name: 'Schedule',  href: '/schedule',  icon: CalendarIcon },
   { name: 'Inventory', href: '/inventory', icon: DocumentDuplicateIcon },
   { name: 'Reports',   href: '/report',    icon: ChartPieIcon },
+  { name: 'Customer',  href: '/customer',  icon: DocumentDuplicateIcon },
+  { name: 'Product',   href: '/report',    icon: ChartPieIcon },
 ]
 
 const userNavigation = [
