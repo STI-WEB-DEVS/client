@@ -1,65 +1,145 @@
 <template>
-  <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">Shop</h1>
-      <p class="text-sm text-gray-500 mt-1">Browse products and add items to your cart.</p>
-    </div>
+  <div class="bg-white">
+    <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          Featured Products
+        </h1>
+        <p class="mt-3 text-lg text-gray-600">
+          Check out our latest products with real-time stock availability
+        </p>
+      </div>
 
-    <div v-if="pending" class="flex justify-center py-16">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-indigo-600"></div>
-    </div>
+      <div v-if="pending" class="flex justify-center py-16">
+        <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-indigo-600"></div>
+      </div>
 
-    <div v-else-if="products.length === 0" class="text-center py-16 bg-white rounded-lg shadow">
-      <p class="text-gray-500">No products available.</p>
-    </div>
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div
+          v-for="product in products"
+          :key="product.uuid"
+          class="group relative rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-lg"
+        >
+          <div class="aspect-square rounded-xl bg-gray-100 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-12 w-12 text-gray-400">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+            </svg>
+          </div>
 
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      <div v-for="product in products" :key="product.uuid" class="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
-        <div class="relative bg-gray-100 p-6">
-          <svg class="mx-auto h-32 w-32 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-        </div>
-        
-        <div class="p-4">
-          <h3 class="text-lg font-semibold text-gray-900">{{ product.name }}</h3>
-          <p class="text-2xl font-bold text-indigo-600 mt-2">₱{{ formatPrice(product.price) }}</p>
-          
-          <div class="mt-4 flex gap-2">
-            <button @click="buyNow(product)" class="flex-1 bg-indigo-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">
-              Buy Now
-            </button>
-            <button @click="addToCart(product)" class="flex-1 border border-indigo-600 text-indigo-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-50 transition-colors">
-              Add to Cart
+          <div class="mt-4">
+            <h3 class="text-lg font-semibold text-gray-900 line-clamp-1">{{ product.name }}</h3>
+            <p class="mt-1 text-sm text-gray-500 line-clamp-2">{{ product.description || 'No description available' }}</p>
+            
+            <div class="mt-3 flex items-center justify-between">
+              <span class="text-xl font-bold text-indigo-600">₱{{ formatPrice(product.price) }}</span>
+              <span
+                :class="[
+                  'rounded-full px-2 py-1 text-xs font-medium',
+                  product.stock_quantity <= 0 ? 'bg-red-100 text-red-700' :
+                  product.stock_quantity < 10 ? 'bg-yellow-100 text-yellow-700' :
+                  'bg-green-100 text-green-700'
+                ]"
+              >
+                {{ getStockStatus(product) }}
+              </span>
+            </div>
+
+            <div v-if="product.stock_quantity > 0" class="mt-3">
+              <div class="flex items-center gap-2">
+                <button
+                  @click="decrementQuantity(product)"
+                  class="flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 hover:bg-gray-50"
+                >
+                  -
+                </button>
+                <span class="w-8 text-center text-sm font-medium">{{ quantities[product.uuid] || 1 }}</span>
+                <button
+                  @click="incrementQuantity(product)"
+                  class="flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  :disabled="(quantities[product.uuid] || 1) >= product.stock_quantity"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <button
+              @click="addToCart(product)"
+              :disabled="product.stock_quantity <= 0"
+              class="mt-4 w-full rounded-lg py-2.5 text-sm font-medium transition-colors"
+              :class="product.stock_quantity <= 0
+                ? 'cursor-not-allowed bg-gray-100 text-gray-400'
+                : 'bg-indigo-600 text-white hover:bg-indigo-700'"
+            >
+              {{ product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Cart' }}
             </button>
           </div>
         </div>
       </div>
+
+      <div v-if="!pending && products.length === 0" class="text-center py-16">
+        <p class="text-gray-500">No products available at the moment.</p>
+      </div>
+    </div>
+
+    <div
+      v-if="showToast"
+      class="fixed bottom-4 right-4 z-50 rounded-lg bg-green-600 px-6 py-3 text-white shadow-lg transition-all"
+    >
+      {{ toastMessage }}
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { productService } from '~/api/product/ProductService'
 import { useCart } from '~/composables/useCart'
 
 definePageMeta({ layout: 'customer' })
 
-const { addItem, clearCart, loadCart, cartItems } = useCart()
+const { addItem, loadCart } = useCart()
 const products = ref([])
 const pending = ref(true)
+const showToast = ref(false)
+const toastMessage = ref('')
+const quantities = reactive({})
 
 const formatPrice = (price) => Number(price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+const getStockStatus = (product) => {
+  if (product.stock_quantity <= 0) return 'Out of Stock'
+  return `Stock Left: ${product.stock_quantity}`
+}
+
+const incrementQuantity = (product) => {
+  const currentQty = quantities[product.uuid] || 1
+  if (currentQty < product.stock_quantity) {
+    quantities[product.uuid] = currentQty + 1
+  }
+}
+
+const decrementQuantity = (product) => {
+  const currentQty = quantities[product.uuid] || 1
+  if (currentQty > 1) {
+    quantities[product.uuid] = currentQty - 1
+  }
+}
 
 const fetchProducts = async () => {
   pending.value = true
   try {
     const res = await productService.list()
-    products.value = res.data || []
-    console.log('=== PRODUCTS FROM API ===')
-    products.value.forEach(p => {
-      console.log(`Product: ${p.name}, UUID: ${p.uuid}`)
+    products.value = (res.data || []).map(product => ({
+      ...product,
+      price: Number(product.price),
+      stock_quantity: Number(product.stock_quantity ?? 0)
+    }))
+
+    products.value.forEach(product => {
+      if (!quantities[product.uuid]) {
+        quantities[product.uuid] = 1
+      }
     })
   } catch (error) {
     console.error('Error fetching products:', error)
@@ -69,35 +149,32 @@ const fetchProducts = async () => {
 }
 
 const addToCart = (product) => {
-  console.log('=== ADD TO CART CLICKED ===')
-  console.log('Product:', product.name)
-  console.log('UUID:', product.uuid)
-  console.log('Current cart before add:', cartItems.value.map(i => i.name))
-  
-  addItem({ 
-    id: product.id,
-    uuid: product.uuid, 
-    name: product.name, 
-    price: Number(product.price) 
-  }, 1)
-  
-  console.log('Cart after add:', cartItems.value.map(i => i.name))
+  if (product.stock_quantity <= 0) return
+
+  const quantity = quantities[product.uuid] || 1
+
+  if (quantity > product.stock_quantity) {
+    showToastMessage(`Only ${product.stock_quantity} items available`)
+    return
+  }
+
+  const added = addItem(product, quantity)
+
+  if (added) {
+    showToastMessage(`${quantity} x ${product.name} added to cart!`)
+  }
 }
 
-const buyNow = (product) => {
-  console.log('Buy now:', product.name)
-  clearCart()
-  addItem({ 
-    id: product.id,
-    uuid: product.uuid, 
-    name: product.name, 
-    price: Number(product.price) 
-  }, 1)
-  navigateTo('/checkout')
+const showToastMessage = (message) => {
+  toastMessage.value = message
+  showToast.value = true
+  setTimeout(() => {
+    showToast.value = false
+  }, 2000)
 }
 
 onMounted(() => {
-  fetchProducts()
   loadCart()
+  fetchProducts()
 })
 </script>

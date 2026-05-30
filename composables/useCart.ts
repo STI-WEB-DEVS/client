@@ -1,12 +1,23 @@
 import { ref, computed, readonly } from 'vue'
 
 // Create a singleton instance outside the composable
-const cartItemsRef = ref([])
-const notificationRef = ref(null)
+type CartItem = {
+    product_uuid: string
+    name: string
+    price: number
+    quantity: number
+    maxStock: number
+}
+
+const CART_STORAGE_KEY = 'cart_items'
+const LEGACY_CART_STORAGE_KEY = 'cart'
+
+const cartItemsRef = ref<CartItem[]>([])
+const notificationRef = ref<{ message: string; type: string } | null>(null)
 const cartBadgeAnimationRef = ref(false)
 
 export const useCart = () => {
-    const showNotification = (message, type = 'success') => {
+    const showNotification = (message: string, type = 'success') => {
         notificationRef.value = { message, type }
         setTimeout(() => {
             notificationRef.value = null
@@ -20,16 +31,44 @@ export const useCart = () => {
         }, 300)
     }
 
+    const normalizeCartItem = (item: any): CartItem | null => {
+        const productUuid = item?.product_uuid || item?.uuid
+
+        if (!productUuid || !item?.name) {
+            return null
+        }
+
+        return {
+            product_uuid: String(productUuid),
+            name: String(item.name),
+            price: Number(item.price) || 0,
+            quantity: Math.max(1, Number(item.quantity) || 1),
+            maxStock: Math.max(0, Number(item.maxStock ?? item.stock_quantity ?? item.quantity) || 0),
+        }
+    }
+
+    const readStoredCart = () => {
+        if (typeof localStorage === 'undefined') {
+            return null
+        }
+
+        return localStorage.getItem(CART_STORAGE_KEY) || localStorage.getItem(LEGACY_CART_STORAGE_KEY)
+    }
+
     const loadCart = () => {
-        const saved = localStorage.getItem('cart_items')
-        console.log('loadCart called. localStorage:', saved)
-        
+        const saved = readStoredCart()
+
         if (saved) {
             try {
                 const parsed = JSON.parse(saved)
-                cartItemsRef.value = parsed
-                console.log('Cart loaded. Items count:', cartItemsRef.value.length)
-                console.log('Products:', cartItemsRef.value.map(i => i.name))
+                cartItemsRef.value = Array.isArray(parsed)
+                    ? parsed.map(normalizeCartItem).filter(Boolean) as CartItem[]
+                    : []
+
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItemsRef.value))
+                    localStorage.removeItem(LEGACY_CART_STORAGE_KEY)
+                }
             } catch (e) {
                 console.error('Error loading cart:', e)
                 cartItemsRef.value = []
@@ -40,66 +79,91 @@ export const useCart = () => {
     }
 
     const saveCart = () => {
-        console.log('saveCart called. Saving items:', cartItemsRef.value.length)
-        localStorage.setItem('cart_items', JSON.stringify(cartItemsRef.value))
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItemsRef.value))
+            localStorage.removeItem(LEGACY_CART_STORAGE_KEY)
+        }
+
         triggerCartBadge()
         
-        // Force a small delay to ensure DOM updates
-        setTimeout(() => {
-            console.log('Cart saved. Total items now:', totalItems.value)
-        }, 50)
+        // Dispatch event for other components
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cart-updated', { 
+                detail: { 
+                    items: cartItemsRef.value, 
+                    total: totalItems.value 
+                } 
+            }))
+        }
     }
 
-    const addItem = (product, quantity = 1) => {
-        console.log('=== ADDING ITEM ===')
-        console.log('Product:', product.name)
-        console.log('Product ID (integer):', product.id)
-        console.log('Product UUID:', product.uuid)
-        console.log('Current cart before:', [...cartItemsRef.value])
-        
+    const addItem = (product: any, quantity = 1) => {
+        const productUuid = product?.uuid || product?.product_uuid
+        const stockQuantity = Number(product?.stock_quantity ?? product?.maxStock ?? 0)
+
+        if (!productUuid) {
+            showNotification('Unable to add product to cart', 'error')
+            return false
+        }
+
+        if (stockQuantity <= 0) {
+            showNotification('This product is out of stock', 'error')
+            return false
+        }
+
         // Check if product exists by UUID
-        const existingIndex = cartItemsRef.value.findIndex(item => item.product_uuid === product.uuid)
+        const existingIndex = cartItemsRef.value.findIndex(item => item.product_uuid === productUuid)
+        
+        // Validate stock
+        const currentQuantity = existingIndex !== -1 ? cartItemsRef.value[existingIndex].quantity : 0
+        const newQuantity = currentQuantity + quantity
+        
+        if (newQuantity > stockQuantity) {
+            showNotification(`Only ${stockQuantity} items available in stock`, 'error')
+            return false
+        }
         
         if (existingIndex !== -1) {
             // Update existing
-            cartItemsRef.value[existingIndex].quantity += quantity
-            console.log('Updated existing. New quantity:', cartItemsRef.value[existingIndex].quantity)
-            showNotification(`Updated ${product.name} to ${cartItemsRef.value[existingIndex].quantity}`, 'success')
+            cartItemsRef.value[existingIndex].quantity = newQuantity
+            cartItemsRef.value[existingIndex].maxStock = stockQuantity
+            showNotification(`Updated ${product.name} to ${cartItemsRef.value[existingIndex].quantity} in cart`, 'success')
         } else {
-            // Add new item with UUID for API
+            // Add new item
             const newItem = {
-                product_uuid: product.uuid,
+                product_uuid: productUuid,
                 name: product.name,
-                price: product.price,
+                price: parseFloat(product.price),
                 quantity: quantity,
-                addedAt: Date.now()
+                maxStock: stockQuantity,
             }
             cartItemsRef.value.push(newItem)
-            console.log('Added new. Total items now:', cartItemsRef.value.length)
-            console.log('Stored with product_uuid:', newItem.product_uuid)
-            showNotification(`Added ${product.name} to cart!`, 'success')
+            showNotification(`${quantity} x ${product.name} added to cart!`, 'success')
         }
         
         // Force reactivity by creating a new reference
         cartItemsRef.value = [...cartItemsRef.value]
         
-        console.log('Cart after add:', cartItemsRef.value.map(i => `${i.name} (ID: ${i.product_id}, Qty: ${i.quantity})`))
         saveCart()
         
         return true
     }
 
-    const updateQuantity = (productUuid, quantity) => {
+    const updateQuantity = (productUuid: string, quantity: number) => {
         const itemIndex = cartItemsRef.value.findIndex(i => i.product_uuid === productUuid)
         
         if (itemIndex !== -1) {
+            const item = cartItemsRef.value[itemIndex]
+            
             if (quantity <= 0) {
-                const itemName = cartItemsRef.value[itemIndex].name
                 cartItemsRef.value.splice(itemIndex, 1)
-                showNotification(`Removed ${itemName} from cart`, 'info')
+                showNotification(`Removed ${item.name} from cart`, 'info')
+            } else if (quantity > item.maxStock) {
+                showNotification(`Only ${item.maxStock} items available in stock`, 'error')
+                return
             } else {
                 cartItemsRef.value[itemIndex].quantity = quantity
-                showNotification(`Updated ${cartItemsRef.value[itemIndex].name} to ${quantity}`, 'success')
+                showNotification(`Updated ${item.name} to ${quantity}`, 'success')
             }
             // Force reactivity
             cartItemsRef.value = [...cartItemsRef.value]
@@ -107,7 +171,7 @@ export const useCart = () => {
         }
     }
 
-    const removeItem = (productUuid) => {
+    const removeItem = (productUuid: string) => {
         const itemIndex = cartItemsRef.value.findIndex(i => i.product_uuid === productUuid)
         
         if (itemIndex !== -1) {
@@ -119,21 +183,49 @@ export const useCart = () => {
         }
     }
 
+    const syncItemStock = (product: any) => {
+        const productUuid = product?.uuid || product?.product_uuid
+        const itemIndex = cartItemsRef.value.findIndex(i => i.product_uuid === productUuid)
+
+        if (itemIndex === -1) {
+            return
+        }
+
+        cartItemsRef.value[itemIndex] = {
+            ...cartItemsRef.value[itemIndex],
+            name: product.name ?? cartItemsRef.value[itemIndex].name,
+            price: Number(product.price ?? cartItemsRef.value[itemIndex].price),
+            maxStock: Math.max(0, Number(product.stock_quantity ?? product.maxStock ?? 0)),
+        }
+        cartItemsRef.value = [...cartItemsRef.value]
+        saveCart()
+    }
+
     const clearCart = () => {
         cartItemsRef.value = []
+        cartItemsRef.value = [...cartItemsRef.value]
         saveCart()
         showNotification('Cart cleared', 'info')
     }
 
+    // Get item count for a specific product
+    const getItemQuantity = (productUuid: string) => {
+        const item = cartItemsRef.value.find(i => i.product_uuid === productUuid)
+        return item ? item.quantity : 0
+    }
+
+    // Check if product is in cart
+    const isInCart = (productUuid: string) => {
+        return cartItemsRef.value.some(i => i.product_uuid === productUuid)
+    }
+
     // Computed properties
     const totalItems = computed(() => {
-        const total = cartItemsRef.value.reduce((sum, i) => sum + i.quantity, 0)
-        console.log('totalItems computed (reactive):', total)
-        return total
+        return cartItemsRef.value.reduce((sum, i) => sum + (i.quantity || 0), 0)
     })
     
     const totalPrice = computed(() => {
-        return cartItemsRef.value.reduce((sum, i) => sum + (i.price * i.quantity), 0)
+        return cartItemsRef.value.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 0)), 0)
     })
     
     const formattedTotal = computed(() => `₱${totalPrice.value.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`)
@@ -149,6 +241,9 @@ export const useCart = () => {
         addItem,
         updateQuantity,
         removeItem,
-        clearCart
+        syncItemStock,
+        clearCart,
+        getItemQuantity,
+        isInCart
     }
 }

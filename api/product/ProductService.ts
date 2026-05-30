@@ -16,7 +16,12 @@ class ProductService extends BaseService {
         return await this.request(this.resource, 'GET', params);
     }
 
-    async create(payload: object): Promise<any> {
+    async create(payload: {
+        name: string;
+        description?: string;
+        price: number;
+        stock_quantity: number;
+    }): Promise<any> {
         return await this.request(this.resource, 'POST', payload);
     }
 
@@ -24,7 +29,12 @@ class ProductService extends BaseService {
         return await this.request(`${this.resource}/${uuid}`, 'GET');
     }
 
-    async update(uuid: string, payload: object): Promise<any> {
+    async update(uuid: string, payload: {
+        name?: string;
+        description?: string;
+        price?: number;
+        restock_quantity?: number;
+    }): Promise<any> {
         return await this.request(`${this.resource}/${uuid}`, 'PUT', payload);
     }
 

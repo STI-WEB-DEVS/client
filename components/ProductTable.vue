@@ -6,6 +6,8 @@
           <tr>
             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Name</th>
+            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Description</th>
+            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Stock</th>
             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Price</th>
             <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
           </tr>
@@ -14,6 +16,19 @@
           <tr v-for="product in products" :key="product.id">
             <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ product.id }}</td>
             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ product.name }}</td>
+            <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{{ product.description || '-' }}</td>
+            <td class="whitespace-nowrap px-6 py-4 text-sm">
+              <span 
+                :class="[
+                  'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+                  product.stock_quantity <= 0 ? 'bg-red-100 text-red-800' : 
+                  product.stock_quantity < 10 ? 'bg-yellow-100 text-yellow-800' : 
+                  'bg-green-100 text-green-800'
+                ]"
+              >
+                {{ product.stock_quantity ?? 0 }}
+              </span>
+            </td>
             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">₱{{ formatPrice(product.price) }}</td>
             <td class="whitespace-nowrap px-6 py-4">
               <div class="flex items-center justify-end gap-2">
@@ -33,7 +48,7 @@
             </td>
           </tr>
           <tr v-if="!products?.length">
-            <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">No products found.</td>
+            <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">No products found.</td>
           </tr>
         </tbody>
       </table>

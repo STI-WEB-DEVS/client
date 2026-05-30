@@ -34,9 +34,13 @@
                       <span class="text-sm text-gray-900 w-8 text-center">{{ item.quantity }}</span>
                       <button 
                         @click="updateQuantity(item.product_uuid, item.quantity + 1)"
-                        class="w-6 h-6 rounded border border-gray-300 text-gray-600 hover:bg-gray-100"
+                        :disabled="item.quantity >= item.maxStock"
+                        class="w-6 h-6 rounded border border-gray-300 text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
                       >+</button>
                     </div>
+                    <p class="mt-1 text-xs text-gray-500">
+                      {{ item.maxStock > 0 ? `Stock Left: ${item.maxStock}` : 'Out of Stock' }}
+                    </p>
                   </td>
                   <td class="px-6 py-4">
                     <div class="text-sm text-gray-900">₱{{ formatPrice(item.price) }}</div>
@@ -70,6 +74,10 @@
                   <span class="font-medium text-gray-600">Subtotal</span>
                   <span class="font-bold text-gray-900">₱{{ formatPrice(totalPrice) }}</span>
                 </div>
+                <div class="flex justify-between py-2 text-sm">
+                  <span class="font-medium text-gray-600">Total Items</span>
+                  <span class="font-semibold text-gray-900">{{ totalItems }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -98,14 +106,18 @@
               <span class="font-semibold text-gray-900">Total</span>
               <span class="text-xl font-bold text-blue-600">{{ formattedTotal }}</span>
             </div>
+            <div class="mt-2 flex justify-between text-sm">
+              <span class="font-medium text-gray-600">Total Items</span>
+              <span class="font-semibold text-gray-900">{{ totalItems }}</span>
+            </div>
 
             <div class="mt-6 space-y-3">
               <button 
                 @click="placeOrder" 
-                :disabled="cartItems.length === 0"
+                :disabled="cartItems.length === 0 || isPlacingOrder"
                 class="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 disabled:opacity-50"
               >
-                Proceed to Checkout
+                {{ isPlacingOrder ? 'Checking stock...' : 'Proceed to Checkout' }}
               </button>
 
               <button 
@@ -156,6 +168,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import BaseService from '~/api/BaseService'
+import { productService } from '~/api/product/ProductService'
 import { useCart } from '~/composables/useCart'
 
 definePageMeta({ layout: 'customer' })
@@ -169,6 +182,7 @@ const {
   formattedTotal, 
   updateQuantity,
   removeItem,
+  syncItemStock,
   clearCart,
   loadCart 
 } = useCart()
@@ -176,15 +190,51 @@ const {
 const showPayloadModal = ref(false)
 const payloadData = ref(null)
 const responseData = ref(null)
+const isPlacingOrder = ref(false)
 
 const formatPrice = (price) => price.toLocaleString('en-PH', { minimumFractionDigits: 2 })
 
+const validateCartStock = async () => {
+  for (const item of cartItems.value) {
+    const product = await productService.show(item.product_uuid)
+    const currentStock = Number(product.stock_quantity ?? 0)
+
+    syncItemStock(product)
+
+    if (currentStock <= 0 || item.quantity > currentStock) {
+      alert('Insufficient stock available.')
+      return false
+    }
+  }
+
+  return true
+}
+
 const placeOrder = async () => {
+  if (isPlacingOrder.value) return
+
   // Get customer ID from localStorage (should be integer)
   const customerId = localStorage.getItem('customer_id')
   
   if (!customerId) {
     alert('Unable to place order. Please sign in again.')
+    return
+  }
+
+  isPlacingOrder.value = true
+
+  let hasStock = false
+  try {
+    hasStock = await validateCartStock()
+  } catch (error) {
+    console.error('Stock validation failed:', error)
+    alert(error.message || 'Unable to verify stock. Please try again.')
+    isPlacingOrder.value = false
+    return
+  }
+
+  if (!hasStock) {
+    isPlacingOrder.value = false
     return
   }
 
@@ -196,6 +246,7 @@ const placeOrder = async () => {
     if (!item.product_uuid) {
       console.error('Missing product_uuid for:', item.name)
       alert(`Missing product UUID for ${item.name}. Please refresh and try again.`)
+      isPlacingOrder.value = false
       return
     }
     
@@ -225,15 +276,18 @@ const placeOrder = async () => {
     console.log('Order Response:', response)
     
     // Show success message
-    alert(`Order placed successfully! Order ID: ${response.data?.id || 'N/A'}`)
+    alert(`Order placed successfully! Order ID: ${response.order?.id || 'N/A'}`)
     showPayloadModal.value = true
     
     // Clear cart after successful order
     clearCart()
+    window.dispatchEvent(new CustomEvent('product-stock-updated'))
     
   } catch (error) {
     console.error('Order creation failed:', error)
     alert(error.message || 'Failed to place order. Please try again.')
+  } finally {
+    isPlacingOrder.value = false
   }
 }
 

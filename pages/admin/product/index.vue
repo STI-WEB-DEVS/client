@@ -2,7 +2,7 @@
   <div class="space-y-6">
     <PageHeader 
       title="Products" 
-      description="Displaying product records from your API."
+      description="Manage your product inventory, stock levels, and product information."
       entity-name="Product"
       :show-create-button="true"
       @create="openCreateModal"
@@ -69,7 +69,13 @@ const showDeleteModal = ref(false)
 const isEditing = ref(false)
 const editingUuid = ref(null)
 const productToDelete = ref(null)
-const form = ref({ name: '', price: 0 })
+const form = ref({ 
+  name: '', 
+  description: '', 
+  price: 0, 
+  stock_quantity: 0,
+  restock_quantity: ''
+})
 const isFeedbackModalOpen = ref(false)
 const feedbackMessage = ref('')
 
@@ -81,6 +87,8 @@ const fetchProducts = async () => {
     meta.value = response.meta || {}
   } catch (error: any) {
     console.error('Error fetching products:', error)
+    feedbackMessage.value = error.message || 'Failed to fetch products'
+    isFeedbackModalOpen.value = true
   } finally {
     pending.value = false
   }
@@ -93,14 +101,26 @@ const handleView = (product: any) => {
 const openCreateModal = () => {
   isEditing.value = false
   editingUuid.value = null
-  form.value = { name: '', price: 0 }
+  form.value = { 
+    name: '', 
+    description: '', 
+    price: 0, 
+    stock_quantity: 0,
+    restock_quantity: ''
+  }
   showModal.value = true
 }
 
 const openEditModal = (product: any) => {
   isEditing.value = true
   editingUuid.value = product.uuid
-  form.value = { name: product.name, price: product.price }
+  form.value = { 
+    name: product.name, 
+    description: product.description || '',
+    price: product.price, 
+    stock_quantity: product.stock_quantity || 0,
+    restock_quantity: ''
+  }
   showModal.value = true
 }
 
@@ -144,7 +164,13 @@ const confirmDelete = async () => {
 
 const closeModal = () => {
   showModal.value = false
-  form.value = { name: '', price: 0 }
+  form.value = { 
+    name: '', 
+    description: '', 
+    price: 0, 
+    stock_quantity: 0,
+    restock_quantity: ''
+  }
   editingUuid.value = null
   isEditing.value = false
 }
@@ -154,6 +180,11 @@ const closeFeedbackModal = () => {
 }
 
 onMounted(() => {
-  fetchProducts()
+  const token = localStorage.getItem('_token');
+  if (!token) {
+    navigateTo('/');
+  } else {
+    fetchProducts();
+  }
 })
 </script>
