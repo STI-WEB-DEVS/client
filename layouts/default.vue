@@ -16,11 +16,8 @@
                   </button>
                 </div>
               </TransitionChild>
-
-              <!-- Mobile Sidebar Content -->
               <div class="flex grow flex-col overflow-y-auto" style="background: linear-gradient(180deg, #1e3a5f 0%, #162d4a 100%);">
                 <div class="flex h-16 shrink-0 items-center gap-x-3 border-b border-white/10 px-6">
-                  <!-- Logo -->
                   <div class="flex size-9 items-center justify-center rounded-lg shrink-0" style="background: #162c48;">
                     <svg width="24" height="24" viewBox="0 0 44 44" fill="none">
                       <path d="M22 32C22 32 11 25.5 11 18.5C11 14.9 13.9 12 17.5 12C19.7 12 21.6 13.2 22 13.8C22.4 13.2 24.3 12 26.5 12C30.1 12 33 14.9 33 18.5C33 25.5 22 32 22 32Z" fill="none" stroke="#7eb8f7" stroke-width="1.4"/>
@@ -53,21 +50,6 @@
                         </li>
                       </ul>
                     </li>
-                    <li class="mt-auto">
-                      <p class="text-xs font-semibold text-blue-300/60 uppercase tracking-widest mb-3 px-3">System</p>
-                      <NuxtLink
-                        to="/settings"
-                        :class="[
-                          route.path === '/settings'
-                            ? 'bg-white/10 text-white border-l-2 border-blue-400'
-                            : 'text-blue-100/70 hover:bg-white/5 hover:text-white border-l-2 border-transparent',
-                          'group flex gap-x-3 rounded-r-md pl-3 pr-2 py-2.5 text-sm font-medium transition-all duration-150'
-                        ]"
-                      >
-                        <Cog6ToothIcon class="size-5 shrink-0 mt-0.5" aria-hidden="true" />
-                        Settings
-                      </NuxtLink>
-                    </li>
                   </ul>
                 </nav>
               </div>
@@ -80,8 +62,6 @@
     <!-- Desktop Sidebar -->
     <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
       <div class="flex grow flex-col overflow-y-auto shadow-xl" style="background: linear-gradient(180deg, #1e3a5f 0%, #162d4a 100%);">
-
-        <!-- Logo -->
         <div class="flex h-16 shrink-0 items-center gap-x-3 border-b border-white/10 px-6">
           <div class="flex size-9 items-center justify-center rounded-lg shrink-0" style="background: #162c48;">
             <svg width="24" height="24" viewBox="0 0 44 44" fill="none">
@@ -94,7 +74,6 @@
             <p class="text-blue-300 text-xs leading-tight">Healthcare Portal</p>
           </div>
         </div>
-
         <nav class="flex flex-1 flex-col px-4 py-6">
           <ul role="list" class="flex flex-1 flex-col gap-y-6">
             <li>
@@ -116,23 +95,6 @@
                 </li>
               </ul>
             </li>
-
-            <!-- Settings at bottom -->
-            <li class="mt-auto">
-              <p class="text-xs font-semibold text-blue-300/60 uppercase tracking-widest mb-3 px-3">System</p>
-              <NuxtLink
-                to="/settings"
-                :class="[
-                  route.path === '/settings'
-                    ? 'bg-white/10 text-white border-l-2 border-blue-400'
-                    : 'text-blue-100/70 hover:bg-white/5 hover:text-white border-l-2 border-transparent',
-                  'group flex gap-x-3 rounded-r-md pl-3 pr-2 py-2.5 text-sm font-medium transition-all duration-150'
-                ]"
-              >
-                <Cog6ToothIcon class="size-5 shrink-0 mt-0.5" aria-hidden="true" />
-                Settings
-              </NuxtLink>
-            </li>
           </ul>
         </nav>
       </div>
@@ -149,26 +111,22 @@
         <div class="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true"></div>
 
         <div class="flex flex-1 items-center justify-between">
-          <!-- Breadcrumb -->
           <div class="flex items-center gap-x-2">
             <span class="text-xs text-gray-400 font-medium uppercase tracking-widest hidden sm:block">AMUMA</span>
             <span class="text-gray-300 hidden sm:block">/</span>
             <span class="text-sm font-semibold text-gray-700 capitalize hidden sm:block">{{ currentPage }}</span>
           </div>
 
-          <!-- Right Side -->
           <div class="flex items-center gap-x-3">
             <button type="button" class="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
               <span class="sr-only">View notifications</span>
               <BellIcon class="size-5" aria-hidden="true" />
               <span class="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500"></span>
             </button>
-
             <div class="h-6 w-px bg-gray-200" aria-hidden="true"></div>
-
             <Menu as="div" class="relative">
               <MenuButton class="flex items-center gap-x-2 rounded-lg px-2 py-1.5 hover:bg-gray-100 transition">
-                <div class="size-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow" style="background: linear-gradient(135deg, #1e3a5f, #2563eb);">NL</div>
+                <div class="size-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow" style="background: linear-gradient(135deg, #1e3a5f, #2563eb);">AD</div>
                 <div class="hidden lg:block text-left">
                   <p class="text-sm font-semibold text-gray-800 leading-tight">Admin</p>
                 </div>
@@ -176,24 +134,12 @@
               </MenuButton>
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-2xl bg-white py-1 shadow-lg ring-1 ring-gray-900/5">
-                  <MenuItem v-slot="{ active }">
-                    <a href="/profile" :class="[active ? 'bg-gray-50' : '', 'flex items-center gap-x-2 px-4 py-2.5 text-sm text-gray-700 rounded-t-2xl']">
-                      <UserCircleIcon class="size-4 text-gray-400" />
-                      Your Profile
-                    </a>
-                  </MenuItem>
-                  <MenuItem v-slot="{ active }">
-                    <a href="/settings" :class="[active ? 'bg-gray-50' : '', 'flex items-center gap-x-2 px-4 py-2.5 text-sm text-gray-700']">
-                      <Cog6ToothIcon class="size-4 text-gray-400" />
-                      Settings
-                    </a>
-                  </MenuItem>
                   <div class="my-1 border-t border-gray-100"></div>
                   <MenuItem v-slot="{ active }">
-                    <a href="/" :class="[active ? 'bg-red-50 text-red-600' : 'text-red-500', 'flex items-center gap-x-2 px-4 py-2.5 text-sm rounded-b-2xl']">
+                    <button @click="handleLogout" :class="[active ? 'bg-red-50 text-red-600' : 'text-red-500', 'flex w-full items-center gap-x-2 px-4 py-2.5 text-sm rounded-b-2xl']">
                       <ArrowRightOnRectangleIcon class="size-4" />
                       Sign Out
-                    </a>
+                    </button>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -219,28 +165,32 @@ import {
   TransitionChild, TransitionRoot,
 } from '@headlessui/vue'
 import {
-  Bars3Icon, BellIcon, CalendarIcon, ChartPieIcon,
-  Cog6ToothIcon, HomeIcon, UsersIcon, XMarkIcon,
-  UserCircleIcon, ArrowRightOnRectangleIcon,
-  DocumentDuplicateIcon, FolderIcon,
+  Bars3Icon, BellIcon, Cog6ToothIcon, HomeIcon, UsersIcon, XMarkIcon,
+  UserCircleIcon, ArrowRightOnRectangleIcon, DocumentDuplicateIcon,
+  FolderIcon, ShoppingBagIcon, ShoppingCartIcon,
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const sidebarOpen = ref(false)
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Patients', href: '/patients', icon: FolderIcon },
-  { name: 'Appointments', href: '/appointments', icon: CalendarIcon },
-  { name: 'Records', href: '/records', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '/reports', icon: ChartPieIcon },
+  { name: 'Shop', href: '/customer/shop', icon: ShoppingCartIcon },
+  { name: 'Products', href: '/admin/products', icon: ShoppingBagIcon },
+  { name: 'Customers', href: '/admin/customers', icon: UsersIcon },
+  { name: 'Orders', href: '/admin/orders', icon: DocumentDuplicateIcon },
 ]
 
 const currentPage = computed(() => {
-  const path = route.path.replace('/', '') || 'home'
-  return path
+  const parts = route.path.split('/')
+  return parts[parts.length - 1] || 'home'
 })
+
+const handleLogout = () => {
+  localStorage.clear()
+  router.push('/')
+}
 </script>

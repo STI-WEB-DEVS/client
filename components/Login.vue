@@ -78,6 +78,9 @@
             </svg>
             <span>{{ loading ? 'Signing in…' : success ? 'Access granted' : 'Sign in' }}</span>
           </button>
+
+          <p v-if="error" class="err">{{ error }}</p>
+
         </form>
 
         <p class="foot">🔒 Authorized healthcare staff only · STI College 2025</p>
@@ -88,50 +91,57 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
+
 definePageMeta({
   layout: false,
 });
- 
-import { ref } from "vue";
-import { AuthService } from "~/api/auth/AuthService";
- 
+
 const email = ref("");
 const password = ref("");
 const error = ref("");
-const isLoading = ref(false);
- 
+const remember = ref(false);
+const loading = ref(false);
+const success = ref(false);
+
 const authService = new AuthService();
- 
+
 const handleSubmit = async () => {
+  if (loading.value) return;
+
   error.value = "";
-  isLoading.value = true;
- 
+  loading.value = true;
+  success.value = false;
+
   try {
     const response = await authService.login(email.value, password.value);
- 
+
     if (response?.token) {
-      localStorage.setItem("_token", response.token);
+  localStorage.setItem("_token", response.token);
+  }
+
+    if (response?.user?.email) {
+  localStorage.setItem("_email", response.user.email);
+  }
+
+    if (response?.user?.role) {
+      localStorage.setItem("_role", response.user.role);
     }
- 
-    // // if (response?.user.customer_uuid) {
-    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
-    // // } else if (response?.user.uuid) {
-    // //   localStorage.setItem("_uuid", response.user.uuid);
-    // // }
- 
-    / /// if (response?.user.role) {
-    // //   localStorage.setItem("_role", response.user.role);
-    // // }
- 
-    // await navigateTo("/admin/dashboard");
- 
-    await navigateTo(
-      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
-    );
+
+    if (response?.user?.uuid) {
+  localStorage.setItem("_uuid", response.user.uuid);
+  }
+
+    success.value = true;
+
+    const targetPath = response.user.role === "admin" ? "/dashboard" : "/customer/shop";
+    await navigateTo(targetPath);
+
   } catch (err: any) {
-    error.value = err?.message || "";
+    error.value = err?.response?.data?.message || err?.message || "Invalid credentials. Please try again.";
   } finally {
-    isLoading.value = false;
+    loading.value = false;
   }
 };
 </script>
@@ -151,7 +161,6 @@ const handleSubmit = async () => {
   font-family: 'Geist', sans-serif;
 }
 
-/* ── Left panel ── */
 .left {
   width: 46%;
   background: #0f1f35;
@@ -254,7 +263,6 @@ const handleSubmit = async () => {
   flex-shrink: 0;
 }
 
-/* ── Right panel ── */
 .right {
   flex: 1;
   background: #eef2f7;
@@ -286,7 +294,6 @@ const handleSubmit = async () => {
   margin-bottom: 36px;
 }
 
-/* ── Form ── */
 .field {
   margin-bottom: 18px;
 }
@@ -395,6 +402,13 @@ const handleSubmit = async () => {
   cursor: not-allowed;
 }
 
+.err {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 10px;
+  text-align: center;
+}
+
 .foot {
   margin-top: 18px;
   font-size: 11px;
@@ -402,7 +416,6 @@ const handleSubmit = async () => {
   text-align: center;
 }
 
-/* ── Spinner ── */
 .spin {
   animation: spin 0.8s linear infinite;
 }
@@ -411,7 +424,6 @@ const handleSubmit = async () => {
   to { transform: rotate(360deg); }
 }
 
-/* ── Responsive ── */
 @media (max-width: 768px) {
   .shell {
     flex-direction: column;
