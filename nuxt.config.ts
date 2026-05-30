@@ -5,7 +5,8 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss'],
   runtimeConfig: {
     public: {
-      apiBaseURL: process.env.API_BASE_URL
+      //apiBaseURL: process.env.API_BASE_URL
+      apiBaseURL: 'http://127.0.0.1:8000/api'
     }
   }
 })

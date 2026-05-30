@@ -74,6 +74,7 @@
           <div>
             <label class="block text-xs font-semibold uppercase tracking-widest mb-2" style="color: #1C3028;">Email address</label>
             <input
+              v-model="email"
               type="email" autocomplete="email" required
               placeholder="you@servora.com"
               class="block w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#1C3028] transition-colors shadow-sm"
@@ -84,6 +85,7 @@
           <div>
             <label class="block text-xs font-semibold uppercase tracking-widest mb-2" style="color: #1C3028;">Password</label>
             <input
+              v-model="password"
               type="password" autocomplete="current-password" required
               placeholder="••••••••"
               class="block w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#1C3028] transition-colors shadow-sm"
@@ -163,20 +165,20 @@ const handleSubmit = async () => {
       localStorage.setItem("_token", response.token);
     }
  
-    // // if (response?.user.customer_uuid) {
-    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
-    // // } else if (response?.user.uuid) {
-    // //   localStorage.setItem("_uuid", response.user.uuid);
-    // // }
+     if (response?.user.customer_uuid) {
+      localStorage.setItem("_uuid", response.user.customer_uuid);
+     } else if (response?.user.uuid) {
+       localStorage.setItem("_uuid", response.user.uuid);
+     }
  
-    / /// if (response?.user.role) {
-    // //   localStorage.setItem("_role", response.user.role);
-    // // }
+     if (response?.user.role) {
+       localStorage.setItem("_role", response.user.role);
+     }
  
-    // await navigateTo("/admin/dashboard");
+    await navigateTo("/admin/dashboard");
  
     await navigateTo(
-      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+      response.user.role === "admin" ? "/admin/dashboard" : "/customer/shop",
     );
   } catch (err: any) {
     error.value = err?.message || "";
