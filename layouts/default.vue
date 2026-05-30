@@ -32,7 +32,7 @@
                     <li>
                       <ul role="list" class="-mx-2 space-y-1">
                         <li v-for="item in navigation" :key="item.name">
-                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/10 text-white' : 'text-[#A8DADC] hover:bg-white/10 hover:text-white', 'group flex gap-x-3 rounded-lg p-2 text-sm font-semibold transition-colors']">
+                          <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/10 text-white' : 'text-[#A8DADC] hover:bg-white/10 hover:text-white', 'group flex gap-x-3 rounded-lg p-2 text-sm font-semibold transition-colors duration-200 ease-out']">
                             <component :is="item.icon" class="size-5 shrink-0" aria-hidden="true" />
                             {{ item.name }}
                           </NuxtLink>
@@ -40,7 +40,7 @@
                       </ul>
                     </li>
                     <li class="mt-auto">
-                      <NuxtLink to="/setting" class="group -mx-2 flex gap-x-3 rounded-lg p-2 text-sm font-semibold text-[#A8DADC] hover:bg-white/10 hover:text-white transition-colors">
+                      <NuxtLink to="/setting" class="group -mx-2 flex gap-x-3 rounded-lg p-2 text-sm font-semibold text-[#A8DADC] hover:bg-white/10 hover:text-white transition-colors duration-200 ease-out">
                         <Cog6ToothIcon class="size-5 shrink-0" aria-hidden="true" />
                         Settings
                       </NuxtLink>
@@ -69,7 +69,7 @@
             <li>
               <ul role="lis t" class="-mx-2 space-y-1">
                 <li v-for="item in navigation" :key="item.name">
-                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/10 text-white' : 'text-[#A8DADC] hover:bg-white/10 hover:text-white', 'group flex gap-x-3 rounded-lg p-2 text-sm font-semibold transition-colors']">
+                  <NuxtLink :to="item.href" :class="[route.path === item.href ? 'bg-white/10 text-white' : 'text-[#A8DADC] hover:bg-white/10 hover:text-white', 'group flex gap-x-3 rounded-lg p-2 text-sm font-semibold transition-colors duration-200 ease-out']">
                     <component :is="item.icon" class="size-5 shrink-0" aria-hidden="true" />
                     {{ item.name }}
                   </NuxtLink>
@@ -77,7 +77,7 @@
               </ul>
             </li>
             <li class="mt-auto border-t border-white/10 pt-4">
-              <NuxtLink to="/setting/general" :class="[route.path.startsWith('/setting/general') ? 'bg-white/10 text-white' : 'text-[#A8DADC] hover:bg-white/10 hover:text-white', 'group -mx-2 flex gap-x-3 rounded-lg p-2 text-sm font-semibold transition-colors']">
+              <NuxtLink to="/setting/general" :class="[route.path.startsWith('/setting/general') ? 'bg-white/10 text-white' : 'text-[#A8DADC] hover:bg-white/10 hover:text-white', 'group -mx-2 flex gap-x-3 rounded-lg p-2 text-sm font-semibold transition-colors duration-200 ease-out']">
                 <Cog6ToothIcon class="size-5 shrink-0" aria-hidden="true" />
                 Settings
               </NuxtLink>
@@ -91,7 +91,7 @@
     <div class="lg:pl-72">
 
       <!-- Top bar -->
-      <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-[#A8DADC]/20 bg-[#F1FAEE] px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+      <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-[#A8DADC]/20 bg-[#F1FAEE] px-4 shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] sm:gap-x-6 sm:px-6 lg:px-8">
         <button type="button" class="-m-2.5 p-2.5 text-[#1D3557] lg:hidden" @click="sidebarOpen = true">
           <span class="sr-only">Open sidebar</span>
           <Bars3Icon class="size-6" aria-hidden="true" />
@@ -99,7 +99,7 @@
         <div class="h-6 w-px bg-[#1D3557]/10 lg:hidden" aria-hidden="true"></div>
 
         <div class="flex flex-1 items-center justify-end gap-x-4 lg:gap-x-6">
-          <button type="button" class="-m-2.5 p-2.5 text-[#457B9D] hover:text-[#1D3557] transition-colors">
+          <button type="button" class="-m-2.5 p-2.5 text-[#457B9D] hover:text-[#1D3557] transition-colors duration-200 ease-out">
             <span class="sr-only">View notifications</span>
             <BellIcon class="size-5" aria-hidden="true" />
           </button>
@@ -114,10 +114,10 @@
                 <ChevronDownIcon class="ml-2 size-4 text-[#457B9D]" aria-hidden="true" />
               </span>
             </MenuButton>
-            <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-              <MenuItems class="absolute right-0 z-10 mt-2.5 w-36 origin-top-right rounded-xl bg-white py-2 shadow-lg ring-1 ring-[#1D3557]/10">
+            <transition enter-active-class="transition ease-out duration-200" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-200" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+              <MenuItems class="absolute right-0 z-10 mt-2.5 w-36 origin-top-right rounded-lg bg-white py-2 shadow-[0_12px_30px_rgba(29,53,87,0.14),0_4px_10px_rgba(29,53,87,0.08)] ring-1 ring-[#1D3557]/10">
                 <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                  <a :href="item.href" :class="[active ? 'bg-[#F1FAEE] text-[#D62828]' : 'text-[#1D3557]', 'block px-4 py-1.5 text-sm font-medium transition-colors']">{{ item.name }}</a>
+                  <a :href="item.href" :class="[active ? 'bg-[#F1FAEE] text-[#D62828]' : 'text-[#1D3557]', 'block px-4 py-1.5 text-sm font-medium transition-colors duration-200 ease-out']">{{ item.name }}</a>
                 </MenuItem>
               </MenuItems>
             </transition>
@@ -153,7 +153,7 @@ const navigation = [
   { name: 'Inventory', href: '/inventory', icon: DocumentDuplicateIcon },
   { name: 'Reports',   href: '/report',    icon: ChartPieIcon },
   { name: 'Customer',  href: '/customer',  icon: DocumentDuplicateIcon },
-  { name: 'Product',   href: '/report',    icon: ChartPieIcon },
+  { name: 'Product',   href: '/Product',   icon: ChartPieIcon },
 ]
 
 const userNavigation = [

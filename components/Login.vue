@@ -1,13 +1,12 @@
 <template>
   <div class="flex min-h-full flex-1">
 
-    <!-- ── Left panel: form ───────────────────────────────── -->
-    <div class="flex flex-1 flex-col justify-center px-6 py-12 lg:px-20 xl:px-24 bg-[#F1FAEE]">
+        <div class="flex flex-1 flex-col justify-center px-6 py-12 lg:px-20 xl:px-24 bg-[#F1FAEE]">
       <div class="mx-auto w-full max-w-sm">
 
         <!-- Brand -->
         <div class="flex items-center gap-3 mb-10">
-          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#D62828] shadow-lg shadow-[#D62828]/30">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#D62828] shadow-[0_12px_30px_rgba(29,53,87,0.14),0_4px_10px_rgba(29,53,87,0.08)] shadow-[#D62828]/30">
             <svg class="size-6 text-white" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/>
             </svg>
@@ -36,7 +35,7 @@
               name="email"
               autocomplete="email"
               placeholder="you@bloodbank.org"
-              class="block w-full rounded-xl border border-[#A8DADC]/60 bg-white px-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/40 shadow-sm outline-none transition focus:border-[#457B9D] focus:ring-2 focus:ring-[#457B9D]/20"
+              class="block w-full rounded-lg border border-[#A8DADC]/60 bg-white px-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/40 shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] outline-none transition focus:border-[#457B9D] focus:ring-2 focus:ring-[#457B9D]/20"
             />
           </div>
 
@@ -52,13 +51,13 @@
                 id="password"
                 name="password"
                 autocomplete="current-password"
-                placeholder="••••••••"
-                class="block w-full rounded-xl border border-[#A8DADC]/60 bg-white px-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/40 shadow-sm outline-none transition focus:border-[#457B9D] focus:ring-2 focus:ring-[#457B9D]/20 pr-10"
+                placeholder="Password"
+                class="block w-full rounded-lg border border-[#A8DADC]/60 bg-white px-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/40 shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] outline-none transition focus:border-[#457B9D] focus:ring-2 focus:ring-[#457B9D]/20 pr-10"
               />
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-[#457B9D]/50 hover:text-[#457B9D] transition-colors"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-[#457B9D]/50 hover:text-[#457B9D] transition-colors duration-200 ease-out"
               >
                 <EyeIcon v-if="!showPassword" class="size-4" />
                 <EyeSlashIcon v-else class="size-4" />
@@ -84,7 +83,7 @@
               <span class="text-sm text-[#1D3557]">Remember me</span>
             </label>
 
-            <a href="#" class="text-sm font-semibold text-[#457B9D] hover:text-[#1D3557] transition-colors">
+            <a href="#" class="text-sm font-semibold text-[#457B9D] hover:text-[#1D3557] transition-colors duration-200 ease-out">
               Forgot password?
             </a>
           </div>
@@ -93,13 +92,13 @@
           <button
             type="submit"
             :disabled="loading"
-            class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#D62828] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#D62828]/20 transition hover:bg-[#b52020] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D62828] disabled:opacity-60"
+            class="flex w-full items-center justify-center gap-2 rounded-lg bg-[#D62828] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(29,53,87,0.12),0_2px_6px_rgba(29,53,87,0.08)] shadow-[#D62828]/20 transition hover:bg-[#b52020] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D62828] disabled:opacity-60"
           >
             <svg v-if="loading" class="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
             </svg>
-            {{ loading ? 'Signing in…' : 'Sign in' }}
+            {{ loading ? 'Signing in...' : 'Sign in' }}
           </button>
 
         </form>
@@ -113,7 +112,7 @@
 
         <!-- Social buttons -->
         <div class="mt-5 grid grid-cols-2 gap-3">
-          <a href="#" class="flex items-center justify-center gap-2.5 rounded-xl border border-[#A8DADC]/50 bg-white px-3 py-2.5 text-sm font-semibold text-[#1D3557] shadow-sm hover:bg-[#F1FAEE] transition-colors">
+          <a href="#" class="flex items-center justify-center gap-2.5 rounded-lg border border-[#A8DADC]/50 bg-white px-3 py-2.5 text-sm font-semibold text-[#1D3557] shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] hover:bg-[#F1FAEE] transition-colors duration-200 ease-out">
             <svg class="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335"/>
               <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4"/>
@@ -122,7 +121,7 @@
             </svg>
             Google
           </a>
-          <a href="#" class="flex items-center justify-center gap-2.5 rounded-xl border border-[#A8DADC]/50 bg-white px-3 py-2.5 text-sm font-semibold text-[#1D3557] shadow-sm hover:bg-[#F1FAEE] transition-colors">
+          <a href="#" class="flex items-center justify-center gap-2.5 rounded-lg border border-[#A8DADC]/50 bg-white px-3 py-2.5 text-sm font-semibold text-[#1D3557] shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] hover:bg-[#F1FAEE] transition-colors duration-200 ease-out">
             <svg class="size-4 fill-[#24292F]" viewBox="0 0 20 20" aria-hidden="true">
               <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"/>
             </svg>
@@ -133,7 +132,7 @@
         <!-- Register link -->
         <p class="mt-8 text-center text-sm text-[#457B9D]">
           Not registered yet?
-          <a href="#" class="font-semibold text-[#D62828] hover:text-[#b52020] transition-colors">
+          <a href="#" class="font-semibold text-[#D62828] hover:text-[#b52020] transition-colors duration-200 ease-out">
             Request access
           </a>
         </p>
@@ -141,25 +140,20 @@
       </div>
     </div>
 
-    <!-- ── Right panel: brand illustration ───────────────── -->
-    <div class="relative hidden w-0 flex-1 lg:block">
-      <div class="absolute inset-0 bg-gradient-to-br from-[#1D3557] via-[#457B9D] to-[#A8DADC]">
+        <div class="relative hidden w-0 flex-1 lg:block">
+      <div class="absolute inset-0 bg-[#1D3557]">
 
-        <!-- Decorative blobs -->
-        <div class="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-white/5"></div>
-        <div class="absolute -bottom-24 left-8 h-72 w-72 rounded-full bg-white/5"></div>
-        <div class="absolute top-1/3 right-1/4 h-40 w-40 rounded-full bg-[#D62828]/20"></div>
+        <div class="absolute inset-x-0 top-0 h-px bg-white/20"></div>
+        <div class="absolute inset-y-0 left-0 w-px bg-white/10"></div>
 
         <!-- Grid overlay -->
-        <div class="absolute inset-0 opacity-[0.04]"
-          style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:40px 40px;">
-        </div>
+        
 
         <!-- Center content -->
         <div class="absolute inset-0 flex flex-col items-center justify-center px-12 text-center">
 
           <!-- Big blood drop icon -->
-          <div class="mb-8 flex h-24 w-24 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl">
+          <div class="mb-8 flex h-24 w-24 items-center justify-center rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 shadow-[0_24px_60px_rgba(29,53,87,0.20),0_8px_20px_rgba(29,53,87,0.12)]">
             <svg class="size-14 text-white" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/>
             </svg>
@@ -194,55 +188,6 @@
 
   </div>
 </template>
-
-
-// definePageMeta({
-//   layout: false,
-// });
- 
-// import { ref } from "vue";
-// import { AuthService } from "~/api/auth/AuthService";
- 
-// const email = ref("");
-// const password = ref("");
-// const error = ref("");
-// const isLoading = ref(false);
- 
-// const authService = new AuthService();
- 
-// const handleSubmit = async () => {
-//   error.value = "";
-//   isLoading.value = true;
- 
-//   try {
-//     const response = await authService.login(email.value, password.value);
- 
-//     if (response?.token) {
-//       localStorage.setItem("_token", response.token);
-//     }
- 
-//     // // if (response?.user.customer_uuid) {
-//     // //   localStorage.setItem("_uuid", response.user.customer_uuid);
-//     // // } else if (response?.user.uuid) {
-//     // //   localStorage.setItem("_uuid", response.user.uuid);
-//     // // }
- 
-//     / /// if (response?.user.role) {
-//     // //   localStorage.setItem("_role", response.user.role);
-//     // // }
- 
-//     // await navigateTo("/admin/dashboard");
- 
-//     await navigateTo(
-//       response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
-//     );
-//   } catch (err: any) {
-//     error.value = err?.message || "";
-//   } finally {
-//     isLoading.value = false;
-//   }
-// };
-
 
 <script setup lang="ts">
 definePageMeta({

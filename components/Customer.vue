@@ -12,15 +12,15 @@
             v-model="searchQuery"
             type="text"
             placeholder="Search customer..."
-            class="rounded-xl border border-[#A8DADC]/60 bg-white pl-9 pr-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/50 shadow-sm outline-none focus:border-[#457B9D] focus:ring-2 focus:ring-[#457B9D]/20 transition-all"
+            class="rounded-xl border border-[#A8DADC]/60 bg-white pl-9 pr-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/50 shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] outline-none transition-all duration-200 ease-out"
           />
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#457B9D]/50 text-sm">🔍</span>
+          <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#457B9D]/50" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 103.473 9.764l2.631 2.632a.75.75 0 101.061-1.061l-2.631-2.632A5.5 5.5 0 009 3.5zM5 9a4 4 0 118 0 4 4 0 01-8 0z" clip-rule="evenodd" /></svg>
         </div>
         <button 
           @click="openCreateModal"
-          class="inline-flex items-center gap-2 rounded-xl bg-[#D62828] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#b52020] transition-colors"
+          class="inline-flex items-center gap-2 rounded-xl bg-[#D62828] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] hover:bg-[#b52020] transition-colors duration-200 ease-out"
         >
-          + Add Customer
+          <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg> Add Customer
         </button>
       </div>
     </div>
@@ -30,21 +30,21 @@
       <div 
         v-for="stat in customerStats" 
         :key="stat.label"
-        class="rounded-2xl border bg-white p-5 shadow-sm hover:shadow-md transition-all"
+        class="rounded-xl border bg-white p-5 shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(29,53,87,0.12),0_2px_6px_rgba(29,53,87,0.08)] transition-all duration-200 ease-out"
         :class="stat.borderClass"
       >
         <div class="mb-3 flex items-start justify-between">
           <span class="text-3xl font-black text-[#1D3557]">{{ stat.value }}</span>
           <span 
-            class="rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-tight"
+            class="rounded-none px-2 py-0.5 text-[9px] font-bold uppercase tracking-tight"
             :class="stat.badgeClass"
           >
             {{ stat.label }}
           </span>
         </div>
-        <div class="h-1.5 rounded-full bg-[#A8DADC]/30 overflow-hidden">
+        <div class="h-1.5 rounded-none bg-[#A8DADC]/30 overflow-hidden">
           <div 
-            class="h-full rounded-full transition-all duration-700"
+            class="h-full rounded-none transition-all duration-700"
             :class="stat.progressClass"
             :style="{ width: stat.percentage + '%' }"
           >
@@ -55,12 +55,11 @@
     </div>
 
     <!-- Customer table -->
-    <div class="rounded-2xl border border-[#A8DADC]/40 bg-white shadow-sm overflow-hidden">
+    <div class="rounded-xl border border-[#A8DADC]/40 bg-white shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] overflow-hidden">
       <div class="flex items-center justify-between border-b border-[#A8DADC]/30 px-6 py-4">
         <h3 class="font-bold text-[#1D3557]">Customer Records</h3>
-        <button class="text-sm font-semibold text-[#457B9D] hover:text-[#1D3557] transition-colors">
-          View All →
-        </button>
+        <button class="text-sm font-semibold text-[#457B9D] hover:text-[#1D3557] transition-colors duration-200 ease-out">
+          View All`r`n        </button>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left">
@@ -68,8 +67,6 @@
             <tr class="border-b border-[#A8DADC]/20 bg-[#F1FAEE]">
               <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-[#457B9D]">Name</th>
               <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-[#457B9D]">Email</th>
-              <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-[#457B9D]">Phone</th>
-              <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-[#457B9D]">Address</th>
               <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-[#457B9D]">Status</th>
               <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-[#457B9D]">Actions</th>
             </tr>
@@ -78,7 +75,7 @@
             <tr 
               v-for="customer in customers" 
               :key="customer.uuid" 
-              class="hover:bg-[#F1FAEE]/60 transition-colors"
+              class="hover:bg-[#F1FAEE]/60 transition-colors duration-200 ease-out"
             >
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
@@ -89,17 +86,13 @@
                 </div>
               </td>
               <td class="px-6 py-4 text-sm text-[#457B9D]">{{ customer.email }}</td>
-              <td class="px-6 py-4 text-sm text-[#1D3557]">{{ customer.phone || '-' }}</td>
-              <td class="px-6 py-4 text-sm text-[#457B9D] max-w-[200px] truncate">
-                {{ customer.address || '-' }}
-              </td>
               <td class="px-6 py-4">
                 <span 
-                  class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
+                  class="inline-flex items-center gap-1.5 rounded-none px-2.5 py-1 text-xs font-semibold"
                   :class="customer.deleted_at ? 'bg-[#D62828]/10 text-[#D62828]' : 'bg-green-100 text-green-700'"
                 >
                   <span 
-                    class="h-1.5 w-1.5 rounded-full"
+                    class="h-1.5 w-1.5 rounded-none"
                     :class="customer.deleted_at ? 'bg-[#D62828]' : 'bg-green-600'"
                   ></span>
                   {{ customer.deleted_at ? 'Deleted' : 'Active' }}
@@ -109,21 +102,21 @@
                 <div class="flex gap-2">
                   <button 
                     @click="openEditModal(customer)"
-                    class="rounded-lg bg-[#457B9D]/10 px-3 py-1.5 text-xs font-semibold text-[#457B9D] hover:bg-[#457B9D]/20 transition-colors"
+                    class="rounded-xl bg-[#457B9D]/10 px-3 py-1.5 text-xs font-semibold text-[#457B9D] hover:bg-[#457B9D]/20 transition-colors duration-200 ease-out"
                   >
                     Edit
                   </button>
                   <button 
                     v-if="!customer.deleted_at"
                     @click="handleDelete(customer)"
-                    class="rounded-lg bg-[#D62828]/10 px-3 py-1.5 text-xs font-semibold text-[#D62828] hover:bg-[#D62828]/20 transition-colors"
+                    class="rounded-xl bg-[#D62828]/10 px-3 py-1.5 text-xs font-semibold text-[#D62828] hover:bg-[#D62828]/20 transition-colors duration-200 ease-out"
                   >
                     Delete
                   </button>
                   <button 
                     v-else
                     @click="handleRestore(customer)"
-                    class="rounded-lg bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-200 transition-colors"
+                    class="rounded-xl bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-200 transition-colors duration-200 ease-out"
                   >
                     Restore
                   </button>
@@ -149,17 +142,14 @@
       ></div>
       
       <!-- Modal Content -->
-      <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <div class="relative w-full max-w-md rounded-xl bg-white p-6 shadow-[0_18px_48px_rgba(29,53,87,0.18),0_6px_18px_rgba(29,53,87,0.10)]">
         <div class="mb-6 flex items-center justify-between">
           <h2 class="text-xl font-bold text-[#1D3557]">
             {{ isEdit ? 'Edit Customer' : 'Add Customer' }}
           </h2>
           <button 
             @click="closeModal"
-            class="text-2xl text-[#457B9D] hover:text-[#1D3557]"
-          >
-            ×
-          </button>
+            class="inline-flex h-8 w-8 items-center justify-center rounded-xl text-[#457B9D] transition-colors duration-200 ease-out hover:bg-[#F1FAEE] hover:text-[#1D3557]" type="button" aria-label="Close modal"><svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" /></svg></button>
         </div>
 
         <form @submit.prevent="handleSubmit" class="space-y-4">
@@ -170,7 +160,7 @@
               type="text"
               required
               placeholder="Enter customer name"
-              class="w-full rounded-xl border border-[#A8DADC]/60 bg-white px-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/50 shadow-sm outline-none focus:border-[#457B9D] focus:ring-2 focus:ring-[#457B9D]/20 transition-all"
+              class="w-full rounded-xl border border-[#A8DADC]/60 bg-white px-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/50 shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] outline-none transition-all duration-200 ease-out"
             />
           </div>
 
@@ -181,42 +171,23 @@
               type="email"
               required
               placeholder="Enter email address"
-              class="w-full rounded-xl border border-[#A8DADC]/60 bg-white px-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/50 shadow-sm outline-none focus:border-[#457B9D] focus:ring-2 focus:ring-[#457B9D]/20 transition-all"
+              class="w-full rounded-xl border border-[#A8DADC]/60 bg-white px-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/50 shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] outline-none transition-all duration-200 ease-out"
             />
           </div>
 
-          <div>
-            <label class="mb-1 block text-xs font-semibold text-[#457B9D]">Phone</label>
-            <input
-              v-model="formData.phone"
-              type="tel"
-              placeholder="Enter phone number"
-              class="w-full rounded-xl border border-[#A8DADC]/60 bg-white px-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/50 shadow-sm outline-none focus:border-[#457B9D] focus:ring-2 focus:ring-[#457B9D]/20 transition-all"
-            />
-          </div>
-
-          <div>
-            <label class="mb-1 block text-xs font-semibold text-[#457B9D]">Address</label>
-            <textarea
-              v-model="formData.address"
-              placeholder="Enter address"
-              rows="3"
-              class="w-full rounded-xl border border-[#A8DADC]/60 bg-white px-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/50 shadow-sm outline-none focus:border-[#457B9D] focus:ring-2 focus:ring-[#457B9D]/20 transition-all"
-            ></textarea>
-          </div>
 
           <div class="flex gap-3 pt-2">
             <button
               type="button"
               @click="closeModal"
-              class="flex-1 rounded-xl border border-[#A8DADC]/60 bg-white px-5 py-2.5 text-sm font-semibold text-[#457B9D] hover:bg-[#F1FAEE] transition-colors"
+              class="flex-1 rounded-xl border border-[#A8DADC]/60 bg-white px-5 py-2.5 text-sm font-semibold text-[#457B9D] hover:bg-[#F1FAEE] transition-colors duration-200 ease-out"
             >
               Cancel
             </button>
             <button
               type="submit"
               :disabled="loading"
-              class="flex-1 rounded-xl bg-[#457B9D] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1D3557] transition-colors disabled:opacity-50"
+              class="flex-1 rounded-xl bg-[#457B9D] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1D3557] transition-colors duration-200 ease-out disabled:opacity-50"
             >
               {{ loading ? 'Saving...' : 'Save' }}
             </button>
@@ -246,9 +217,7 @@ const formLoading = ref(false)
 // Form data
 const formData = ref({
   name: '',
-  email: '',
-  phone: '',
-  address: ''
+  email: ''
 })
 
 // Computed
@@ -326,9 +295,7 @@ const openCreateModal = () => {
   selectedCustomer.value = null
   formData.value = {
     name: '',
-    email: '',
-    phone: '',
-    address: ''
+    email: ''
   }
   showModal.value = true
 }
@@ -338,9 +305,7 @@ const openEditModal = (customer) => {
   selectedCustomer.value = customer
   formData.value = {
     name: customer.name,
-    email: customer.email,
-    phone: customer.phone || '',
-    address: customer.address || ''
+    email: customer.email
   }
   showModal.value = true
 }

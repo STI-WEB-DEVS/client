@@ -12,12 +12,12 @@
             v-model="searchQuery"
             type="text"
             placeholder="Search type..."
-            class="rounded-xl border border-[#A8DADC]/60 bg-white pl-9 pr-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/50 shadow-sm outline-none focus:border-[#457B9D] focus:ring-2 focus:ring-[#457B9D]/20 transition-all"
+            class="rounded-lg border border-[#A8DADC]/60 bg-white pl-9 pr-4 py-2.5 text-sm text-[#1D3557] placeholder:text-[#457B9D]/50 shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] outline-none focus:border-[#457B9D] focus:ring-2 focus:ring-[#457B9D]/20 transition-all duration-200 ease-out"
           />
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#457B9D]/50 text-sm">🔍</span>
+          <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#457B9D]/50" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 103.473 9.764l2.631 2.632a.75.75 0 101.061-1.061l-2.631-2.632A5.5 5.5 0 009 3.5zM5 9a4 4 0 118 0 4 4 0 01-8 0z" clip-rule="evenodd" /></svg>
         </div>
-        <button class="inline-flex items-center gap-2 rounded-xl bg-[#D62828] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#b52020] transition-colors">
-          + Add Units
+        <button class="inline-flex items-center gap-2 rounded-lg bg-[#D62828] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] hover:bg-[#b52020] transition-colors duration-200 ease-out">
+          <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg> Add Units
         </button>
       </div>
     </div>
@@ -25,7 +25,7 @@
     <!-- Blood type cards -->
     <div class="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
       <div v-for="item in filteredInventory" :key="item.type"
-        class="rounded-2xl border bg-white p-5 shadow-sm hover:shadow-md transition-all"
+        class="rounded-lg border bg-white p-5 shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(29,53,87,0.12),0_2px_6px_rgba(29,53,87,0.08)] transition-all duration-200 ease-out"
         :class="item.status === 'Critical' ? 'border-[#D62828]/30' : item.status === 'Low' ? 'border-yellow-300/50' : 'border-[#A8DADC]/40'">
         <div class="mb-3 flex items-start justify-between">
           <span class="text-2xl font-black text-[#1D3557]">{{ item.type }}</span>
@@ -51,10 +51,10 @@
     </div>
 
     <!-- Activity table -->
-    <div class="rounded-2xl border border-[#A8DADC]/40 bg-white shadow-sm overflow-hidden">
+    <div class="rounded-lg border border-[#A8DADC]/40 bg-white shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] overflow-hidden">
       <div class="flex items-center justify-between border-b border-[#A8DADC]/30 px-6 py-4">
         <h3 class="font-bold text-[#1D3557]">Recent Stock Activity</h3>
-        <button class="text-sm font-semibold text-[#457B9D] hover:text-[#1D3557] transition-colors">View All Logs →</button>
+        <button class="text-sm font-semibold text-[#457B9D] hover:text-[#1D3557] transition-colors duration-200 ease-out">View All</button>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left">
@@ -69,7 +69,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-[#A8DADC]/20">
-            <tr v-for="i in 3" :key="i" class="hover:bg-[#F1FAEE]/60 transition-colors">
+            <tr v-for="i in 3" :key="i" class="hover:bg-[#F1FAEE]/60 transition-colors duration-200 ease-out">
               <td class="px-6 py-4 font-mono text-xs font-semibold text-[#457B9D]">#TRX-99{{ i }}24</td>
               <td class="px-6 py-4 text-sm font-bold text-[#D62828]">O- (Negative)</td>
               <td class="px-6 py-4 text-sm font-bold text-[#D62828]">-2 Units</td>

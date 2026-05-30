@@ -1,15 +1,10 @@
 <template>
   <div>
 
-    <!-- ── Profile hero ───────────────────────────────────── -->
-    <div class="relative overflow-hidden bg-gradient-to-br from-[#1D3557] via-[#457B9D] to-[#A8DADC]">
+        <div class="relative overflow-hidden bg-[#1D3557]">
 
       <!-- Decorative -->
-      <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div class="absolute -right-24 -top-32 h-80 w-80 rounded-full bg-white/5"></div>
-        <div class="absolute -bottom-16 left-[6%] h-56 w-56 rounded-full bg-white/5"></div>
-        <div class="absolute inset-0 opacity-[0.03]" style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:40px 40px;"></div>
-      </div>
+      <div class="pointer-events-none absolute inset-0" aria-hidden="true"><div class="absolute inset-x-0 top-0 h-px bg-white/20"></div><div class="absolute inset-y-0 left-0 w-px bg-white/10"></div></div>
 
       <div class="relative mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
         <div class="flex flex-wrap items-end justify-between gap-6">
@@ -19,9 +14,9 @@
               <img
                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                 alt="Tom Cook"
-                class="h-24 w-24 rounded-2xl border-2 border-white/40 object-cover shadow-2xl"
+                class="h-24 w-24 rounded-lg border-2 border-white/40 object-cover shadow-[0_24px_60px_rgba(29,53,87,0.20),0_8px_20px_rgba(29,53,87,0.12)]"
               />
-              <span class="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-md">
+              <span class="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-[0_8px_20px_rgba(29,53,87,0.12),0_2px_6px_rgba(29,53,87,0.08)]">
                 <span class="h-2.5 w-2.5 animate-pulse rounded-full bg-green-500"></span>
               </span>
             </div>
@@ -48,7 +43,7 @@
           </div>
 
           <!-- Quick stats -->
-          <div class="flex shrink-0 items-center divide-x divide-white/20 rounded-2xl border border-white/20 bg-white/10 px-2 py-3 backdrop-blur-sm">
+          <div class="flex shrink-0 items-center divide-x divide-white/20 rounded-lg border border-white/20 bg-white/10 px-2 py-3 backdrop-blur-sm">
             <div class="flex flex-col items-center px-5">
               <span class="text-2xl font-bold text-white">42</span>
               <span class="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-white/60">Drives</span>
@@ -68,13 +63,13 @@
     </div>
 
 
-    <div class="sticky top-16 z-30 border-b border-[#A8DADC]/30 bg-[#F1FAEE] shadow-sm">
+    <div class="sticky top-16 z-30 border-b border-[#A8DADC]/30 bg-[#F1FAEE] shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)]">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex items-center gap-1">
 
           <NuxtLink
             to="/profile/overview"
-            class="inline-flex items-center gap-2 border-b-2 px-4 py-3.5 text-sm font-semibold transition-colors"
+            class="inline-flex items-center gap-2 border-b-2 px-4 py-3.5 text-sm font-semibold transition-colors duration-200 ease-out"
             :class="route.path === '/profile'
               ? 'border-[#D62828] text-[#D62828]'
               : 'border-transparent text-[#457B9D] hover:border-[#457B9D] hover:text-[#1D3557]'"
@@ -85,7 +80,7 @@
 
           <NuxtLink
             to="/profile/activity"
-            class="inline-flex items-center gap-2 border-b-2 px-4 py-3.5 text-sm font-semibold transition-colors"
+            class="inline-flex items-center gap-2 border-b-2 px-4 py-3.5 text-sm font-semibold transition-colors duration-200 ease-out"
             :class="route.path.startsWith('/profile/activity')
               ? 'border-[#D62828] text-[#D62828]'
               : 'border-transparent text-[#457B9D] hover:border-[#457B9D] hover:text-[#1D3557]'"
@@ -96,7 +91,7 @@
 
           <NuxtLink
             to="/profile/document"
-            class="inline-flex items-center gap-2 border-b-2 px-4 py-3.5 text-sm font-semibold transition-colors"
+            class="inline-flex items-center gap-2 border-b-2 px-4 py-3.5 text-sm font-semibold transition-colors duration-200 ease-out"
             :class="route.path.startsWith('/profile/documents')
               ? 'border-[#D62828] text-[#D62828]'
               : 'border-transparent text-[#457B9D] hover:border-[#457B9D] hover:text-[#1D3557]'"

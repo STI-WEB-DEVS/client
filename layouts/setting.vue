@@ -7,7 +7,7 @@
 
         <!-- Title row -->
         <div class="flex items-center gap-3 py-6">
-          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1D3557]">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1D3557]">
             <Cog6ToothIcon class="size-5 text-white" aria-hidden="true" />
           </div>
           <div>
@@ -21,7 +21,7 @@
 
           <NuxtLink
             to="/setting/general"
-            class="inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors"
+            class="inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors duration-200 ease-out"
             :class="route.path.startsWith('/setting/general')
               ? 'border-[#1D3557] text-[#1D3557]'
               : 'border-transparent text-[#457B9D] hover:border-[#457B9D] hover:text-[#1D3557]'"
@@ -32,7 +32,7 @@
 
           <NuxtLink
             to="/setting/security"
-            class="inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors"
+            class="inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors duration-200 ease-out"
             :class="route.path.startsWith('/setting/security')
               ? 'border-[#1D3557] text-[#1D3557]'
               : 'border-transparent text-[#457B9D] hover:border-[#457B9D] hover:text-[#1D3557]'"
@@ -43,7 +43,7 @@
 
           <NuxtLink
             to="/setting/notification"
-            class="inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors"
+            class="inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors duration-200 ease-out"
             :class="route.path.startsWith('/setting/notifications')
               ? 'border-[#1D3557] text-[#1D3557]'
               : 'border-transparent text-[#457B9D] hover:border-[#457B9D] hover:text-[#1D3557]'"
@@ -54,7 +54,7 @@
 
           <NuxtLink
             to="/setting/billing"
-            class="inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors"
+            class="inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors duration-200 ease-out"
             :class="route.path.startsWith('/setting/billing')
               ? 'border-[#1D3557] text-[#1D3557]'
               : 'border-transparent text-[#457B9D] hover:border-[#457B9D] hover:text-[#1D3557]'"

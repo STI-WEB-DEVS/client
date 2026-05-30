@@ -10,7 +10,7 @@ class ProductService extends BaseService {
         return ProductService.instance;
     }
  
-    private resource = '/products';
+    private resource = '/product';
  
     async list(params: object = {}): Promise<any> {
         return await this.request(this.resource, 'GET', params);

@@ -6,22 +6,22 @@
         <h1 class="text-2xl font-bold text-[#1D3557]">Blood Bank Programs</h1>
         <p class="mt-1 text-sm text-[#457B9D]">Manage and monitor donation drives and outreach events.</p>
       </div>
-      <button class="inline-flex items-center gap-2 rounded-xl bg-[#D62828] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#b52020] transition-colors">
+      <button class="inline-flex items-center gap-2 rounded-lg bg-[#D62828] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] hover:bg-[#b52020] transition-colors duration-200 ease-out">
         <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         New Program
       </button>
     </div>
 
     <!-- Tab bar -->
-    <div class="mb-6 inline-flex rounded-xl border border-[#A8DADC]/40 bg-white p-1 shadow-sm">
+    <div class="mb-6 inline-flex rounded-lg border border-[#A8DADC]/40 bg-white p-1 shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)]">
       <button
         v-for="tab in tabs"
         :key="tab"
         @click="activeTab = tab"
         :class="[
-          'rounded-lg px-5 py-2 text-sm font-semibold transition-all',
+          'rounded-lg px-5 py-2 text-sm font-semibold transition-all duration-200 ease-out',
           activeTab === tab
-            ? 'bg-[#1D3557] text-white shadow-sm'
+            ? 'bg-[#1D3557] text-white shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)]'
             : 'text-[#457B9D] hover:text-[#1D3557]'
         ]"
       >
@@ -35,19 +35,19 @@
 
     <!-- Program list -->
     <div class="space-y-3">
-      <div v-if="filteredPrograms.length === 0" class="rounded-2xl border border-[#A8DADC]/40 bg-white p-12 text-center shadow-sm">
+      <div v-if="filteredPrograms.length === 0" class="rounded-lg border border-[#A8DADC]/40 bg-white p-12 text-center shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)]">
         <p class="text-sm text-[#457B9D]">No programs currently {{ activeTab.toLowerCase() }}.</p>
       </div>
 
       <div
         v-for="program in filteredPrograms"
         :key="program.id"
-        class="flex items-center justify-between rounded-2xl border bg-white p-5 shadow-sm hover:shadow-md transition-all"
+        class="flex items-center justify-between rounded-lg border bg-white p-5 shadow-[0_1px_2px_rgba(29,53,87,0.06),0_8px_24px_rgba(29,53,87,0.08)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(29,53,87,0.12),0_2px_6px_rgba(29,53,87,0.08)] transition-all duration-200 ease-out"
         :class="program.status === 'Ongoing' ? 'border-[#A8DADC]/50' : program.status === 'Upcoming' ? 'border-[#457B9D]/30' : 'border-[#A8DADC]/30'"
       >
         <div class="flex items-center gap-4">
           <!-- Status dot -->
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
             :class="program.status === 'Ongoing' ? 'bg-green-50' : program.status === 'Upcoming' ? 'bg-[#457B9D]/10' : 'bg-[#A8DADC]/20'">
             <span class="h-2.5 w-2.5 rounded-full"
               :class="program.status === 'Ongoing' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] animate-pulse' : program.status === 'Upcoming' ? 'bg-[#457B9D]' : 'bg-[#A8DADC]'">
@@ -63,9 +63,15 @@
               </span>
             </div>
             <p class="mt-0.5 text-xs text-[#457B9D]">
-              <span>📍 {{ program.location }}</span>
-              <span class="mx-1.5 text-[#A8DADC]">•</span>
-              <span>🗓 {{ program.date }}</span>
+              <span class="inline-flex items-center gap-1">
+                <MapPinIcon class="h-3.5 w-3.5" aria-hidden="true" />
+                {{ program.location }}
+              </span>
+              <span class="mx-1.5 text-[#A8DADC]">/</span>
+              <span class="inline-flex items-center gap-1">
+                <CalendarDaysIcon class="h-3.5 w-3.5" aria-hidden="true" />
+                {{ program.date }}
+              </span>
             </p>
           </div>
         </div>
@@ -81,6 +87,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { CalendarDaysIcon, MapPinIcon } from '@heroicons/vue/24/outline'
 
 const activeTab = ref('Ongoing')
 const tabs = ['Upcoming', 'Ongoing', 'Done']
