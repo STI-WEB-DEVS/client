@@ -52,6 +52,17 @@
           <p
             class="text-xs font-semibold uppercase tracking-wider text-gray-400"
           >
+            Description
+          </p>
+          <p class="mt-1 text-lg font-medium text-gray-900">
+            {{ product.description}}
+          </p>
+        </div>
+
+        <div>
+          <p
+            class="text-xs font-semibold uppercase tracking-wider text-gray-400"
+          >
             Price
           </p>
           <p class="mt-1 text-lg font-medium text-gray-900">

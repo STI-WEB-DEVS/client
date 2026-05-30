@@ -44,9 +44,11 @@
             <span class="w-8 text-center text-sm font-medium">{{item.quantity}}</span>
             
             <button
-              @click="increment(item)"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50">+
-            </button>
+  @click="increment(item)"
+  :disabled="item.stock_quantity !== undefined && item.quantity >= item.stock_quantity"
+  class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent transition">
+  +
+</button>
           </div>
           <p class="w-24 text-right text-sm font-semibold text-gray-900">
             ₱{{ (Number(item.price) * item.quantity).toFixed(2) }}
@@ -102,6 +104,10 @@ const saveCart = () => {
 };
 
 const increment = (item: any) => {
+  // Siguroon nga dili molapas sa stock_quantity kon kini anaa
+  if (item.stock_quantity !== undefined && item.quantity >= item.stock_quantity) {
+    return;
+  }
   item.quantity++;
   saveCart();
 };
