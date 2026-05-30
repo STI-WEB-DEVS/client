@@ -41,6 +41,11 @@
             </div>
 
             <div>
+              <p class="text-sm text-gray-500">Stock</p>
+              <p class="mt-2 text-base font-medium text-gray-900">{{ product?.stock_quantity ?? 0 }}</p>
+            </div>
+
+            <div>
               <p class="text-sm text-gray-500">Description</p>
               <p class="mt-2 text-base font-medium text-gray-900">{{ product?.description || 'N/A' }}</p>
             </div>

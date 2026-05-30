@@ -125,14 +125,26 @@
             <h3 class="truncate text-sm font-bold text-gray-900 group-hover:text-indigo-700 transition">
               {{ product.name }}
             </h3>
-            <p class="mt-1 text-xs text-gray-400">UUID: {{ product.uuid.slice(0, 8) }}…</p>
+            <p class="mt-1 line-clamp-2 text-xs text-gray-400">{{ product.description || 'No description available.' }}</p>
 
             <div class="mt-auto pt-4 flex items-center justify-between">
               <span class="text-lg font-extrabold text-gray-900">${{ Number(product.price).toFixed(2) }}</span>
 
-              <!-- Already in cart indicator -->
+              <!-- Stock and Cart indicator -->
               <span
-                v-if="getCartQuantity(product.uuid) > 0"
+                v-if="product.stock_quantity === 0"
+                class="text-xs font-semibold text-red-600"
+              >
+                Out of Stock
+              </span>
+              <span
+                v-else-if="product.stock_quantity <= 5"
+                class="text-xs font-semibold text-orange-500"
+              >
+                Only {{ product.stock_quantity }} left
+              </span>
+              <span
+                v-else-if="getCartQuantity(product.uuid) > 0"
                 class="text-xs font-semibold text-indigo-600"
               >
                 {{ getCartQuantity(product.uuid) }} in cart
@@ -143,7 +155,8 @@
               <button
                 :id="`add-to-cart-${product.uuid}`"
                 @click="handleAddToCart(product)"
-                class="flex-1 rounded-xl py-2.5 text-sm font-bold transition active:scale-95 border"
+                :disabled="product.stock_quantity === 0 || getCartQuantity(product.uuid) >= product.stock_quantity"
+                class="flex-1 rounded-xl py-2.5 text-sm font-bold transition active:scale-95 border disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:border-gray-200"
                 :class="
                   getCartQuantity(product.uuid) > 0
                     ? 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100'
@@ -154,7 +167,8 @@
               </button>
               <button
                 @click="handleBuyNow(product)"
-                class="flex-1 rounded-xl bg-indigo-600 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-indigo-700 active:scale-95 border border-indigo-600"
+                :disabled="product.stock_quantity === 0"
+                class="flex-1 rounded-xl bg-indigo-600 py-2.5 text-sm font-bold text-white shadow-md transition border border-indigo-600 hover:bg-indigo-700 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600"
               >
                 Buy Now
               </button>
@@ -218,6 +232,7 @@ const handleAddToCart = (product: any) => {
     uuid: product.uuid,
     name: product.name,
     price: Number(product.price),
+    stock_quantity: Number(product.stock_quantity)
   })
   lastAddedName.value = product.name
   toastTrigger.value++
@@ -228,7 +243,8 @@ const handleBuyNow = async (product: any) => {
     product_uuid: product.uuid,
     name: product.name,
     price: Number(product.price),
-    quantity: 1
+    quantity: 1,
+    stock_quantity: Number(product.stock_quantity)
   }]
   await navigateTo('/customer/checkout')
 }

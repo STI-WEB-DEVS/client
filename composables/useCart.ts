@@ -6,6 +6,7 @@ export interface CartItem {
   name: string
   price: number
   quantity: number
+  stock_quantity: number
 }
 
 export const useCart = () => {
@@ -15,17 +16,22 @@ export const useCart = () => {
   // Used to pass items to the checkout page if bypassing the main cart
   const directCheckoutItems = useState<CartItem[]>('direct_checkout_items', () => [])
 
-  const addToCart = (product: { uuid: string; name: string; price: number }) => {
+  const addToCart = (product: { uuid: string; name: string; price: number; stock_quantity: number }) => {
     const existing = cartItems.value.find((i) => i.product_uuid === product.uuid)
     if (existing) {
-      existing.quantity += 1
+      if (existing.quantity < product.stock_quantity) {
+        existing.quantity += 1
+      }
     } else {
-      cartItems.value.push({
-        product_uuid: product.uuid,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-      })
+      if (product.stock_quantity > 0) {
+        cartItems.value.push({
+          product_uuid: product.uuid,
+          name: product.name,
+          price: product.price,
+          quantity: 1,
+          stock_quantity: product.stock_quantity,
+        })
+      }
     }
     newItemAdded.value = true
   }
@@ -40,7 +46,9 @@ export const useCart = () => {
       return
     }
     const item = cartItems.value.find((i) => i.product_uuid === product_uuid)
-    if (item) item.quantity = quantity
+    if (item && quantity <= item.stock_quantity) {
+      item.quantity = quantity
+    }
   }
 
   const clearCart = () => {

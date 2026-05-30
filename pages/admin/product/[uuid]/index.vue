@@ -43,14 +43,23 @@
             <p class="mt-2 text-base font-medium text-gray-900">${{ product.price }}</p>
           </div>
           <div>
+            <p class="text-sm text-gray-500">Stock</p>
+            <p class="mt-2 text-base font-medium text-gray-900">{{ product.stock_quantity }}</p>
+          </div>
+          <div>
             <p class="text-sm text-gray-500">Created At</p>
-            <p class="mt-2 text-base font-medium text-gray-900">{{ new Date(product.created_at).toLocaleString() }}</p>
+            <p class="mt-2 text-base font-medium text-gray-900">{{ product.created_at ? new Date(product.created_at).toLocaleString() : '—' }}</p>
           </div>
           <div>
             <p class="text-sm text-gray-500">Updated At</p>
-            <p class="mt-2 text-base font-medium text-gray-900">{{ new Date(product.updated_at).toLocaleString() }}</p>
+            <p class="mt-2 text-base font-medium text-gray-900">{{ product.updated_at ? new Date(product.updated_at).toLocaleString() : '—' }}</p>
+          </div>
+          <div class="sm:col-span-2">
+            <p class="text-sm text-gray-500">Description</p>
+            <p class="mt-2 text-base font-medium text-gray-900">{{ product.description || 'N/A' }}</p>
           </div>
         </div>
+
       </div>
   </div>
 </template>

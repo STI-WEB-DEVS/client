@@ -33,7 +33,9 @@
                 class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
                 placeholder="Product name"
                 required
+                @input="validateName"
               />
+              <p v-if="nameError" class="mt-1 text-xs text-red-600">{{ nameError }}</p>
             </div>
 
             <div>
@@ -42,9 +44,38 @@
                 v-model="price"
                 type="number"
                 step="0.01"
-                min="0"
+                min="0.01"
                 class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
                 placeholder="0.00"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea
+                v-model="description"
+                rows="3"
+                class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
+                placeholder="Brief description..."
+              ></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Current Stock</label>
+              <div class="mt-2 w-full rounded-xl border border-gray-200 bg-gray-100 px-4 py-3 text-sm text-gray-500 cursor-not-allowed select-none">
+                {{ props.product?.stock_quantity ?? 0 }} units
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Restock</label>
+              <input
+                v-model="quantity"
+                type="number"
+                min="0"
+                class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
+                placeholder="0"
                 required
               />
             </div>
@@ -94,17 +125,32 @@ const emit = defineEmits<{
 
 const name = ref('');
 const price = ref('');
+const description = ref('');
+const quantity = ref(0);
+
 const saving = ref(false);
 const error = ref<any>(null);
+const nameError = ref('');
+
+const validateName = () => {
+  nameError.value = /^\d+$/.test(name.value.trim())
+    ? 'Product name cannot be a number.'
+    : '';
+};
 
 watch(() => props.product, (newProduct) => {
   if (newProduct) {
     name.value = newProduct.name || '';
     price.value = newProduct.price?.toString() || '';
+    description.value = newProduct.description || '';
+    quantity.value = 0;
+
   }
 }, { immediate: true });
 
 const handleSubmit = async () => {
+  validateName();
+  if (nameError.value) return;
   error.value = null;
   saving.value = true;
 
@@ -112,6 +158,8 @@ const handleSubmit = async () => {
     await productService.update(props.product.uuid, {
       name: name.value,
       price: parseFloat(price.value),
+      description: description.value,
+      stock_quantity: (props.product.stock_quantity ?? 0) + parseInt(quantity.value.toString(), 10),
     });
     emit('updated');
     emit('close');

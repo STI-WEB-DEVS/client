@@ -26,9 +26,31 @@
               v-model="price"
               type="number"
               step="0.01"
-              min="0"
+              min="0.01"
               class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
               placeholder="0.00"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea
+              v-model="description"
+              rows="3"
+              class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
+              placeholder="Brief description..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Restock</label>
+            <input
+              v-model="quantity"
+              type="number"
+              min="0"
+              class="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:outline-none"
+              placeholder="0"
               required
             />
           </div>
@@ -69,6 +91,9 @@ const uuid = computed(() => String(route.params.uuid ?? ''));
 
 const name = ref('');
 const price = ref('');
+const description = ref('');
+const quantity = ref('0');
+const currentStock = ref(0);
 const pending = ref(true);
 const saving = ref(false);
 const error = ref<any>(null);
@@ -82,6 +107,9 @@ const loadProduct = async () => {
     const product = response?.data ?? response;
     name.value = product.name;
     price.value = product.price?.toString();
+    description.value = product.description || '';
+    currentStock.value = product.stock_quantity ?? 0;
+    quantity.value = '0';
   } catch (err: any) {
     error.value = err;
   } finally {
@@ -99,6 +127,8 @@ const handleSubmit = async () => {
     await productService.update(uuid.value, {
       name: name.value,
       price: parseFloat(price.value),
+      description: description.value,
+      stock_quantity: currentStock.value + parseInt(quantity.value, 10),
     });
     router.push('/admin/product');
   } catch (err: any) {

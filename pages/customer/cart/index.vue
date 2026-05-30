@@ -67,7 +67,8 @@
                   <span class="w-10 text-center text-sm font-semibold text-gray-900">{{ item.quantity }}</span>
                   <button
                     @click="updateQuantity(item.product_uuid, item.quantity + 1)"
-                    class="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition hover:bg-gray-100 hover:text-gray-900"
+                    class="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed"
+                    :disabled="item.quantity >= item.stock_quantity"
                   >
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
