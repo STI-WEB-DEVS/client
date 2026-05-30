@@ -37,11 +37,25 @@
           <div class="min-w-0 flex-1">
             <p class="truncate text-sm font-semibold text-gray-800">{{ item.name }}</p>
             <p class="text-xs text-gray-400">{{ formatPrice(item.price) }} each</p>
+            <!-- Stock warning -->
+            <p v-if="item.quantity >= item.stocks" class="text-xs text-orange-500 font-medium mt-0.5">
+              Max stock reached ({{ item.stocks }})
+            </p>
           </div>
           <div class="flex items-center gap-2 rounded-lg border border-gray-200 px-2 py-1">
-            <button class="flex h-6 w-6 items-center justify-center rounded text-gray-500 transition hover:bg-gray-100" @click="cart.updateQuantity(item.product_uuid, item.quantity - 1)">−</button>
+            <button
+              class="flex h-6 w-6 items-center justify-center rounded text-gray-500 transition hover:bg-gray-100"
+              @click="cart.updateQuantity(item.product_uuid, item.quantity - 1)"
+            >−</button>
             <span class="w-6 text-center text-sm font-medium tabular-nums">{{ item.quantity }}</span>
-            <button class="flex h-6 w-6 items-center justify-center rounded text-gray-500 transition hover:bg-gray-100" @click="cart.updateQuantity(item.product_uuid, item.quantity + 1)">+</button>
+            <button
+              class="flex h-6 w-6 items-center justify-center rounded transition"
+              :class="item.quantity >= item.stocks
+                ? 'cursor-not-allowed text-gray-200'
+                : 'text-gray-500 hover:bg-gray-100'"
+              :disabled="item.quantity >= item.stocks"
+              @click="cart.updateQuantity(item.product_uuid, item.quantity + 1)"
+            >+</button>
           </div>
           <p class="w-24 text-right text-sm font-bold text-gray-900">{{ formatPrice(item.price * item.quantity) }}</p>
           <button class="ml-1 rounded-lg p-1.5 text-gray-300 transition hover:bg-red-50 hover:text-red-500" @click="cart.removeItem(item.product_uuid)">

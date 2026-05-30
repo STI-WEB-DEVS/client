@@ -15,6 +15,8 @@ interface Product {
   uuid: string
   name: string
   price: number
+  description: string
+  stocks: number
 }
 
 interface PaginationMeta {
@@ -34,7 +36,6 @@ const sortBy = ref<'name_asc' | 'name_desc' | 'price_asc' | 'price_desc'>('name_
 const currentPage = ref(1)
 const flashUuid = ref<string | null>(null)
 
-// Modal state
 const showOrderModal = ref(false)
 const selectedProduct = ref<Product | null>(null)
 
@@ -69,33 +70,32 @@ const filtered = computed(() => {
     list = list.filter(p => p.name.toLowerCase().includes(q))
   }
   switch (sortBy.value) {
-    case 'name_asc':
-      list.sort((a, b) => a.name.localeCompare(b.name))
-      break
-    case 'name_desc':
-      list.sort((a, b) => b.name.localeCompare(a.name))
-      break
-    case 'price_asc':
-      list.sort((a, b) => a.price - b.price)
-      break
-    case 'price_desc':
-      list.sort((a, b) => b.price - a.price)
-      break
+    case 'name_asc': list.sort((a, b) => a.name.localeCompare(b.name)); break
+    case 'name_desc': list.sort((a, b) => b.name.localeCompare(a.name)); break
+    case 'price_asc': list.sort((a, b) => a.price - b.price); break
+    case 'price_desc': list.sort((a, b) => b.price - a.price); break
   }
   return list
 })
 
 function addToCart(product: Product) {
+  if (product.stocks === 0) return
   cart.addItem(product)
   flashUuid.value = product.uuid
-  setTimeout(() => {
-    flashUuid.value = null
-  }, 1500)
+  setTimeout(() => { flashUuid.value = null }, 1500)
 }
 
 function openBuyNow(product: Product) {
+  if (product.stocks === 0) return
   selectedProduct.value = product
   showOrderModal.value = true
+}
+
+function handleOrderSuccess(uuid: string, quantity: number) {
+  const product = products.value.find(p => p.uuid === uuid)
+  if (product) {
+    product.stocks = Math.max(0, product.stocks - quantity)
+  }
 }
 
 function formatPrice(value: number) {
@@ -183,10 +183,27 @@ function cardBg(index: number) {
         v-for="(product, index) in filtered"
         :key="product.uuid"
         class="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md"
+        :class="product.stocks === 0 ? 'opacity-70' : ''"
       >
-        <div :class="[cardBg(index), 'flex aspect-square items-center justify-center']">
+        <!-- Card image area -->
+        <div :class="[cardBg(index), 'relative flex aspect-square items-center justify-center']">
           <span class="select-none text-4xl font-bold tracking-tight text-gray-300">
             {{ product.name.charAt(0).toUpperCase() }}
+          </span>
+          
+          <!-- Out of stock badge -->
+          <span
+            v-if="product.stocks === 0"
+            class="absolute top-2 right-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600"
+          >
+            Out of Stock
+          </span>
+          <!-- Low stock badge -->
+          <span
+            v-else-if="product.stocks <= 5"
+            class="absolute top-2 right-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-600"
+          >
+            Only {{ product.stocks }} left!
           </span>
         </div>
 
@@ -194,22 +211,45 @@ function cardBg(index: number) {
           <h3 class="line-clamp-2 text-sm font-semibold text-gray-800">{{ product.name }}</h3>
           <p class="text-base font-bold text-indigo-600">{{ formatPrice(product.price) }}</p>
 
+            <p v-if="product.description" class="text-xs text-gray-500 line-clamp-2">
+              {{ product.description }}
+            </p> 
+
+          <!-- Stocks indicator -->
+          <p
+            class="text-xs"
+            :class="product.stocks === 0
+              ? 'text-red-400 font-medium'
+              : product.stocks <= 5
+                ? 'text-amber-500 font-medium'
+                : 'text-gray-400'"
+          >
+            {{ product.stocks === 0 ? 'Out of stock' : `${product.stocks} in stock` }}
+          </p>
+
           <div class="mt-auto flex flex-col gap-2">
+            <!-- Add to Cart -->
             <button
-              class="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white transition active:scale-95"
-              :class="
-                flashUuid === product.uuid
+              class="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white transition"
+              :class="product.stocks === 0
+                ? 'bg-gray-300 cursor-not-allowed'
+                : flashUuid === product.uuid
                   ? 'bg-green-500 hover:bg-green-500'
-                  : 'bg-indigo-600 hover:bg-indigo-700'
-              "
+                  : 'bg-indigo-600 hover:bg-indigo-700 active:scale-95'"
+              :disabled="product.stocks === 0"
               @click="addToCart(product)"
             >
               <ShoppingCartIcon class="h-3.5 w-3.5" />
               {{ flashUuid === product.uuid ? 'Added!' : 'Add to Cart' }}
             </button>
 
+            <!-- Buy Now -->
             <button
-              class="flex items-center justify-center rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 active:scale-95"
+              class="flex items-center justify-center rounded-lg border px-3 py-2 text-xs font-semibold transition"
+              :class="product.stocks === 0
+                ? 'border-gray-100 text-gray-300 cursor-not-allowed'
+                : 'border-gray-200 text-gray-700 hover:bg-gray-50 active:scale-95'"
+              :disabled="product.stocks === 0"
               @click="openBuyNow(product)"
             >
               Buy Now
@@ -259,6 +299,10 @@ function cardBg(index: number) {
     </p>
   </div>
 
-  <!-- Reusable Order Modal -->
-  <OrderModal v-model="showOrderModal" :product="selectedProduct" @order-placed="(payload) => console.log('Order placed', payload)" />
+  <!-- Order Modal -->
+  <OrderModal
+    v-model="showOrderModal"
+    :product="selectedProduct"
+    @order-success="handleOrderSuccess"
+  />
 </template>

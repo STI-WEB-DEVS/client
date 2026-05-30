@@ -72,12 +72,14 @@ const handleSubmit = async () => {
     <form v-else id="customer-form" @submit.prevent="handleSubmit" class="space-y-5">
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-        <input 
-          v-model="form.name" 
-          type="text" 
-          required 
-          placeholder="e.g. John Doe"
-          class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 outline-none transition" 
+        <!-- Name field - letters and spaces only -->
+        <input
+          v-model="form.name"
+          type="text"
+          required
+          placeholder="e.g. Juan dela Cruz"
+          @keypress="(e) => { if (!/^[a-zA-Z\s]$/.test(e.key)) e.preventDefault() }"
+          class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 outline-none transition"
         />
       </div>
       <div>

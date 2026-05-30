@@ -22,29 +22,46 @@
       </div>
 
       <!-- Product Details -->
-      <div v-else class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+<div v-else class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+  <div class="grid grid-cols-3 gap-4 items-start">
 
-        <div class="grid grid-cols-3 gap-4 items-center">
+    <!-- Name -->
+    <p class="text-sm text-gray-500">Product Name</p>
+    <p class="col-span-2 text-lg font-semibold text-gray-900">
+      {{ product?.name || 'N/A' }}
+    </p>
 
-          <!-- Name -->
-          <p class="text-sm text-gray-500">Product Name</p>
-          <p class="col-span-2 text-lg font-semibold text-gray-900">
-            {{ product?.name || 'N/A' }}
-          </p>
+    <!-- Price -->
+    <p class="text-sm text-gray-500">Price</p>
+    <p class="col-span-2 text-gray-700">
+      ₱{{ Number(product?.price ?? 0).toFixed(2) }}
+    </p>
 
-          <!-- Price -->
-          <p class="text-sm text-gray-500">Price</p>
-          <p class="col-span-2 text-gray-700">
-            ₱{{ Number(product?.price ?? 0).toFixed(2) }}
-          </p>
+    <!-- Description -->
+    <p class="text-sm text-gray-500">Description</p>
+    <p class="col-span-2 text-gray-700">
+      {{ product?.description || '—' }}
+    </p>
 
-          <!-- UUID -->
-          <p class="text-sm text-gray-500">Product UUID</p>
-          <p class="col-span-2 font-mono text-gray-900 break-all">
-            {{ uuid }}
-          </p>
+    <!-- Stocks -->
+    <p class="text-sm text-gray-500">Stocks</p>
+    <p class="col-span-2 font-medium"
+      :class="(product?.stocks ?? 0) === 0
+        ? 'text-red-500'
+        : (product?.stocks ?? 0) <= 5
+          ? 'text-amber-500'
+          : 'text-gray-700'">
+      {{ (product?.stocks ?? 0) === 0 ? 'Out of stock' : `${product?.stocks} in stock` }}
+    </p>
 
-        </div>
+    <!-- UUID -->
+    <p class="text-sm text-gray-500">Product UUID</p>
+    <p class="col-span-2 font-mono text-gray-900 break-all">
+      {{ uuid }}
+    </p>
+
+  </div>
+
 
       </div>
     </div>

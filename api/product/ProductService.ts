@@ -13,7 +13,6 @@ class ProductService extends BaseService {
     }
 
     async list(params: object = {}): Promise<any> {
-        // This will result in: apiBaseURL + '/products'
         return await this.request(this.resource, 'GET', params);
     }
 
@@ -36,7 +35,11 @@ class ProductService extends BaseService {
     async restore(uuid: string): Promise<any> {
         return await this.request(`${this.resource}/${uuid}/restore`, 'POST');
     }
+
+    // ✅ Add this
+    async reduceStock(uuid: string, quantity: number): Promise<any> {
+        return await this.request(`${this.resource}/${uuid}/reduce-stock`, 'POST', { quantity });
+    }
 }
 
-// Export the instance directly
 export const productService = ProductService.getInstance();

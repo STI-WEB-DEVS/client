@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useCartStore } from '~/stores/cart'
 import { useOrdersStore } from '~/stores/order'   
+import { productService } from '~/api/product/ProductService'
 import { useRoute } from 'vue-router'
 import { CheckCircleIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
 
@@ -73,6 +74,13 @@ async function placeOrder() {
       customerUuid.value.trim(),
       orderItems.value,
       totalPrice.value
+    )
+
+    // Call reduceStock API for each item in the order
+    await Promise.all(
+      orderItems.value.map(item =>
+        productService.reduceStock(item.product_uuid, item.quantity)
+      )
     )
 
     if (!isDirectBuy) {

@@ -28,42 +28,44 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">Name</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">Price</th>
-                <th class="px-6 py-4 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
-              </tr>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">Name</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">Description</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">Price</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">Stocks</th>
+              <th class="px-6 py-4 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
+            </tr>
             </thead>
 
             <tbody class="divide-y divide-gray-100 bg-white">
-              <tr v-for="product in products" :key="product.uuid" class="transition hover:bg-gray-50">
-                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ product.name || product.title }}</td>
-                <td class="px-6 py-4 text-sm text-gray-700">₱{{ Number(product.price || 0).toFixed(2) }}</td>
-                <td class="px-6 py-4 text-right space-x-2">
-                  <button 
-                @click="router.push(`/admin/product/${product.uuid}`)" 
-                class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                <EyeIcon class="h-4 w-4" />
-                <span>View</span>
-              </button>
-
-              <button 
-                @click="openModal('edit', product)" 
-                class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                <PencilSquareIcon class="h-4 w-4" />
-                <span>Edit</span>
-              </button>
-
-              <button 
-                @click="openModal('delete', product)" 
-                class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
-              >
-                <TrashIcon class="h-4 w-4" />
-                <span>Delete</span>
-              </button>
-                </td>
-              </tr>
+                <tr v-for="product in products" :key="product.uuid" class="transition hover:bg-gray-50">
+                  <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ product.name || product.title }}</td>
+                  <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{{ product.description || '—' }}</td>
+                  <td class="px-6 py-4 text-sm text-gray-700">₱{{ Number(product.price || 0).toFixed(2) }}</td>
+                  <td class="px-6 py-4 text-sm text-gray-700">{{ product.stocks ?? product.stock ?? '—' }}</td>
+                  <td class="px-6 py-4 text-right space-x-2">
+                    <button 
+                      @click="router.push(`/admin/product/${product.uuid}`)" 
+                      class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      <EyeIcon class="h-4 w-4" />
+                      <span>View</span>
+                    </button>
+                    <button 
+                      @click="openModal('edit', product)" 
+                      class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      <PencilSquareIcon class="h-4 w-4" />
+                      <span>Edit</span>
+                    </button>
+                    <button 
+                      @click="openModal('delete', product)" 
+                      class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+                    >
+                      <TrashIcon class="h-4 w-4" />
+                      <span>Delete</span>
+                    </button>
+                  </td>
+                </tr>
             </tbody>
           </table>
         </div>
