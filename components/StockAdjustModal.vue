@@ -126,10 +126,10 @@ const mode = ref<'add' | 'deduct' | 'set'>('add');
 const quantity = ref<number>(1);
 const loading = ref(false);
 
-const modes = [
-  { value: 'add',    label: '+ Restock',    activeClass: 'border-green-400 bg-green-50 text-green-700' },
-  { value: 'deduct', label: '− Deduct',     activeClass: 'border-red-400 bg-red-50 text-red-700' },
-  { value: 'set',    label: '= Set Exact',  activeClass: 'border-blue-400 bg-blue-50 text-blue-700' },
+const modes: { value: 'add' | 'deduct' | 'set'; label: string; activeClass: string }[] = [
+  { value: 'add',    label: '+ Restock',   activeClass: 'border-green-400 bg-green-50 text-green-700' },
+  { value: 'deduct', label: '− Deduct',    activeClass: 'border-red-400 bg-red-50 text-red-700' },
+  { value: 'set',    label: '= Set Exact', activeClass: 'border-blue-400 bg-blue-50 text-blue-700' },
 ];
 
 watch(() => props.open, (val) => {

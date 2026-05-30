@@ -52,7 +52,7 @@
             </div>
             <div class="mt-2 flex items-center gap-3">
               <StockBadge :quantity="product.stock_quantity" />
-              <span class="text-sm text-gray-500">({{ product.stock_quantity }} units)</span>
+              <span class="text-sm text-gray-500"></span>
             </div>
           </div>
 

@@ -200,9 +200,10 @@ const feedbackMessage = ref('');
 const feedbackType = ref<'success' | 'error' | 'info'>('info');
 
 const fields = [
-  { name: 'name', label: 'Product Name', placeholder: 'e.g. Premium Widget', required: true },
-  { name: 'price', label: 'Price', type: 'number', placeholder: '0.00', required: true },
-  { name: 'stock_quantity', label: 'Stock Quantity', type: 'number', placeholder: 'e.g. 100', required: true },
+  { name: 'name',           label: 'Product Name',   type: 'text',     placeholder: 'e.g. Malunggay Pandesal', required: true },
+  { name: 'description',    label: 'Description',    type: 'textarea', placeholder: 'Enter product description...', required: false },
+  { name: 'price',          label: 'Price',          type: 'number',   placeholder: '0.00', required: true },
+  { name: 'stock_quantity', label: 'Stock Quantity', type: 'number',   placeholder: 'e.g. 100', required: true },
 ];
 
 const fetchProducts = async () => {
