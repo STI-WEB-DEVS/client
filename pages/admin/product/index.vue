@@ -38,6 +38,9 @@
                   Price
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Stock
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Created At
                 </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -57,6 +60,26 @@
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
                   ${{ product.price }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4">
+                  <span
+                    :class="[
+                      product.stock === 0
+                        ? 'bg-red-100 text-red-700'
+                        : product.stock <= 10
+                        ? 'bg-amber-100 text-amber-700'
+                        : 'bg-emerald-100 text-emerald-700'
+                    ]"
+                    class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                  >
+                    <span
+                      :class="[
+                        product.stock === 0 ? 'bg-red-500' : product.stock <= 10 ? 'bg-amber-500' : 'bg-emerald-500'
+                      ]"
+                      class="h-1.5 w-1.5 rounded-full"
+                    />
+                    {{ product.stock === 0 ? 'Out of Stock' : product.stock + ' in stock' }}
+                  </span>
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                   {{ product.created_at?.split('T')[0] }}
@@ -119,7 +142,7 @@
       <CrudFormModal
         :open="showFormModal"
         :entityName="'Product'"
-        :fields="fields"
+        :fields="editingEntity ? editFields : createFields"
         :service="productsService"
         :initialData="editingEntity"
         :isEdit="!!editingEntity"
@@ -150,7 +173,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   PlusIcon,
@@ -183,10 +206,29 @@ const isFeedbackModalOpen = ref(false);
 const feedbackMessage = ref('');
 const feedbackType = ref<'success' | 'error' | 'info'>('info');
 
-const fields = [
-  { name: 'name', label: 'Product Name', placeholder: 'e.g. Premium Widget', required: true },
-  { name: 'price', label: 'Price', type: 'number', placeholder: '0.00', required: true },
+// Create: all fields editable, stock sets the initial quantity
+const createFields = [
+  { name: 'name',        label: 'Product Name',   placeholder: 'e.g. Premium Widget', required: true, lettersOnly: true },
+  { name: 'price',       label: 'Price',           type: 'number', placeholder: '0.00', required: true },
+  { name: 'stock',       label: 'Initial Stock',   type: 'number', placeholder: '0',    required: true },
+  { name: 'description', label: 'Description',     type: 'textarea', placeholder: 'Describe the product…', rows: 4, required: false },
 ];
+
+// Edit: stock is read-only (display only); restock adds to existing stock; description is editable
+const editFields = computed(() => [
+  { name: 'name',        label: 'Product Name',                     placeholder: 'e.g. Premium Widget', required: true, lettersOnly: true },
+  { name: 'price',       label: 'Price',                            type: 'number', placeholder: '0.00', required: true },
+  { name: 'stock',       label: 'Current Stock',                    type: 'number', readonly: true },
+  {
+    name: 'restock',
+    label: 'Add Restock Quantity',
+    type: 'number',
+    placeholder: 'e.g. 50',
+    required: false,
+    helper: 'This amount will be added on top of the current stock.',
+  },
+  { name: 'description', label: 'Description', type: 'textarea', placeholder: 'Describe the product…', rows: 4, required: false },
+]);
 
 const fetchProducts = async () => {
   pending.value = true;

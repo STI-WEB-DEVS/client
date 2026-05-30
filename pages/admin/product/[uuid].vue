@@ -35,6 +35,35 @@
             <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Price</p>
             <p class="mt-1 text-sm text-gray-900">${{ product.price }}</p>
           </div>
+          <div class="px-6 py-4">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Stock</p>
+            <div class="mt-2 flex items-center gap-3">
+              <span
+                :class="[
+                  product.stock === 0
+                    ? 'bg-red-100 text-red-700'
+                    : product.stock <= 10
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-emerald-100 text-emerald-700'
+                ]"
+                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold"
+              >
+                <span
+                  :class="[
+                    product.stock === 0 ? 'bg-red-500' : product.stock <= 10 ? 'bg-amber-500' : 'bg-emerald-500'
+                  ]"
+                  class="h-2 w-2 rounded-full"
+                />
+                {{ product.stock === 0 ? 'Out of Stock' : product.stock <= 10 ? 'Low Stock' : 'In Stock' }}
+              </span>
+              <span class="text-lg font-bold text-gray-900">{{ product.stock }}</span>
+              <span class="text-sm text-gray-400">units available</span>
+            </div>
+          </div>
+          <div v-if="product.description" class="px-6 py-4">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Description</p>
+            <p class="mt-1 text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ product.description }}</p>
+          </div>
           <div v-if="product.created_at" class="px-6 py-4">
             <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Created At</p>
             <p class="mt-1 text-sm text-gray-900">{{ product.created_at }}</p>

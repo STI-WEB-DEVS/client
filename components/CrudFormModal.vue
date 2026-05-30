@@ -35,14 +35,43 @@
               <label :for="'modal-' + field.name" class="text-sm font-medium text-gray-700">
                 {{ field.label }}
               </label>
-              <input
-                v-model="formData[field.name]"
-                :id="'modal-' + field.name"
-                :type="field.type || 'text'"
-                :required="field.required"
-                class="block w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
-                :placeholder="field.placeholder"
-              />
+
+              <!-- Read-only display field (e.g. current stock) -->
+              <div
+                v-if="field.readonly"
+                class="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm"
+              >
+                <span class="font-semibold text-gray-800">{{ formData[field.name] ?? '—' }}</span>
+                <span class="text-xs text-gray-400 font-medium">(read-only)</span>
+              </div>
+
+              <!-- Normal editable input -->
+              <template v-else>
+                <textarea
+                  v-if="field.type === 'textarea'"
+                  v-model="formData[field.name]"
+                  :id="'modal-' + field.name"
+                  :required="field.required"
+                  :rows="field.rows || 4"
+                  class="block w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900 resize-none"
+                  :placeholder="field.placeholder"
+                />
+                <input
+                  v-else
+                  v-model="formData[field.name]"
+                  :id="'modal-' + field.name"
+                  :type="field.type || 'text'"
+                  :required="field.required"
+                  class="block w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                  :placeholder="field.placeholder"
+                  @input="field.lettersOnly ? filterLetters(field.name, $event) : null"
+                />
+              </template>
+
+              <!-- Helper text -->
+              <p v-if="field.helper" class="flex items-center gap-1 text-xs font-medium text-indigo-600">
+                <span>ℹ</span> {{ field.helper }}
+              </p>
             </div>
 
             <!-- Footer -->
@@ -79,6 +108,10 @@ interface Field {
   type?: string;
   placeholder?: string;
   required?: boolean;
+  readonly?: boolean;
+  helper?: string;
+  rows?: number;
+  lettersOnly?: boolean;
 }
 
 const props = defineProps<{
@@ -100,10 +133,25 @@ const emit = defineEmits<{
 const formData = ref<any>({});
 const loading = ref(false);
 
+// Strips out anything that isn't a letter or space (for lettersOnly fields)
+const filterLetters = (fieldName: string, event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const cleaned = input.value.replace(/[^a-zA-Z\s]/g, '');
+  if (input.value !== cleaned) {
+    input.value = cleaned;
+    formData.value[fieldName] = cleaned;
+  }
+};
+
 const initForm = () => {
   const data: any = {};
   props.fields.forEach(field => {
-    data[field.name] = props.initialData?.[field.name] || '';
+    if (field.readonly) {
+      // Populate readonly fields from initialData for display only — not submitted
+      data[field.name] = props.initialData?.[field.name] ?? '';
+    } else {
+      data[field.name] = props.initialData?.[field.name] || '';
+    }
   });
   formData.value = data;
 };
@@ -120,11 +168,20 @@ watch(() => props.initialData, () => {
 const handleSubmit = async () => {
   loading.value = true;
   try {
+    // Strip readonly fields — they are display-only and must not be submitted
+    const readonlyKeys = new Set(props.fields.filter(f => f.readonly).map(f => f.name));
+    const payload: any = {};
+    for (const key in formData.value) {
+      if (!readonlyKeys.has(key)) {
+        payload[key] = formData.value[key];
+      }
+    }
+
     if (props.isEdit && props.uuid) {
-      await props.service.update(props.uuid, formData.value);
+      await props.service.update(props.uuid, payload);
       emit('success', `${props.entityName} updated successfully!`);
     } else {
-      await props.service.create(formData.value);
+      await props.service.create(payload);
       emit('success', `${props.entityName} created successfully!`);
     }
     emit('close');
