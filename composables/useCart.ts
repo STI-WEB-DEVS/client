@@ -1,23 +1,32 @@
+import { ref, computed } from 'vue';
+
 interface CartItem {
   product_uuid: string;
   name: string;
   price: number;
   quantity: number;
+  stock_quantity: number;
 }
 
 const cartItems = ref<CartItem[]>([]);
 
 export const useCart = () => {
-  const addToCart = (product: { uuid: string; name: string; price: number }, qty: number = 1) => {
+  const addToCart = (
+    product: { uuid: string; name: string; price: number; stock_quantity: number },
+    qty: number = 1
+  ) => {
     const existing = cartItems.value.find((item) => item.product_uuid === product.uuid);
     if (existing) {
-      existing.quantity += qty;
+      const newQty = existing.quantity + qty;
+      existing.quantity = Math.min(newQty, product.stock_quantity);
     } else {
+      if (product.stock_quantity === 0) return;
       cartItems.value.push({
         product_uuid: product.uuid,
         name: product.name,
         price: product.price,
-        quantity: qty,
+        quantity: Math.min(qty, product.stock_quantity),
+        stock_quantity: product.stock_quantity,
       });
     }
   };
@@ -33,7 +42,7 @@ export const useCart = () => {
     }
     const item = cartItems.value.find((i) => i.product_uuid === productUuid);
     if (item) {
-      item.quantity = quantity;
+      item.quantity = Math.min(quantity, item.stock_quantity);
     }
   };
 
@@ -41,7 +50,9 @@ export const useCart = () => {
     cartItems.value = [];
   };
 
-  const cartCount = computed(() => cartItems.value.reduce((sum, item) => sum + item.quantity, 0));
+  const cartCount = computed(() =>
+    cartItems.value.reduce((sum, item) => sum + item.quantity, 0)
+  );
 
   const cartTotal = computed(() =>
     cartItems.value.reduce((sum, item) => sum + item.price * item.quantity, 0)

@@ -60,20 +60,24 @@ const handleCheckout = () => {
           </div>
 
           <!-- Quantity Controls -->
-          <div class="flex items-center gap-2">
-            <button
-              @click="updateQuantity(item.product_uuid, item.quantity - 1)"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-100 active:bg-gray-200"
-            >
-              −
-            </button>
-            <span class="w-8 text-center text-sm font-semibold text-gray-900">{{ item.quantity }}</span>
-            <button
-              @click="updateQuantity(item.product_uuid, item.quantity + 1)"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-100 active:bg-gray-200"
-            >
-              +
-            </button>
+          <div class="flex flex-col items-center gap-1">
+            <div class="flex items-center gap-2">
+              <button
+                @click="updateQuantity(item.product_uuid, item.quantity - 1)"
+                class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-100 active:bg-gray-200"
+              >
+                −
+              </button>
+              <span class="w-8 text-center text-sm font-semibold text-gray-900">{{ item.quantity }}</span>
+              <button
+                @click="updateQuantity(item.product_uuid, item.quantity + 1)"
+                :disabled="item.quantity >= item.stock_quantity"
+                class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-100 active:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                +
+              </button>
+            </div>
+            <span class="text-xs text-gray-400">/ {{ item.stock_quantity }} in stock</span>
           </div>
 
           <!-- Subtotal -->
