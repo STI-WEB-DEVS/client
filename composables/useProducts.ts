@@ -5,7 +5,9 @@ type ProductApiItem = {
   uuid?: string;
   name?: string;
   price?: number | string;
+  quantity?: number | string | null;
   description?: string | null;
+  product_description?: string | null;
   imageUrl?: string | null;
   image_url?: string | null;
   image?: string | null;
@@ -20,6 +22,13 @@ const normalizeProductsResponse = (response: any): ProductApiItem[] => {
   return [];
 };
 
+const hasAvailableQuantity = (item: ProductApiItem) => {
+  if (item?.quantity == null || item.quantity === "") return true;
+
+  const quantity = Number(item.quantity);
+  return Number.isFinite(quantity) && quantity > 0;
+};
+
 const mapToProduct = (item: ProductApiItem): Product | null => {
   const uuid = (item?.uuid || "").toString().trim();
   const name = (item?.name || "").toString().trim();
@@ -28,7 +37,7 @@ const mapToProduct = (item: ProductApiItem): Product | null => {
       ? Number.parseFloat(item.price)
       : Number(item?.price);
   const description =
-    item?.description == null ? undefined : String(item.description);
+    item?.description ?? item?.product_description ?? undefined;
   const imageUrl = (item?.imageUrl ||
     item?.image_url ||
     item?.image ||
@@ -41,7 +50,7 @@ const mapToProduct = (item: ProductApiItem): Product | null => {
     uuid,
     name,
     price: Number.isFinite(price) ? price : 0,
-    description,
+    description: description == null ? undefined : String(description),
     imageUrl: imageUrl ? String(imageUrl) : undefined,
   };
 };
@@ -59,6 +68,7 @@ export const useProducts = () => {
       const response = await productService.list();
       const items = normalizeProductsResponse(response);
       products.value = items
+        .filter(hasAvailableQuantity)
         .map(mapToProduct)
         .filter((p): p is Product => Boolean(p));
     } catch (e: any) {

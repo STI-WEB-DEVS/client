@@ -10,7 +10,9 @@
           Product Image
         </div>
         <h3 class="font-bold text-lg">{{ product.name }}</h3>
-        <p class="text-gray-600 text-sm mb-2">{{ product.description }}</p>
+        <p class="text-gray-600 text-sm mb-2">
+          {{ product.description || product.product_description || 'No description available.' }}
+        </p>
         <div class="flex justify-between items-center mt-4">
           <span class="text-indigo-600 font-bold">${{ product.price }}</span>
           <button 
@@ -39,11 +41,18 @@ const addToCart = (product) => {
   addItem(product, 1);
 };
 
+const hasAvailableQuantity = (product) => {
+  if (product?.quantity == null || product.quantity === "") return true;
+
+  const quantity = Number(product.quantity);
+  return Number.isFinite(quantity) && quantity > 0;
+};
+
 onMounted(async () => {
   try {
     const response = await productService.list();
-    // Adjust 'response.data' based on your actual BaseService return structure
-    products.value = response.data || response; 
+    const items = Array.isArray(response?.data) ? response.data : response;
+    products.value = Array.isArray(items) ? items.filter(hasAvailableQuantity) : [];
   } catch (err) {
     console.error("Error fetching products:", err);
   } finally {

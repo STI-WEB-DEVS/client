@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <div>
         <h1 class="text-xl font-semibold tracking-tight text-gray-900">
@@ -59,6 +58,20 @@
         </div>
 
         <div>
+          <p class="text-sm text-gray-500">Quantity</p>
+          <p class="mt-1 text-base font-medium text-gray-900">
+            {{ product?.quantity ?? '—' }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Product Description</p>
+          <p class="mt-1 text-base font-medium text-gray-900 whitespace-pre-wrap">
+            {{ product?.product_description ?? '—' }}
+          </p>
+        </div>
+
+        <div>
           <p class="text-sm text-gray-500">Created At</p>
           <p class="mt-1 text-base font-medium text-gray-900">
             {{ product?.created_at }}
@@ -73,7 +86,6 @@
         </div>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

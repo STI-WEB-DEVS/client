@@ -40,6 +40,9 @@
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Price
                 </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Quantity
+                </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
                 </th>
@@ -60,6 +63,9 @@
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                   {{ formatPrice(product.price) }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  {{ product.quantity ?? '—' }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
@@ -94,7 +100,7 @@
               </tr>
 
               <tr v-if="!products?.data?.length">
-                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
+                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
                   No products found.
                 </td>
               </tr>
@@ -126,6 +132,10 @@
   :fields="[
     { key: 'name', label: 'Product Name', placeholder: 'Enter product name' },
     { key: 'price', label: 'Price', type: 'number', placeholder: 'Enter price' },
+    { key: 'quantity', label: 'Quantity', type: 'number', placeholder: 'Enter quantity' },
+    { key: 'restock_amount', label: 'Restock Amount', type: 'number', placeholder: 'Enter restock amount' },
+    { key: 'product_description', label: 'Product Description', type: 'text', placeholder: 'Enter product description' },
+
   ]"
   :on-save="handleSave"
   @close="isCreateModalOpen = false"
@@ -137,8 +147,11 @@
   title="Product"
   :item="selectedItem"
   :fields="[
-    { key: 'name', label: 'Product Name', placeholder: 'Enter product name' },
+    { key: 'name', label: 'Product Name', placeholder: 'Enter product name' }, //should only accept character not integers
     { key: 'price', label: 'Price', type: 'number', placeholder: 'Enter price' },
+    { key: 'quantity', label: 'Quantity', type: 'number', placeholder: 'Enter quantity' }, //display only on edit
+    { key: 'restock_amount', label: 'Restock Amount', type: 'number', placeholder: 'Enter restock amount' }, //add stock amount only, not reduce
+    { key: 'product_description', label: 'Product Description', type: 'text', placeholder: 'Enter product description' },
   ]"
   :on-save="handleSave"
   @close="isEditModalOpen = false"
@@ -199,7 +212,7 @@ const handleCreate = () => {
 };
 
 const handleView = (product: any) => {
-  router.push(`/products/${product.uuid}`);
+  router.push(`/admin/products/${product.uuid}`);
 };
 
 const handleEdit = (product: any) => {

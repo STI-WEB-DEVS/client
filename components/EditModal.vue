@@ -17,14 +17,29 @@
             </button>
           </div>
 
+          <!-- Error Alert -->
+          <div v-if="errorMsg" class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600 border border-red-200">
+            {{ errorMsg }}
+          </div>
+
           <div class="space-y-4">
             <div v-for="field in fields" :key="field.key">
               <label class="mb-1 block text-sm font-medium text-gray-700">{{ field.label }}</label>
+              <textarea
+                v-if="field.key === 'product_description'"
+                v-model="form[field.key]"
+                :placeholder="field.placeholder ?? ''"
+                rows="3"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              />
               <input
+                v-else
                 v-model="form[field.key]"
                 :type="field.type ?? 'text'"
                 :placeholder="field.placeholder ?? ''"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+                :disabled="field.key === 'quantity'"
+                :min="field.key === 'restock_amount' || field.key === 'price' ? 0 : undefined"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -63,23 +78,61 @@ const emit = defineEmits<{
 
 const saving = ref(false);
 const form = ref<Record<string, any>>({});
+const errorMsg = ref('');
 
 // Pre-fill form when item changes
 watch(() => props.item, (item) => {
   if (item) {
+    errorMsg.value = '';
     form.value = props.fields.reduce((acc, field) => {
-      acc[field.key] = item[field.key] ?? '';
+      if (field.key === 'restock_amount') {
+        acc[field.key] = '';
+      } else {
+        acc[field.key] = item[field.key] ?? '';
+      }
       return acc;
     }, {} as Record<string, any>);
   }
 }, { immediate: true });
 
 const handleSave = async () => {
+  errorMsg.value = '';
+
+  // Validations
+  if (!form.value.name || form.value.name.trim() === '') {
+    errorMsg.value = 'Product Name is required.';
+    return;
+  }
+
+  if (/^\d+$/.test(form.value.name.trim())) {
+    errorMsg.value = 'Product Name cannot be a pure integer.';
+    return;
+  }
+
+  if (form.value.price === undefined || form.value.price === '') {
+    errorMsg.value = 'Price is required.';
+    return;
+  }
+
+  if (Number(form.value.price) < 0) {
+    errorMsg.value = 'Price cannot be negative.';
+    return;
+  }
+
+  if (form.value.restock_amount !== undefined && form.value.restock_amount !== '') {
+    if (Number(form.value.restock_amount) < 0) {
+      errorMsg.value = 'Restock Amount cannot be negative.';
+      return;
+    }
+  }
+
   saving.value = true;
   try {
     const updated = await props.onSave(form.value);
     emit('saved', updated);
     emit('close');
+  } catch (err: any) {
+    errorMsg.value = err.message || 'An error occurred while saving.';
   } finally {
     saving.value = false;
   }
