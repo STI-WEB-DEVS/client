@@ -34,6 +34,8 @@
               <tr>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Name</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Description</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Stock</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Price</th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
@@ -47,6 +49,8 @@
               >
                 <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ product.id }}</td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ product.name }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ product.description }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ product.quantity }}</td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ product.price }}</td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">

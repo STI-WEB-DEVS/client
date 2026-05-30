@@ -28,11 +28,25 @@
             {{ product.name }}
           </p>
         </div>
+        <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <p class="text-sm text-gray-500">Description</p>
+          <p class="mt-2 text-base font-medium text-gray-900">
+            {{ product.description }}
+          </p>
+        </div>
 
         <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
           <p class="text-sm text-gray-500">Product Price</p>
           <p class="mt-2 text-base font-medium text-gray-900">
             {{ product.price }}
+          </p>
+        </div>
+
+
+        <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <p class="text-sm text-gray-500">Quanity</p>
+          <p class="mt-2 text-base font-medium text-gray-900">
+            {{ product.quantity }}
           </p>
         </div>
         <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">

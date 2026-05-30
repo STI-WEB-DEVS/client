@@ -58,6 +58,11 @@
 
         <!-- Content -->
         <div class="p-4 flex flex-col flex-1">
+          <div v-if="Number(product.quantity) === 0" class="mb-2">
+            <span class="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-red-700">
+              Sold Out
+            </span>
+          </div>
           
           <h2 class="text-sm font-semibold text-gray-900 line-clamp-2">
             {{ product.name }}
@@ -65,6 +70,9 @@
 
           <p class="mt-1 text-xs text-gray-500 line-clamp-2">
             {{ product.description }}
+          </p>
+          <p class="mt-1 text-xs text-gray-500 line-clamp-2">
+           Stock: {{ product.quantity }}
           </p>
 
           <div class="mt-3 text-lg font-bold text-indigo-600">
@@ -76,10 +84,14 @@
           <!-- Add to Cart -->
           <button
             @click="handleAddToCart(product)"
-            class="mt-4 flex items-center justify-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition active:scale-95"
+            :disabled="Number(product.quantity) === 0"
+            class="mt-4 flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold text-white transition"
+            :class="Number(product.quantity) === 0
+              ? 'cursor-not-allowed bg-gray-300 text-gray-500'
+              : 'bg-indigo-600 hover:bg-indigo-700 active:scale-95'"
           >
             <CartIcon class="size-4" />
-            Add
+            {{ Number(product.quantity) === 0 ? 'Sold Out' : 'Add' }}
           </button>
         </div>
       </div>
@@ -124,6 +136,9 @@ const saveCart = (cartData) => {
 const cart = ref(loadCart())
 
 const handleAddToCart = (product) => {
+  if (Number(product.quantity) === 0) {
+    return
+  }
   addToCart(product)
   showFeedback('Added to cart!')
 }
