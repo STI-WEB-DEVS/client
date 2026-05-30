@@ -22,14 +22,14 @@
           <div>
             <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
             <div class="mt-2">
-              <input type="email" name="email" id="email" autocomplete="email" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+              <input type="email" name="email" id="email" v-model="email" autocomplete="email" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
             </div>
           </div>
 
           <div>
             <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
             <div class="mt-2">
-              <input type="password" name="password" id="password" autocomplete="current-password" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+              <input type="password" name="password" id="password" v-model="password" autocomplete="current-password" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
             </div>
           </div>
 
@@ -95,8 +95,50 @@
 </template>
 
 <script setup lang="ts">
-    const handleSubmit = async () => {
-    // Since there is no BE, we just trigger the redirect immediately
-    await navigateTo('/dashboard') 
+definePageMeta({
+  layout: false,
+});
+ 
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
+ 
+const email = ref("email");
+const password = ref("password");
+const error = ref("");
+const isLoading = ref(false);
+ 
+const authService = new AuthService();
+ 
+const handleSubmit = async () => {
+  error.value = "";
+  isLoading.value = true;
+ 
+  try {
+    const response = await authService.login(email.value, password.value);
+ 
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
     }
+ 
+    // // if (response?.user.customer_uuid) {
+    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
+    // // } else if (response?.user.uuid) {
+    // //   localStorage.setItem("_uuid", response.user.uuid);
+    // // }
+ 
+    / /// if (response?.user.role) {
+    // //   localStorage.setItem("_role", response.user.role);
+    // // }
+ 
+    // await navigateTo("/admin/dashboard");
+ 
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+    );
+  } catch (err: any) {
+    error.value = err?.message || "";
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>

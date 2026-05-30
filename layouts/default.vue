@@ -165,6 +165,8 @@ const navigation = [
   { name: 'Routes', href: '/route', icon: CalendarIcon },
   { name: 'Schedules', href: '/schedule', icon: DocumentDuplicateIcon },
   { name: 'Reports', href: '/report', icon: ChartPieIcon },
+  { name: 'Customers', href: '/customer', icon: UsersIcon},
+  { name: 'Product', href: '/product', icon: TruckIcon}
 ]
 
 const userNavigation = [
