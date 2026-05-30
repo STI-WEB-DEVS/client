@@ -30,7 +30,26 @@
           </div>
           <div>
             <p class="text-sm text-gray-500">Price</p>
-            <p class="mt-1 text-gray-900">{{ product?.price ?? '-' }}</p>
+            <p class="mt-1 text-gray-900">${{ parseFloat(product?.price || 0).toFixed(2) }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Stock Quantity</p>
+            <p 
+              class="mt-1 font-medium"
+              :class="{
+                'text-emerald-600': product?.stock > 5,
+                'text-amber-600': product?.stock > 0 && product?.stock <= 5,
+                'text-red-600': product?.stock <= 0
+              }"
+            >
+              {{ product?.stock ?? 0 }} units
+              <span v-if="product?.stock <= 0" class="text-xs">(Out of Stock)</span>
+              <span v-else-if="product?.stock <= 5" class="text-xs">(Low Stock)</span>
+            </p>
+          </div>
+          <div class="sm:col-span-2">
+            <p class="text-sm text-gray-500">Description</p>
+            <p class="mt-1 text-gray-900">{{ product?.description || 'No description provided.' }}</p>
           </div>
         </div>
       </div>

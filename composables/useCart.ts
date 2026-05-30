@@ -3,22 +3,36 @@ export interface CartItem {
   name: string;
   price: number;
   quantity: number;
+  stock?: number;
   image?: string;
 }
 
 export const useCart = () => {
   const cart = useState<CartItem[]>('cart', () => []);
 
-  const addToCart = (product: { uuid: string; name: string; price: number; image?: string }, quantity: number = 1) => {
+  const addToCart = (product: { uuid: string; name: string; price: number; stock?: number; image?: string }, quantity: number = 1) => {
     const existingItem = cart.value.find(item => item.product_uuid === product.uuid);
+    
+    // Check stock availability
+    const availableStock = product.stock ?? 0;
+    
     if (existingItem) {
-      existingItem.quantity += quantity;
+      const newQuantity = existingItem.quantity + quantity;
+      if (availableStock > 0 && newQuantity > availableStock) {
+        return `Cannot add more. Only ${availableStock} units available in stock.`;
+      }
+      existingItem.quantity = newQuantity;
+      existingItem.stock = product.stock;
     } else {
+      if (availableStock > 0 && quantity > availableStock) {
+        return `Cannot add ${quantity} units. Only ${availableStock} units available in stock.`;
+      }
       cart.value.push({
         product_uuid: product.uuid,
         name: product.name,
         price: product.price,
         quantity,
+        stock: product.stock,
         image: product.image
       });
     }
@@ -35,6 +49,12 @@ export const useCart = () => {
       if (quantity <= 0) {
         removeFromCart(product_uuid);
       } else {
+        // Check stock limit
+        const availableStock = item.stock ?? 0;
+        if (availableStock > 0 && quantity > availableStock) {
+          // Don't update if exceeds stock
+          return `Cannot exceed available stock of ${availableStock} units.`;
+        }
         item.quantity = quantity;
       }
     }

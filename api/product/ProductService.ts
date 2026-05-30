@@ -33,6 +33,10 @@ class ProductService extends BaseService {
   async delete(uuid: string): Promise<any> {
     return await this.request(`${this.resource}/${uuid}`, 'DELETE');
   }
+
+  async restock(uuid: string, quantity: number): Promise<any> {
+    return await this.request(`${this.resource}/${uuid}/restock`, 'POST', { quantity });
+  }
 }
 
 export const productService = ProductService.getInstance();

@@ -43,6 +43,9 @@
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Price
                 </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Stock
+                </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
                 </th>
@@ -62,10 +65,33 @@
                   {{ product.name }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ parseFloat(product.price || 0).toFixed(2) }}
+                  ${{ parseFloat(product.price || 0).toFixed(2) }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm">
+                  <span 
+                    :class="{
+                      'text-emerald-600 font-medium': product.stock > 5,
+                      'text-amber-600 font-bold': product.stock > 0 && product.stock <= 5,
+                      'text-red-600 font-bold': product.stock <= 0
+                    }"
+                  >
+                    {{ product.stock }} units
+                  </span>
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      @click="handleRestock(product)"
+                      class="inline-flex items-center gap-2 rounded-md border border-emerald-200 px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
+                      title="Restock product"
+                    >
+                      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      <span>Restock</span>
+                    </button>
+
                     <button
                       type="button"
                       @click="handleView(product)"
@@ -97,7 +123,7 @@
               </tr>
 
               <tr v-if="!products?.data?.length">
-                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
+                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
                   No products found.
                 </td>
               </tr>
@@ -139,13 +165,80 @@
             {{ mode === 'create' ? 'Create Product' : 'Update Product' }}
           </h2>
           
-          <EntityForm
-            entity="product"
+          <ProductForm
             :mode="mode"
-            :item="selectedProduct"
+            :product="selectedProduct"
             @submitted="handleSubmitted"
             @cancel="isModalOpen = false"
           />
+        </div>
+      </div>
+
+      <!-- Restock Modal -->
+      <div 
+        v-if="isRestockModalOpen" 
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50" 
+        @click="isRestockModalOpen = false"
+      >
+        <div 
+          @click.stop 
+          class="bg-white p-6 rounded-lg max-w-md w-full mx-4 relative"
+        >
+          <button 
+            @click="isRestockModalOpen = false" 
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          >
+            <XMarkIcon class="h-6 w-6" />
+          </button>
+          
+          <h2 class="text-lg font-medium mb-4">Restock Product</h2>
+          
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-gray-600">Product: <span class="font-semibold text-gray-900">{{ restockProduct?.name }}</span></p>
+              <p class="text-sm text-gray-600">Current Stock: <span class="font-semibold text-gray-900">{{ restockProduct?.stock }} units</span></p>
+            </div>
+            
+            <div>
+              <label for="restock-quantity" class="block text-sm font-medium text-gray-700 mb-1">
+                Quantity to Add
+              </label>
+              <input
+                id="restock-quantity"
+                v-model="restockQuantity"
+                type="number"
+                min="1"
+                step="1"
+                required
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none"
+                placeholder="Enter quantity to add"
+              />
+            </div>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+              <p class="text-sm text-blue-800">
+                New stock will be: <span class="font-bold">{{ (restockProduct?.stock || 0) + (parseInt(restockQuantity) || 0) }} units</span>
+              </p>
+            </div>
+            
+            <div class="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                @click="isRestockModalOpen = false"
+                class="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                @click="handleRestockSubmit"
+                :disabled="!restockQuantity || parseInt(restockQuantity) < 1 || isRestocking"
+                class="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {{ isRestocking ? 'Restocking...' : 'Confirm Restock' }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -175,7 +268,7 @@ import {
 } from '@heroicons/vue/24/outline';
 
 import { productService } from '~/api/product/ProductService';
-import EntityForm from '~/components/EntityForm.vue';
+import ProductForm from '~/components/ProductForm.vue';
 
 const router = useRouter();
 
@@ -189,6 +282,11 @@ const feedbackMessage = ref('');
 const selectedProduct = ref<any>(null);
 const mode = ref<'create' | 'update'>('create');
 const isModalOpen = ref(false);
+
+const isRestockModalOpen = ref(false);
+const restockProduct = ref<any>(null);
+const restockQuantity = ref('');
+const isRestocking = ref(false);
 
 // Fetch products
 const fetchProducts = async () => {
@@ -236,6 +334,33 @@ const handleEdit = (product: any) => {
   mode.value = 'update';
   selectedProduct.value = { ...product }; // Create a copy to avoid reactivity issues
   isModalOpen.value = true;
+};
+
+const handleRestock = (product: any) => {
+  restockProduct.value = { ...product };
+  restockQuantity.value = '';
+  isRestockModalOpen.value = true;
+};
+
+const handleRestockSubmit = async () => {
+  const quantity = parseInt(restockQuantity.value);
+  if (!quantity || quantity < 1) {
+    openFeedbackModal('Please enter a valid quantity.');
+    return;
+  }
+
+  isRestocking.value = true;
+
+  try {
+    await productService.restock(restockProduct.value.uuid, quantity);
+    openFeedbackModal(`Successfully added ${quantity} units to "${restockProduct.value.name}".`);
+    isRestockModalOpen.value = false;
+    await fetchProducts();
+  } catch (err: any) {
+    openFeedbackModal(`Failed to restock product: ${err.message || err}`);
+  } finally {
+    isRestocking.value = false;
+  }
 };
 
 const handleDelete = async (product: any) => {

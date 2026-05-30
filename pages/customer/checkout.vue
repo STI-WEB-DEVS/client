@@ -1,6 +1,7 @@
 <script setup>
 import { useCart } from '~/composables/useCart'
 import { useRouter } from 'vue-router'
+import { ref } from 'vue' // Added ref to handle reactive tracking states
 
 definePageMeta({ 
   layout: 'customer',
@@ -10,6 +11,9 @@ definePageMeta({
 const { cart, getCartTotal, updateQuantity, clearCart } = useCart()
 const router = useRouter()
 
+const isSubmitting = ref(false)   // Tracks network submission animations
+const checkoutError = ref(null)   // Holds inventory stock error exceptions
+
 const formatCurrency = (n) => new Intl.NumberFormat('en-PH', { 
   style: 'currency', 
   currency: 'PHP' 
@@ -17,14 +21,17 @@ const formatCurrency = (n) => new Intl.NumberFormat('en-PH', {
 
 /**
  * Whiteboard Requirement: Call the orders (post) creation.
- * Fixed: Added authorization headers to resolve the 401 error.
+ * Fixed: Added validation tracking hooks to intercept backend out-of-stock messages.
  */
 const handlePlaceOrder = async () => {
   // Validate empty cart before checkout
   if (cart.value.length === 0) {
-    alert("Error: Your cart is empty. Please add items before placing an order.")
+    checkoutError.value = "Your cart is empty. Please add items before placing an order."
     return
   }
+
+  isSubmitting.value = true
+  checkoutError.value = null
 
   try {
     // 1. Build specific payload structure
@@ -57,9 +64,11 @@ const handlePlaceOrder = async () => {
     router.push('/customer/order')
     
   } catch (err) {
-    // Show UI error message if the server blocks or crashes
-    alert("An error occurred while submitting your order over the network.")
+    // 🛑 Capture custom stock exceptions sent back by Laravel ('Sorry, X item only has Y left...')
     console.error("Network Error Details:", err)
+    checkoutError.value = err.data?.message || "An unexpected error occurred while processing your order over the network."
+  } finally {
+    isSubmitting.value = false
   }
 }
 
@@ -128,6 +137,15 @@ const goBack = () => router.push('/customer/cart')
               This will fire an active HTTP POST request containing your credentials directly to your backend service.
             </p>
 
+            <div v-if="checkoutError" class="mt-6 rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+              <div class="flex gap-2 items-center">
+                <svg class="h-5 w-5 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span class="font-bold tracking-tight">{{ checkoutError }}</span>
+              </div>
+            </div>
+
             <div class="mt-16">
               <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Total Amount</span>
               <div class="mt-2 text-6xl font-black text-gray-900 tracking-tighter">
@@ -139,10 +157,11 @@ const goBack = () => router.push('/customer/cart')
           <div class="mt-12 flex justify-end">
             <button
               @click="handlePlaceOrder"
-              class="rounded-xl bg-indigo-600 px-12 py-4 text-base font-bold text-white shadow-xl hover:bg-indigo-700 transition-all active:scale-95 disabled:bg-gray-300 disabled:cursor-not-allowed"
-              :disabled="cart.length === 0"
+              class="rounded-xl bg-indigo-600 px-12 py-4 text-base font-bold text-white shadow-xl hover:bg-indigo-700 transition-all active:scale-95 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              :disabled="cart.length === 0 || isSubmitting"
             >
-              Place Order
+              <span v-if="isSubmitting" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+              {{ isSubmitting ? 'Verifying Stock Pool...' : 'Place Order' }}
             </button>
           </div>
         </div>
