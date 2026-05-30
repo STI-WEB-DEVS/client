@@ -313,10 +313,12 @@ const sidebarOpen = ref(false)
 // ── NAVIGATION (exactly 6 links) ──
 const navigation = [
   { name: 'Dashboard',    href: '/dashboard',    icon: HomeIcon },
+  { name: 'Customer',      href: '/customer',      icon: UsersIcon },
+  { name: 'Product',     href: '/product',     icon: SparklesIcon },
   { name: 'Appointments', href: '/appointments', icon: CalendarIcon,         badge: '3' },
-  { name: 'Clients',      href: '/clients',      icon: UsersIcon },
+  
   { name: 'Team',         href: '/team',         icon: UserGroupIcon },
-  { name: 'Services',     href: '/services',     icon: SparklesIcon },
+  
   { name: 'Reports',      href: '/reports',      icon: ChartPieIcon },
 ]
 

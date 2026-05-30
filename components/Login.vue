@@ -68,13 +68,14 @@
         </div>
 
         <!-- Form -->
-        <form class="login-form" @submit.prevent="handleLogin">
+        <form class="login-form" @submit.prevent="handleSubmit">
 
           <div class="form-group">
             <label>Email Address</label>
             <div class="input-wrap">
               <EnvelopeIcon class="input-icon size-4" />
               <input
+              id="email"
                 v-model="email"
                 type="text"
                 placeholder="Enter your email address"
@@ -90,6 +91,7 @@
             <div class="input-wrap">
               <LockClosedIcon class="input-icon size-4" />
               <input
+                id="password"
                 v-model="password"
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="Enter your password"
@@ -126,32 +128,53 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import {
-  EnvelopeIcon, LockClosedIcon,
-  EyeIcon, EyeSlashIcon,
-} from '@heroicons/vue/24/outline'
+<script setup lang="ts">
+definePageMeta({
+  layout: false,
+});
 
-// No layout for login page
-definePageMeta({ layout: false })
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
 
-const router       = useRouter()
-const showPassword = ref(false)
-const loading      = ref(false)
-const email        = ref('')
-const password     = ref('')
+const email = ref("email");
+const password = ref("password");
+const error = ref("");
+const isLoading = ref(false);
 
-// ── LOGIN ──
-async function handleLogin() {
-  // Basta naay sulod sa duha ka fields — log-in!
-  if (!email.value || !password.value) return
+const authService = new AuthService();
 
-  loading.value = true
-  await new Promise(r => setTimeout(r, 1200))
-  router.push('/dashboard')
-}
+const handleSubmit = async () => {
+  error.value = "";
+  isLoading.value = true;
+
+  try {
+    const response = await authService.login(email.value, password.value);
+
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
+    }
+
+    // // if (response?.user.customer_uuid) {
+    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
+    // // } else if (response?.user.uuid) {
+    // //   localStorage.setItem("_uuid", response.user.uuid);
+    // // }
+
+    / /// if (response?.user.role) {
+    // //   localStorage.setItem("_role", response.user.role);
+    // // }
+
+    // await navigateTo("/admin/dashboard");
+
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+    );
+  } catch (err: any) {
+    error.value = err?.message || "";
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
 
 <style scoped>
