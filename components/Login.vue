@@ -78,6 +78,7 @@
               placeholder="you@servora.com"
               class="block w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#1C3028] transition-colors shadow-sm"
             />
+            
           </div>
 
           <div>
@@ -137,7 +138,50 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: false,
+});
+ 
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
+ 
+const email = ref("");
+const password = ref("");
+const error = ref("");
+const isLoading = ref(false);
+ 
+const authService = new AuthService();
+ 
 const handleSubmit = async () => {
-  await navigateTo('/dashboard')
-}
+  error.value = "";
+  isLoading.value = true;
+ 
+  try {
+    const response = await authService.login(email.value, password.value);
+ 
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
+    }
+ 
+    // // if (response?.user.customer_uuid) {
+    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
+    // // } else if (response?.user.uuid) {
+    // //   localStorage.setItem("_uuid", response.user.uuid);
+    // // }
+ 
+    / /// if (response?.user.role) {
+    // //   localStorage.setItem("_role", response.user.role);
+    // // }
+ 
+    // await navigateTo("/admin/dashboard");
+ 
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+    );
+  } catch (err: any) {
+    error.value = err?.message || "";
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
