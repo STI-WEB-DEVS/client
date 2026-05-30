@@ -3,8 +3,14 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   srcDir: '.',
   modules: ['@nuxtjs/tailwindcss'],
-  css: ['~/assets/css/main.css'],
-  app: {
+  runtimeConfig: {
+    public: {
+      apiBaseURL: process.env.API_BASE_URL
+    }
+  }},
+  {
+    css: ['~/assets/css/main.css'],
+      app: {
     head: {
       title: 'NutriMatch Admin',
       link: [

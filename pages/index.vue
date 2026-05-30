@@ -1,191 +1,148 @@
 <template>
-  <div class="nm-login">
-
-    <!-- ── Left brand panel ───────────────────────── -->
-    <div class="nm-login-brand">
-      <!-- Decorative blobs -->
-      <div class="blob blob-1"/>
-      <div class="blob blob-2"/>
-      <div class="blob blob-3"/>
-
-      <div class="relative z-10 flex flex-col justify-between h-full px-12 py-14">
-        <!-- Logo -->
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(77,182,182,.18)">
-            <svg viewBox="0 0 36 36" fill="none" class="w-7 h-7">
-              <path d="M18 7C18 7 10 12 10 20c0 5.5 3.5 9 8 9s8-3.5 8-9c0-8-8-13-8-13Z"
-                    fill="none" stroke="#4db6b6" stroke-width="1.5" stroke-linejoin="round"/>
-              <line x1="18" y1="29" x2="18" y2="14" stroke="#d97706" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div>
-            <p class="font-display text-white text-xl font-semibold">NutriMatch</p>
-            <p class="text-teal-400 text-[.6rem] uppercase tracking-widest opacity-60">Admin Portal</p>
-          </div>
-        </div>
-
-        <!-- Hero -->
-        <div>
-          <h1 class="font-display text-white text-[2.7rem] leading-[1.15] font-bold mb-4">
-            Clinical<br/>
-            <span class="text-amber-400">Nutrition</span><br/>
-            Management.
-          </h1>
-          <p class="text-teal-400/65 text-sm leading-relaxed max-w-xs">
-            The complete administrative platform for structured Medical Nutrition Therapy — built for the Philippine healthcare system.
-          </p>
-
-          <!-- Features -->
-          <div class="mt-8 space-y-3">
-            <div v-for="f in features" :key="f" class="flex items-center gap-2.5">
-              <div class="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                <svg class="w-2.5 h-2.5" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 4l2 2 4-4" stroke="#d97706" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <span class="text-teal-400/70 text-sm">{{ f }}</span>
-            </div>
-          </div>
-        </div>
-
-        <p class="text-teal-400/25 text-xs">NutriMatch © 2025 · Davao, Philippines</p>
-      </div>
+  <div class="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+      <img class="mx-auto h-10 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" />
+      <h2 class="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Sign in to your account</h2>
     </div>
 
-    <!-- ── Right form panel ───────────────────────── -->
-    <div class="nm-login-form">
-      <div class="w-full max-w-[390px]">
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
+      <div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
 
-        <div class="mb-8">
-          <h2 class="font-display text-[1.85rem] font-bold leading-tight mb-1.5" style="color:#1a2e2e">
-            Welcome back
-          </h2>
-          <p class="text-sm" style="color:#6b8080">Sign in to access the admin dashboard</p>
+        <!-- Error Message -->
+        <div v-if="error" class="mb-6 flex items-center gap-2 p-3 rounded-lg text-sm"
+             style="background:#fef2f2; border:1px solid #fca5a5; color:#dc2626">
+          {{ error }}
         </div>
 
-        <!-- Form (UI-only — no real auth) -->
-        <div class="space-y-5">
+        <form class="space-y-6" @submit.prevent="handleSubmit">
           <div>
-            <label class="nm-label">Email Address</label>
-            <div class="relative">
-              <EnvelopeIcon class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style="color:#6b8080"/>
-              <input v-model="email" type="email" placeholder="admin@nutrimatch.ph" class="nm-input pl-10"/>
+            <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
+            <div class="mt-2">
+              <input
+                type="email"
+                id="email"
+                v-model="email"
+                autocomplete="email"
+                required
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              />
             </div>
           </div>
 
           <div>
-            <label class="nm-label">Password</label>
-            <div class="relative">
-              <LockClosedIcon class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style="color:#6b8080"/>
-              <input v-model="password" :type="show ? 'text' : 'password'" placeholder="••••••••••" class="nm-input pl-10 pr-10"/>
-              <button type="button" @click="show = !show" class="absolute right-3 top-1/2 -translate-y-1/2" style="color:#6b8080">
-                <EyeSlashIcon v-if="show" class="w-4 h-4"/>
-                <EyeIcon v-else class="w-4 h-4"/>
-              </button>
+            <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
+            <div class="mt-2">
+              <input
+                type="password"
+                id="password"
+                v-model="password"
+                autocomplete="current-password"
+                required
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              />
             </div>
           </div>
 
-          <div class="flex items-center justify-between text-sm">
-            <label class="flex items-center gap-2 cursor-pointer select-none" style="color:#6b8080">
-              <input type="checkbox" style="accent-color:#0d6b6b; width:14px; height:14px"/>
-              Remember me
-            </label>
-            <a href="#" class="font-semibold" style="color:#0d6b6b">Forgot password?</a>
+          <div class="flex items-center justify-between">
+            <div class="flex gap-3">
+              <div class="flex h-6 shrink-0 items-center">
+                <div class="group grid size-4 grid-cols-1">
+                  <input id="remember-me" name="remember-me" type="checkbox" class="col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto" />
+                  <svg class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25" viewBox="0 0 14 14" fill="none">
+                    <path class="opacity-0 group-has-[:checked]:opacity-100" d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path class="opacity-0 group-has-[:indeterminate]:opacity-100" d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+              </div>
+              <label for="remember-me" class="block text-sm/6 text-gray-900">Remember me</label>
+            </div>
+
+            <div class="text-sm/6">
+              <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+            </div>
           </div>
 
-          <!-- Validation hint -->
-          <div v-if="error" class="flex items-center gap-2 p-3 rounded-lg text-sm"
-               style="background:#fef2f2; border:1px solid #fca5a5; color:#dc2626">
-            <ExclamationCircleIcon class="w-4 h-4 flex-shrink-0"/>
-            {{ error }}
+          <div>
+            <button
+              type="submit"
+              :disabled="isLoading"
+              class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ isLoading ? 'Signing in...' : 'Sign in' }}
+            </button>
+          </div>
+        </form>
+
+        <div>
+          <div class="mt-10 flex items-center gap-x-6">
+            <div class="w-full flex-1 border-t border-gray-200"></div>
+            <p class="text-nowrap text-sm/6 font-medium text-gray-900">Or continue with</p>
+            <div class="w-full flex-1 border-t border-gray-200"></div>
           </div>
 
-          <!-- Sign in → goes to /admin -->
-          <NuxtLink
-            to="/admin"
-            class="nm-btn nm-btn-primary w-full justify-center py-3 text-[.95rem]"
-            @click.prevent="goAdmin"
-          >
-            Sign In to Admin Portal
-          </NuxtLink>
-        </div>
+          <div class="mt-6 grid grid-cols-2 gap-4">
+            <a href="#" class="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent">
+              <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335" />
+                <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4" />
+                <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05" />
+                <path d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.2654 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z" fill="#34A853" />
+              </svg>
+              <span class="text-sm/6 font-semibold">Google</span>
+            </a>
 
-        <p class="mt-5 text-center text-xs" style="color:#6b8080">
-          Demo: <span style="color:#0d6b6b; font-weight:600">admin@nutrimatch.ph</span> /
-          <span style="color:#0d6b6b; font-weight:600">admin123</span>
-        </p>
-
-        <!-- Security note -->
-        <div class="mt-7 p-3.5 rounded-xl flex items-start gap-2.5"
-             style="background:var(--teal-50); border:1px solid var(--teal-100)">
-          <ShieldCheckIcon class="w-4 h-4 flex-shrink-0 mt-0.5" style="color:#0d6b6b"/>
-          <p class="text-xs leading-relaxed" style="color:#0d6b6b">
-            Restricted to verified System Administrators. All access attempts are logged.
-          </p>
+            <a href="#" class="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent">
+              <svg class="size-5 fill-[#24292F]" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-sm/6 font-semibold">GitHub</span>
+            </a>
+          </div>
         </div>
       </div>
+
+      <p class="mt-10 text-center text-sm/6 text-gray-500">
+        Not a member?
+        {{ ' ' }}
+        <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Start a 14 day free trial</a>
+      </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  EnvelopeIcon, LockClosedIcon, EyeIcon, EyeSlashIcon,
-  ExclamationCircleIcon, ShieldCheckIcon,
-} from '@heroicons/vue/24/outline'
+definePageMeta({
+  layout: false,
+});
 
-definePageMeta({ layout: 'default' })
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
 
-const router = useRouter()
-const email    = ref('')
-const password = ref('')
-const show     = ref(false)
-const error    = ref('')
+const email = ref("");
+const password = ref("");
+const error = ref("");
+const isLoading = ref(false);
 
-const features = [
-  'PRC Verification for Registered Nutritionist-Dietitians',
-  'DOST-FNRI localized food composition data',
-  'Complete Nutrition Care Process workflow',
-  'Automated billing & commission tracking',
-]
+const authService = new AuthService();
 
-function goAdmin() {
-  if (email.value === 'admin@nutrimatch.ph' && password.value === 'admin123') {
-    router.push('/admin')
-  } else if (!email.value || !password.value) {
-    error.value = 'Please enter your email and password.'
-  } else {
-    error.value = 'Invalid credentials. Use the demo credentials below.'
+const handleSubmit = async () => {
+  error.value = "";
+  isLoading.value = true;
+
+  try {
+    const response = await authService.login(email.value, password.value);
+
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
+    }
+
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+    );
+  } catch (err: any) {
+    error.value = err?.message || "Invalid credentials. Please try again.";
+  } finally {
+    isLoading.value = false;
   }
-}
+};
 </script>
-
-<style scoped>
-.nm-login { display: flex; min-height: 100vh; }
-
-.nm-login-brand {
-  flex: 0 0 44%;
-  background: linear-gradient(155deg, #052a2a 0%, #083534 45%, #0d6b6b 100%);
-  position: relative;
-  overflow: hidden;
-}
-@media (max-width: 768px) { .nm-login-brand { display: none; } }
-
-.nm-login-form {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  padding: 2rem;
-}
-
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-}
-.blob-1 { width: 420px; height: 420px; top: -120px; right: -130px; background: radial-gradient(circle, rgba(77,182,182,.1), transparent 70%); }
-.blob-2 { width: 280px; height: 280px; bottom: 60px; left: -100px; background: radial-gradient(circle, rgba(217,119,6,.08), transparent 70%); }
-.blob-3 { width: 180px; height: 180px; top: 55%; left: 45%; background: radial-gradient(circle, rgba(13,107,107,.06), transparent 70%); }
-</style>

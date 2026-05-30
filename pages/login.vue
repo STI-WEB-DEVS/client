@@ -15,7 +15,12 @@
           Clinical Nutrition Consultation System
         </p>
       </div>
-      
+
+      <!-- Error message -->
+      <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+        {{ error }}
+      </div>
+
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
         <div class="space-y-4">
           <div>
@@ -29,8 +34,12 @@
         </div>
 
         <div>
-          <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-            Sign in
+          <button
+            type="submit"
+            :disabled="isLoading"
+            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ isLoading ? 'Signing in...' : 'Sign in' }}
           </button>
         </div>
       </form>
@@ -38,17 +47,40 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({
-  layout: 'auth'
-})
+  layout: false,
+});
 
-const router = useRouter()
-const email = ref('')
-const password = ref('')
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
 
-const handleLogin = () => {
-  // Mock login - redirect to dashboard
-  router.push('/dashboard')
-}
+const email = ref("");
+const password = ref("");
+const error = ref("");
+const isLoading = ref(false);
+
+const authService = new AuthService();
+
+// ✅ Renamed to match @submit.prevent="handleLogin"
+const handleLogin = async () => {
+  error.value = "";
+  isLoading.value = true;
+
+  try {
+    const response = await authService.login(email.value, password.value);
+
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
+    }
+
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+    );
+  } catch (err: any) {
+    error.value = err?.message || "Invalid credentials. Please try again.";
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
