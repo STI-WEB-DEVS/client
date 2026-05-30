@@ -184,5 +184,3 @@ const handleSubmit = async () => {
   }
 
 };
-
-</script>
