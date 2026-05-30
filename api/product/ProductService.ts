@@ -39,6 +39,10 @@ class ProductService extends BaseService {
     async restore(uuid: string): Promise<any> {
         return await this.request(`${this.resource}/${uuid}/restore`, 'POST');
     }
+
+    async restock(uuid: string, quantity: number): Promise<any> {
+        return await this.request(`${this.resource}/${uuid}/restock`, 'POST', { quantity });
+    }
 }
 
 export const productService = ProductService.getInstance();

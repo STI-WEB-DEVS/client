@@ -1,4 +1,5 @@
-<script setup>
+<script setup lang="ts">
+
 import { ref, computed } from 'vue';
 import { ShoppingCartIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
 
@@ -24,6 +25,13 @@ const total = computed(() => {
 
 const updateQuantity = (item, newQuantity) => {
   if (newQuantity < 1) return;
+  
+  // Check if new quantity exceeds available stock
+  if (newQuantity > item.product.quantity) {
+    alert(`Only ${item.product.quantity} items available for ${item.product.name}`);
+    return;
+  }
+  
   item.quantity = newQuantity;
 };
 
@@ -49,10 +57,25 @@ const placeOrder = () => {
     return;
   }
 
+  // Validate stock availability
+  const stockErrors = [];
+  cart.value.forEach((item: any) => {
+    if (!item.product.quantity || item.product.quantity === 0) {
+      stockErrors.push(`${item.product.name} is out of stock`);
+    } else if (item.quantity > item.product.quantity) {
+      stockErrors.push(`Only ${item.product.quantity} items available for ${item.product.name}`);
+    }
+  });
+
+  if (stockErrors.length > 0) {
+    alert('Stock validation failed:\n\n' + stockErrors.join('\n'));
+    return;
+  }
+
   // Build the payload
   const payload = {
     customer_uuid: customerUuid,
-    items: cart.value.map(item => ({
+    items: cart.value.map((item: any) => ({
       product_uuid: item.product.uuid,
       quantity: item.quantity
     }))
@@ -136,6 +159,11 @@ const confirmOrder = async () => {
                   <h3 class="text-base font-medium text-gray-900">{{ item.product.name }}</h3>
                   <p class="mt-1 text-sm text-gray-500">₱{{ parseFloat(item.product.price).toFixed(2) }} each</p>
                   
+                  <!-- Stock Warning -->
+                  <p v-if="item.product.quantity < 10" class="mt-1 text-xs text-yellow-600 font-medium">
+                    Only {{ item.product.quantity }} items available
+                  </p>
+                  
                   <!-- Quantity Controls -->
                   <div class="mt-4 flex items-center gap-4">
                     <div class="flex items-center border border-gray-300 rounded-md">
@@ -148,7 +176,11 @@ const confirmOrder = async () => {
                       <span class="px-4 py-1 border-x border-gray-300">{{ item.quantity }}</span>
                       <button 
                         @click="updateQuantity(item, item.quantity + 1)"
-                        class="px-3 py-1 text-gray-600 hover:bg-gray-50"
+                        :disabled="item.quantity >= item.product.quantity"
+                        :class="[
+                          'px-3 py-1 text-gray-600',
+                          item.quantity >= item.product.quantity ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
+                        ]"
                       >
                         +
                       </button>

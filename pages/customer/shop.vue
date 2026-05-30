@@ -27,9 +27,28 @@ onMounted(async () => {
 });
 
 const addToCart = (product) => {
+  // Check if product is out of stock
+  if (product.quantity === 0) {
+    notificationMessage.value = `${product.name} is out of stock!`;
+    showNotification.value = true;
+    setTimeout(() => {
+      showNotification.value = false;
+    }, 2000);
+    return;
+  }
+
   const existingItem = cart.value.find(item => item.product.uuid === product.uuid);
   
   if (existingItem) {
+    // Check if adding one more would exceed available stock
+    if (existingItem.quantity >= product.quantity) {
+      notificationMessage.value = `Cannot add more. Only ${product.quantity} items available!`;
+      showNotification.value = true;
+      setTimeout(() => {
+        showNotification.value = false;
+      }, 2000);
+      return;
+    }
     existingItem.quantity++;
   } else {
     cart.value.push({
@@ -46,6 +65,16 @@ const addToCart = (product) => {
 };
 
 const buyNow = (product) => {
+  // Check if product is out of stock
+  if (product.quantity === 0) {
+    notificationMessage.value = `${product.name} is out of stock!`;
+    showNotification.value = true;
+    setTimeout(() => {
+      showNotification.value = false;
+    }, 2000);
+    return;
+  }
+
   addToCart(product);
   navigateTo('/customer/checkout');
 };
@@ -120,25 +149,59 @@ const buyNow = (product) => {
             {{ product.name }}
           </h3>
           
-          <div class="flex items-baseline gap-2 mb-4">
+          <div class="flex items-baseline gap-2 mb-2">
             <p class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               ₱{{ parseFloat(product.price).toFixed(2) }}
             </p>
             <span class="text-xs text-gray-500 font-medium">per item</span>
           </div>
 
+          <!-- Stock Status -->
+          <div class="mb-4">
+            <span 
+              v-if="product.quantity === 0"
+              class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800"
+            >
+              Out of Stock
+            </span>
+            <span 
+              v-else-if="product.quantity < 10"
+              class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-semibold text-yellow-800"
+            >
+              Only {{ product.quantity }} left
+            </span>
+            <span 
+              v-else
+              class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800"
+            >
+              In Stock ({{ product.quantity }})
+            </span>
+          </div>
+
           <!-- Action Buttons -->
           <div class="mt-auto flex gap-2">
             <button
               @click="addToCart(product)"
-              class="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-200 px-4 py-2.5 text-sm font-bold text-gray-700 hover:from-gray-100 hover:to-gray-200 hover:border-gray-300 transition-all duration-200 transform hover:scale-105"
+              :disabled="product.quantity === 0"
+              :class="[
+                'flex-1 flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-2.5 text-sm font-bold transition-all duration-200 transform',
+                product.quantity === 0
+                  ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 text-gray-700 hover:from-gray-100 hover:to-gray-200 hover:border-gray-300 hover:scale-105'
+              ]"
             >
               <ShoppingCartIcon class="h-4 w-4" />
               Add
             </button>
             <button
               @click="buyNow(product)"
-              class="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2.5 text-sm font-bold text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              :disabled="product.quantity === 0"
+              :class="[
+                'flex-1 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white shadow-lg transition-all duration-200 transform',
+                product.quantity === 0
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:shadow-xl hover:scale-105'
+              ]"
             >
               <ShoppingBagIcon class="h-4 w-4" />
               Buy Now

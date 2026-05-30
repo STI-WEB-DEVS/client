@@ -26,7 +26,9 @@ const feedbackType = ref<'success' | 'error' | 'info'>('info');
 const showCreateModal = ref(false);
 const createForm = ref({
   name: '',
-  price: ''
+  price: '',
+  quantity: 0,
+  description: ''
 });
 const isSubmitting = ref(false);
 
@@ -54,7 +56,9 @@ onMounted(async () => {
 const handleCreate = () => {
   createForm.value = {
     name: '',
-    price: ''
+    price: '',
+    quantity: 0,
+    description: ''
   };
   showCreateModal.value = true;
 };
@@ -64,7 +68,9 @@ const submitCreate = async () => {
   try {
     await productService.create({
       name: createForm.value.name,
-      price: parseFloat(createForm.value.price)
+      price: parseFloat(createForm.value.price),
+      quantity: parseInt(createForm.value.quantity.toString()),
+      description: createForm.value.description
     });
     showCreateModal.value = false;
     feedbackMessage.value = 'Product created successfully!';
@@ -152,6 +158,9 @@ const handleFeedbackClose = () => {
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Price
                 </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Stock
+                </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
                 </th>
@@ -171,7 +180,19 @@ const handleFeedbackClose = () => {
                   {{ product.name }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                  ${{ product.price }}
+                  ₱{{ product.price }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm">
+                  <span 
+                    :class="[
+                      'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+                      product.quantity === 0 ? 'bg-red-100 text-red-800' : 
+                      product.quantity < 10 ? 'bg-yellow-100 text-yellow-800' : 
+                      'bg-green-100 text-green-800'
+                    ]"
+                  >
+                    {{ product.quantity || 0 }}
+                  </span>
                 </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
@@ -206,7 +227,7 @@ const handleFeedbackClose = () => {
               </tr>
 
               <tr v-if="!products?.data?.length">
-                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
+                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
                   No products found.
                 </td>
               </tr>
@@ -243,6 +264,8 @@ const handleFeedbackClose = () => {
                 v-model="createForm.name" 
                 type="text" 
                 required 
+                pattern="[a-zA-Z\s\-']+"
+                title="Product name must contain only letters, spaces, hyphens, and apostrophes"
                 class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-gray-500 focus:ring-gray-500" 
               />
             </div>
@@ -256,6 +279,24 @@ const handleFeedbackClose = () => {
                 required 
                 class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-gray-500 focus:ring-gray-500" 
               />
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Quantity (Stock)</label>
+              <input 
+                v-model="createForm.quantity" 
+                type="number" 
+                min="0"
+                required 
+                class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-gray-500 focus:ring-gray-500" 
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea 
+                v-model="createForm.description" 
+                rows="3"
+                class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-gray-500 focus:ring-gray-500" 
+              ></textarea>
             </div>
             <div class="flex justify-end gap-3">
               <button

@@ -7,6 +7,8 @@ import {
   PencilSquareIcon,
   TrashIcon,
   ArrowLeftIcon,
+  PlusIcon,
+  XMarkIcon,
 } from '@heroicons/vue/24/outline';
 
 const route = useRoute();
@@ -25,9 +27,15 @@ const showFeedback = ref(false);
 const feedbackMessage = ref('');
 const feedbackType = ref('info');
 
+// Restock modal
+const showRestockModal = ref(false);
+const restockQuantity = ref(0);
+const isRestocking = ref(false);
+
 const editForm = reactive({
   name: '',
-  price: ''
+  price: '',
+  description: ''
 });
 
 onMounted(async () => {
@@ -40,6 +48,7 @@ onMounted(async () => {
     // Initialize edit form with existing data
     editForm.name = response.data.name || '';
     editForm.price = response.data.price?.toString() || '';
+    editForm.description = response.data.description || '';
   } catch (err) {
     error.value = err;
   } finally {
@@ -52,6 +61,7 @@ const cancelEdit = () => {
   if (productData.value) {
     editForm.name = productData.value.name || '';
     editForm.price = productData.value.price?.toString() || '';
+    editForm.description = productData.value.description || '';
   }
   isEditMode.value = false;
 };
@@ -61,7 +71,8 @@ const submitUpdate = async () => {
   try {
     await productService.update(uuid.value, {
       name: editForm.name,
-      price: parseFloat(editForm.price)
+      price: parseFloat(editForm.price),
+      description: editForm.description
     });
     // Refresh data
     const response = await productService.show(uuid.value);
@@ -76,6 +87,38 @@ const submitUpdate = async () => {
     showFeedback.value = true;
   } finally {
     isSubmitting.value = false;
+  }
+};
+
+const openRestockModal = () => {
+  restockQuantity.value = 0;
+  showRestockModal.value = true;
+};
+
+const submitRestock = async () => {
+  if (restockQuantity.value <= 0) {
+    feedbackMessage.value = 'Please enter a valid quantity';
+    feedbackType.value = 'error';
+    showFeedback.value = true;
+    return;
+  }
+
+  isRestocking.value = true;
+  try {
+    await productService.restock(uuid.value, restockQuantity.value);
+    // Refresh data
+    const response = await productService.show(uuid.value);
+    productData.value = response.data;
+    showRestockModal.value = false;
+    feedbackMessage.value = `Successfully added ${restockQuantity.value} items to stock!`;
+    feedbackType.value = 'success';
+    showFeedback.value = true;
+  } catch (err) {
+    feedbackMessage.value = err.message || 'Failed to restock product';
+    feedbackType.value = 'error';
+    showFeedback.value = true;
+  } finally {
+    isRestocking.value = false;
   }
 };
 
@@ -166,7 +209,24 @@ const handleFeedbackClose = () => {
           </div>
           <div>
             <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Price</p>
-            <p class="mt-1 text-lg font-semibold text-gray-900">${{ productData.price }}</p>
+            <p class="mt-1 text-lg font-semibold text-gray-900">₱{{ productData.price }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Stock Quantity</p>
+            <span 
+              :class="[
+                'inline-flex items-center rounded-full px-3 py-1 text-sm font-medium',
+                productData.quantity === 0 ? 'bg-red-100 text-red-800' : 
+                productData.quantity < 10 ? 'bg-yellow-100 text-yellow-800' : 
+                'bg-green-100 text-green-800'
+              ]"
+            >
+              {{ productData.quantity || 0 }} items
+            </span>
+          </div>
+          <div v-if="productData.description">
+            <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Description</p>
+            <p class="mt-1 text-sm text-gray-700">{{ productData.description }}</p>
           </div>
           <div v-if="productData.created_at">
             <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Created At</p>
@@ -188,6 +248,8 @@ const handleFeedbackClose = () => {
               v-model="editForm.name" 
               type="text" 
               required 
+              pattern="[a-zA-Z\s\-']+"
+              title="Product name must contain only letters, spaces, hyphens, and apostrophes"
               class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-gray-500 focus:ring-gray-500" 
             />
           </div>
@@ -201,6 +263,38 @@ const handleFeedbackClose = () => {
               required 
               class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-gray-500 focus:ring-gray-500" 
             />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Stock Quantity</label>
+            <div class="mt-1 flex items-center gap-3">
+              <span 
+                :class="[
+                  'inline-flex items-center rounded-full px-3 py-1 text-sm font-medium',
+                  productData.quantity === 0 ? 'bg-red-100 text-red-800' : 
+                  productData.quantity < 10 ? 'bg-yellow-100 text-yellow-800' : 
+                  'bg-green-100 text-green-800'
+                ]"
+              >
+                {{ productData.quantity || 0 }} items
+              </span>
+              <button
+                type="button"
+                @click="openRestockModal"
+                class="inline-flex items-center gap-1 rounded-md bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700"
+              >
+                <PlusIcon class="h-3 w-3" />
+                Restock
+              </button>
+            </div>
+            <p class="mt-1 text-xs text-gray-500">Use the Restock button to add more items to the current stock</p>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea 
+              v-model="editForm.description" 
+              rows="3"
+              class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-gray-500 focus:ring-gray-500" 
+            ></textarea>
           </div>
           <div class="flex justify-end gap-3">
             <button
@@ -219,6 +313,51 @@ const handleFeedbackClose = () => {
             </button>
           </div>
         </form>
+      </div>
+
+      <!-- Restock Modal -->
+      <div v-if="showRestockModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Restock Product</h2>
+            <button @click="showRestockModal = false" class="text-gray-400 hover:text-gray-600">
+              <XMarkIcon class="h-5 w-5" />
+            </button>
+          </div>
+          <div class="mb-4">
+            <p class="text-sm text-gray-600 mb-4">
+              Current stock: <span class="font-semibold">{{ productData.quantity || 0 }}</span> items
+            </p>
+            <label class="block text-sm font-medium text-gray-700">Quantity to Add</label>
+            <input 
+              v-model="restockQuantity" 
+              type="number" 
+              min="1"
+              required 
+              class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-gray-500 focus:ring-gray-500" 
+              placeholder="Enter quantity to add"
+            />
+            <p class="mt-2 text-sm text-gray-500">
+              New stock will be: <span class="font-semibold">{{ (productData.quantity || 0) + (parseInt(restockQuantity) || 0) }}</span> items
+            </p>
+          </div>
+          <div class="flex justify-end gap-3">
+            <button
+              type="button"
+              @click="showRestockModal = false"
+              class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              @click="submitRestock"
+              :disabled="isRestocking"
+              class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {{ isRestocking ? 'Adding...' : 'Add to Stock' }}
+            </button>
+          </div>
+        </div>
       </div>
 
       <FeedbackModal 
