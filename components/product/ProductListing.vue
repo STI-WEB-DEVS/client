@@ -10,6 +10,8 @@ interface Product {
   uuid: string
   name: string
   price: number
+  stocks: number
+  product_description: string
 }
 
 interface PaginationMeta {
@@ -29,7 +31,6 @@ const sortBy = ref<'name_asc' | 'name_desc' | 'price_asc' | 'price_desc'>('name_
 const currentPage = ref(1)
 const flashUuid = ref<string | null>(null)
 
-// Modal state
 const showOrderModal = ref(false)
 const selectedProduct = ref<Product | null>(null)
 
@@ -119,6 +120,7 @@ function cardBg(index: number) { return PALETTES[index % PALETTES.length] }
         <div class="space-y-2 p-4">
           <div class="h-3 w-3/4 rounded bg-gray-200" />
           <div class="h-3 w-1/2 rounded bg-gray-200" />
+          <div class="h-3 w-2/3 rounded bg-gray-200" />
           <div class="mt-4 h-8 rounded-lg bg-gray-200" />
         </div>
       </div>
@@ -139,19 +141,49 @@ function cardBg(index: number) { return PALETTES[index % PALETTES.length] }
     <!-- Product Grid -->
     <div v-else>
       <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        <div v-for="(product, index) in filtered" :key="product.uuid" class="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md">
+        <div
+          v-for="(product, index) in filtered"
+          :key="product.uuid"
+          class="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md"
+        >
           <div :class="[cardBg(index), 'flex aspect-square items-center justify-center']">
-            <span class="select-none text-4xl font-bold tracking-tight text-gray-300">{{ product.name.charAt(0).toUpperCase() }}</span>
+            <span class="select-none text-4xl font-bold tracking-tight text-gray-300">
+              {{ product.name.charAt(0).toUpperCase() }}
+            </span>
           </div>
+
           <div class="flex flex-1 flex-col gap-1 p-4">
             <h3 class="line-clamp-2 text-sm font-semibold text-gray-800">{{ product.name }}</h3>
             <p class="text-base font-bold text-indigo-600">{{ formatPrice(product.price) }}</p>
-            <div class="mt-auto flex flex-col gap-2">
-              <button class="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white transition active:scale-95" :class="flashUuid === product.uuid ? 'bg-green-500 hover:bg-green-500' : 'bg-indigo-600 hover:bg-indigo-700'" @click="addToCart(product)">
+            <p class="text-xs text-gray-400">
+              {{ product.stocks > 0 ? `${product.stocks} in stock` : 'Out of stock' }}
+            </p>
+            <p v-if="product.product_description" class="line-clamp-2 text-xs text-gray-500 mt-1">
+              {{ product.product_description }}
+            </p>
+
+            <div class="mt-auto pt-3 flex flex-col gap-2">
+              <button
+                class="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white transition active:scale-95"
+                :class="
+                  product.stocks === 0
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : flashUuid === product.uuid
+                      ? 'bg-green-500 hover:bg-green-500'
+                      : 'bg-indigo-600 hover:bg-indigo-700'
+                "
+                :disabled="product.stocks === 0"
+                @click="addToCart(product)"
+              >
                 <ShoppingCartIcon class="h-3.5 w-3.5" />
-                {{ flashUuid === product.uuid ? 'Added!' : 'Add to Cart' }}
+                {{ product.stocks === 0 ? 'Out of Stock' : flashUuid === product.uuid ? 'Added!' : 'Add to Cart' }}
               </button>
-              <button class="flex items-center justify-center rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 active:scale-95" @click="openBuyNow(product)">
+
+              <button
+                class="flex items-center justify-center rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                :disabled="product.stocks === 0"
+                @click="openBuyNow(product)"
+              >
                 Buy Now
               </button>
             </div>

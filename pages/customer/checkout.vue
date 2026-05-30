@@ -4,6 +4,7 @@ import { useCartStore } from '~/stores/cart'
 import { useOrdersStore } from '~/stores/order'   
 import { useOrderStore } from '~/stores/orderEvents'
 import { useRoute } from 'vue-router'
+import { productService } from '~/api/product/ProductService'
 import { CheckCircleIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
 
 definePageMeta({ layout: 'customer' })
@@ -91,6 +92,19 @@ async function placeOrder() {
       totalPrice.value
     )
 
+    await Promise.all(
+      orderItems.value.map(async (item) => {
+        try {
+          const res = await productService.show(item.product_uuid)
+          const data = res.data ?? res
+          const newStocks = Math.max(0, (data.stocks ?? 0) - item.quantity)
+          await productService.update(item.product_uuid, { stocks: newStocks })
+        } catch (err) {
+          console.error(`Failed to deduct stocks for ${item.name}:`, err)
+        }
+      })
+    )
+
     // Notify dashboard of order completion
     orderEventStore.notifyOrderCompleted()
 
@@ -105,7 +119,7 @@ async function placeOrder() {
   } finally {
     isPlacing.value = false
   }
-}
+}   
 
 function cancelOrder() {
   navigateTo('/customer/shop')

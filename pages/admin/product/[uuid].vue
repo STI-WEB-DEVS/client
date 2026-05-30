@@ -38,10 +38,20 @@
             ₱{{ Number(product?.price ?? 0).toFixed(2) }}
           </p>
 
+          <p class="text-sm text-gray-500">Stocks Available</p>
+          <p class="col-span-2 text-gray-700">
+           {{ product?.stocks }}
+          </p>
+
           <!-- UUID -->
           <p class="text-sm text-gray-500">Product UUID</p>
           <p class="col-span-2 font-mono text-gray-900 break-all">
             {{ uuid }}
+          </p>
+
+          <p class="text-sm text-gray-500">Product Description</p>
+          <p class="col-span-2 font-mono text-gray-900 break-all">
+            {{ product?.product_description }}
           </p>
 
         </div>
@@ -76,7 +86,6 @@ onMounted(async () => {
   try {
     const res = await productService.show(uuid.value)
 
-    // ✅ SAME AS CUSTOMER STYLE
     product.value = res.data ?? res
 
     console.log('Product:', product.value)

@@ -30,6 +30,7 @@
               <tr>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">Name</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">Price</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">Stocks</th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
               </tr>
             </thead>
@@ -38,30 +39,31 @@
               <tr v-for="product in products" :key="product.uuid" class="transition hover:bg-gray-50">
                 <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ product.name || product.title }}</td>
                 <td class="px-6 py-4 text-sm text-gray-700">₱{{ Number(product.price || 0).toFixed(2) }}</td>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ product.stocks ?? 0 }}</td>
                 <td class="px-6 py-4 text-right space-x-2">
                   <button 
-                @click="router.push(`/admin/product/${product.uuid}`)" 
-                class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                <EyeIcon class="h-4 w-4" />
-                <span>View</span>
-              </button>
+                    @click="router.push(`/admin/product/${product.uuid}`)" 
+                    class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    <EyeIcon class="h-4 w-4" />
+                    <span>View</span>
+                  </button>
 
-              <button 
-                @click="openModal('edit', product)" 
-                class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                <PencilSquareIcon class="h-4 w-4" />
-                <span>Edit</span>
-              </button>
+                  <button 
+                    @click="openModal('edit', product)" 
+                    class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    <PencilSquareIcon class="h-4 w-4" />
+                    <span>Edit</span>
+                  </button>
 
-              <button 
-                @click="openModal('delete', product)" 
-                class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
-              >
-                <TrashIcon class="h-4 w-4" />
-                <span>Delete</span>
-              </button>
+                  <button 
+                    @click="openModal('delete', product)" 
+                    class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+                  >
+                    <TrashIcon class="h-4 w-4" />
+                    <span>Delete</span>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -82,6 +84,16 @@
         :product-name="modal.selected?.name || modal.selected?.title"
         @close="modal.show = false"
         @success="fetchProducts"
+        @add-stocks="onAddStocksFromModal"
+      />
+
+      <AddStocksModal
+        :open="addStocksModal.show"
+        :uuid="addStocksModal.product?.uuid"
+        :product-name="addStocksModal.product?.name || addStocksModal.product?.title"
+        :current-stocks="addStocksModal.product?.stocks ?? 0"
+        @close="addStocksModal.show = false"
+        @success="fetchProducts"
       />
     </div>
 </template>
@@ -90,20 +102,24 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { productService } from '~/api/product/ProductService'
-import { PlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import ProductModal from '~/components/product/ProductModal.vue'
-
+import AddStocksModal from '~/components/product/AddStocksModal.vue'
 
 const router = useRouter()
 const products = ref<any[]>([])
 const pending = ref(true)
 const error = ref<any>(null)
 
-// Single reactive object for modal state
 const modal = reactive({
   show: false,
   mode: 'create' as 'create' | 'edit' | 'delete',
   selected: null as any
+})
+
+const addStocksModal = reactive({
+  show: false,
+  product: null as any
 })
 
 const fetchProducts = async () => {
@@ -123,6 +139,17 @@ const openModal = (mode: 'create' | 'edit' | 'delete', product: any = null) => {
   modal.mode = mode
   modal.selected = product
   modal.show = true
+}
+
+const openAddStocks = (product: any) => {
+  addStocksModal.product = product
+  addStocksModal.show = true
+}
+
+const onAddStocksFromModal = () => {
+  const savedProduct = modal.selected
+  modal.show = false
+  setTimeout(() => openAddStocks(savedProduct), 150)
 }
 
 onMounted(fetchProducts)
