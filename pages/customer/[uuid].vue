@@ -14,7 +14,7 @@
             >
                 <div class="border-b border-gray-200 px-6 py-4">
                     <h2 class="text-lg font-semibold text-gray-800">
-                        Product Details
+                        Customer Details
                     </h2>
                 </div>
 
@@ -30,12 +30,12 @@
                                 <th
                                     class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
                                 >
-                                    Product Name
+                                    Name
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
                                 >
-                                    Price
+                                    Email
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
@@ -66,11 +66,7 @@
                                 </td>
 
                                 <td class="px-6 py-4">
-                                    <span
-                                        class="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700"
-                                    >
-                                        ₱{{ data.price }}
-                                    </span>
+                                    {{ data.email }}
                                 </td>
 
                                 <td class="px-6 py-4">
@@ -99,22 +95,23 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { productService, type Product } from "@/api/product/ProductService";
+import { useRoute, useRouter } from "vue-router";
+import { customerService, type Customer } from "@/api/customer/CustomerService";
 
-const data = ref<Product | null>(null);
 const route = useRoute();
 const router = useRouter();
+const data = ref<Customer | null>(null);
 const back = () => {
-    router.push("/product");
+    router.push("/customer");
 };
 onMounted(async () => {
     try {
-        const response = await productService.show(route.params.uuid as string);
-        data.value = response.data;
-        console.log(data.value);
+        const response = await customerService.show(
+            route.params.uuid as string,
+        );
+        data.value = response;
     } catch (err: any) {
-        console.error("failed  product", err);
+        console.error("failed  customer", err);
     }
 });
 </script>

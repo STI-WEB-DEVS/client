@@ -6,14 +6,14 @@
                     class="flex items-center justify-between border-b px-6 py-4"
                 >
                     <h2 class="text-lg font-semibold text-gray-800">
-                        Product Details
+                        Customer
                     </h2>
 
                     <button
                         @click="openModal('ADD')"
                         class="rounded-md bg-[#398165] px-4 py-2 text-white hover:bg-[#2f6a53]"
                     >
-                        Add Product
+                        Add Customer
                     </button>
                 </div>
 
@@ -34,7 +34,7 @@
                                 <th
                                     class="px-6 py-3 text-left text-xs font-semibold text-gray-500"
                                 >
-                                    Price
+                                    Email
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-semibold text-gray-500"
@@ -66,10 +66,8 @@
                                     {{ data.name }}
                                 </td>
 
-                                <td
-                                    class="px-6 py-4 text-green-600 font-semibold"
-                                >
-                                    ₱{{ data.price }}
+                                <td class="px-6 py-4">
+                                    {{ data.email }}
                                 </td>
 
                                 <td class="px-6 py-4">
@@ -91,8 +89,8 @@
                                 <td class="px-6 py-4">
                                     <div class="flex gap-2">
                                         <button
-                                            @click="viewProduct(data.uuid)"
-                                            class="rounded bg-[#398165] px-3 py-1 text-white"
+                                            @click="viewCustomer(data.uuid)"
+                                            class="rounded bg-[#398165] px-3 py-1 text-white hover:bg-[#2f6a53]"
                                         >
                                             View
                                         </button>
@@ -123,19 +121,14 @@
             </div>
 
             <div
+                class="flex z-index items-center justify-center"
                 v-if="modalType.modal"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             >
-                <div
-                    @click.stop
-                    class="w-full flex items-center justify-center"
-                >
-                    <ProductModal
-                        :modal-type="modalType.modal"
-                        :uuid="modalType.uuid"
-                        @close="closeModal"
-                    />
-                </div>
+                <CustomerModal
+                    :modal-type="modalType.modal"
+                    :uuid="modalType.uuid"
+                    @close="closeModal"
+                />
             </div>
         </div>
     </NuxtLayout>
@@ -143,12 +136,12 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import ProductModal from "~/components/ProductModal.vue";
-import { productService, type Product } from "@/api/product/ProductService";
+import CustomerModal from "~/components/CustomerModal.vue";
+import { customerService, type Customer } from "@/api/customer/CustomerService";
 
 const router = useRouter();
 
-const datas = ref<Product[]>([]);
+const datas = ref<Customer[]>([]);
 const modalType = ref<{
     modal: "ADD" | "UPDATE" | "DELETE" | "";
     uuid?: string;
@@ -157,9 +150,9 @@ const modalType = ref<{
     uuid: "",
 });
 
-const viewProduct = (uuid: string) => {
+const viewCustomer = (uuid: string) => {
     router.push({
-        path: `/product/${uuid}`,
+        path: `/customer/${uuid}`,
     });
 };
 
@@ -175,7 +168,7 @@ const closeModal = () => {
 };
 
 const fetchData = async () => {
-    const res = await productService.list();
+    const res = await customerService.list();
     datas.value = res.data;
 };
 fetchData();
