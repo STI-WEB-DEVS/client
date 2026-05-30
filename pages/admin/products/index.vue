@@ -11,7 +11,6 @@
           Displaying product records from your API.
         </p>
       </div>
-
       <button
         type="button"
         @click="handleCreate"
@@ -56,7 +55,13 @@
               <th
                 class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
               >
-                Product Price
+                Price
+              </th>
+              <!-- ✅ NEW COLUMN -->
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500"
+              >
+                Stock
               </th>
               <th
                 class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500"
@@ -81,8 +86,29 @@
                 {{ product.name }}
               </td>
               <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                ${{ product.price }}
+                ₱{{ Number(product.price).toFixed(2) }}
               </td>
+
+              <!-- ✅ STOCK BADGE -->
+              <td class="whitespace-nowrap px-6 py-4 text-sm">
+                <span
+                  :class="[
+                    'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                    product.stock_quantity === 0
+                      ? 'bg-red-100 text-red-700'
+                      : product.stock_quantity <= 5
+                        ? 'bg-amber-100 text-amber-700'
+                        : 'bg-green-100 text-green-700',
+                  ]"
+                >
+                  {{
+                    product.stock_quantity === 0
+                      ? "Out of Stock"
+                      : `${product.stock_quantity} in stock`
+                  }}
+                </span>
+              </td>
+
               <td class="whitespace-nowrap px-6 py-4">
                 <div class="flex items-center justify-end gap-2">
                   <button
@@ -119,7 +145,6 @@
       @close="isModalOpen = false"
       @submit="handleFormSubmit"
     />
-
     <DeleteModal
       :open="isDeleteModalOpen"
       :loading="isSaving"
@@ -127,7 +152,6 @@
       @close="isDeleteModalOpen = false"
       @confirm="confirmDelete"
     />
-
     <FeedbackModal
       :open="isFeedbackModalOpen"
       :message="feedbackMessage"
@@ -137,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue"; // 👈 single import line
+import { ref, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import {
   PlusIcon,
@@ -176,7 +200,7 @@ const fetchProducts = async () => {
 onMounted(fetchProducts);
 
 const handleCreate = () => {
-  selectedProduct.value = null; // 👈 was wrongly using selectedCustomer
+  selectedProduct.value = null;
   isModalOpen.value = false;
   nextTick(() => {
     isModalOpen.value = true;
@@ -232,8 +256,8 @@ const handleView = (product: any) => {
   router.push(`/admin/products/${product.uuid}`);
 };
 
-const openFeedbackModal = (message: string) => {
-  feedbackMessage.value = message;
+const openFeedbackModal = (msg: string) => {
+  feedbackMessage.value = msg;
   isFeedbackModalOpen.value = true;
 };
 

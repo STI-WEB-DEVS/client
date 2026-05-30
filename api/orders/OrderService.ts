@@ -34,6 +34,10 @@ class OrderService extends BaseService {
   async delete(uuid: string): Promise<any> {
     return await this.request(`${this.resource}/${uuid}`, "DELETE");
   }
+
+  async summary(params: { from?: string; to?: string } = {}): Promise<any> {
+    return await this.request("orders/summary", "GET", params);
+  }
 }
 
 export const orderService = OrderService.getInstance();

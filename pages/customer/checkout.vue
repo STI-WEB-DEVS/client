@@ -12,23 +12,21 @@ const isLoading = ref(false);
 onMounted(() => {
   cart.value = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  // Prefer customer_uuid, fallback to uuid
-  customerUUID.value = localStorage.getItem("customer_uuid") || 
-                       localStorage.getItem("uuid") || "";
-
-  console.log("Loaded Customer UUID:", customerUUID.value);
+  // ✅ Filter out "null" string and empty string
+  const stored = localStorage.getItem("customer_uuid");
+  customerUUID.value = stored && stored !== "null" ? stored : "";
 
   if (cart.value.length === 0) {
     router.replace("/customer/cart");
   }
 });
 
-const subtotal = computed(() => 
+const subtotal = computed(() =>
   cart.value.reduce((sum, item) => {
     const price = Number(item?.price) || 0;
     const qty = Number(item?.quantity) || 0;
     return sum + price * qty;
-  }, 0)
+  }, 0),
 );
 
 const orderPayload = computed(() => ({
@@ -45,20 +43,23 @@ const placeOrder = async () => {
   console.log("Sending customer_uuid:", customerUUID.value);
 
   if (!token) return alert("Please login first!");
-  if (!customerUUID.value) return alert("Customer UUID is missing! Please login again.");
+  if (!customerUUID.value)
+    return alert("Customer UUID is missing! Please login again.");
 
   isLoading.value = true;
 
   try {
-    const { public: { apiBaseURL } } = useRuntimeConfig();
+    const {
+      public: { apiBaseURL },
+    } = useRuntimeConfig();
 
     const response = await $fetch(`${apiBaseURL}/orders`, {
       method: "POST",
       body: orderPayload.value,
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -66,8 +67,7 @@ const placeOrder = async () => {
 
     localStorage.removeItem("cart");
     alert("✅ Order placed successfully!");
-    router.push("/customer/order");   // Changed to existing page
-
+    router.push("/customer/order"); // Changed to existing page
   } catch (error: any) {
     console.error("Full Error:", error?.response?._data || error);
     alert(error?.response?._data?.message || "Failed to place order");
@@ -82,7 +82,10 @@ const goBack = () => router.push("/customer/cart");
 <template>
   <!-- Your template remains the same -->
   <section class="mx-auto max-w-3xl px-4 py-10">
-    <button @click="goBack" class="mb-6 text-gray-500 hover:text-gray-700 flex items-center gap-1">
+    <button
+      @click="goBack"
+      class="mb-6 text-gray-500 hover:text-gray-700 flex items-center gap-1"
+    >
       ← Back to Cart
     </button>
 
@@ -91,17 +94,27 @@ const goBack = () => router.push("/customer/cart");
     <div class="space-y-6">
       <div class="bg-white border rounded-xl p-5">
         <h3 class="font-semibold mb-2">Customer UUID</h3>
-        <code class="bg-gray-100 px-3 py-1 text-sm">{{ customerUUID || "Not found" }}</code>
+        <code class="bg-gray-100 px-3 py-1 text-sm">{{
+          customerUUID || "Not found"
+        }}</code>
       </div>
 
       <div class="bg-white border rounded-xl divide-y">
         <div class="p-5 font-semibold">Order Items ({{ cart.length }})</div>
-        <div v-for="item in cart" :key="item.uuid" class="p-5 flex justify-between">
+        <div
+          v-for="item in cart"
+          :key="item.uuid"
+          class="p-5 flex justify-between"
+        >
           <div>
             <p>{{ item.name }}</p>
-            <p class="text-sm text-gray-500">₱{{ Number(item.price).toFixed(2) }} × {{ item.quantity }}</p>
+            <p class="text-sm text-gray-500">
+              ₱{{ Number(item.price).toFixed(2) }} × {{ item.quantity }}
+            </p>
           </div>
-          <p class="font-semibold">₱{{ (Number(item.price) * item.quantity).toFixed(2) }}</p>
+          <p class="font-semibold">
+            ₱{{ (Number(item.price) * item.quantity).toFixed(2) }}
+          </p>
         </div>
       </div>
 

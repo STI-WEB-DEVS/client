@@ -121,6 +121,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: false, // ✅ no sidebar on login
+});
+
 import { ref } from "vue";
 import { authService } from "~/api/auth/AuthService";
 
@@ -142,11 +146,14 @@ const handleSubmit = async () => {
     }
 
     // Store all needed data
+    // ✅ Only store if value actually exists
     localStorage.setItem("_token", response.token);
-    localStorage.setItem("uuid", response.user.uuid);                    // User UUID
-    localStorage.setItem("customer_uuid", response.user.customer_uuid);  // ← THIS IS KEY
-    localStorage.setItem("role", response.user.role);
+    localStorage.setItem("uuid", response.user.uuid ?? "");
+    localStorage.setItem("role", response.user.role ?? "");
 
+    if (response.user.customer_uuid) {
+      localStorage.setItem("customer_uuid", response.user.customer_uuid);
+    }
     alert("Login successful!");
 
     if (response.user.role === "admin") {
