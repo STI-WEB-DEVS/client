@@ -157,64 +157,52 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-const { login, register, seedDemoIfEmpty } = useAuth()
-
-onMounted(() => seedDemoIfEmpty())
-
-const activeTab = ref<'login' | 'register'>('login')
-
-const loginEmail    = ref('')
-const loginPassword = ref('')
-const loginError    = ref('')
-const loginLoading  = ref(false)
-const showPassword  = ref(false)
-
-const regName     = ref('')
-const regEmail    = ref('')
-const regPassword = ref('')
-const regPlan     = ref<'basic' | 'premium'>('basic')
-const regError    = ref('')
-const regLoading  = ref(false)
-
-function fillDemo(plan: 'basic' | 'premium') {
-  if (plan === 'premium') {
-    loginEmail.value = 'admin@satura.com'
-    loginPassword.value = 'admin123'
-  } else {
-    loginEmail.value = 'basic@satura.com'
-    loginPassword.value = 'basic123'
-  }
-  loginError.value = ''
-}
-
-async function handleLogin() {
-  loginError.value = ''
-  loginLoading.value = true
-  await new Promise(r => setTimeout(r, 600))
+definePageMeta({
+  layout: false,
+});
+ 
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
+ 
+const email = ref("");
+const password = ref("");
+const error = ref("");
+const isLoading = ref(false);
+ 
+const authService = new AuthService();
+ 
+const handleSubmit = async () => {
+  error.value = "";
+  isLoading.value = true;
+ 
   try {
-    login(loginEmail.value, loginPassword.value)
-    await navigateTo('/dashboard')
-  } catch (e: any) {
-    loginError.value = e.message
+    const response = await authService.login(email.value, password.value);
+ 
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
+    }
+ 
+    // // if (response?.user.customer_uuid) {
+    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
+    // // } else if (response?.user.uuid) {
+    // //   localStorage.setItem("_uuid", response.user.uuid);
+    // // }
+ 
+    / /// if (response?.user.role) {
+    // //   localStorage.setItem("_role", response.user.role);
+    // // }
+ 
+    // await navigateTo("/admin/dashboard");
+ 
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+    );
+  } catch (err: any) {
+    error.value = err?.message || "";
   } finally {
-    loginLoading.value = false
+    isLoading.value = false;
   }
-}
-
-async function handleRegister() {
-  regError.value = ''
-  regLoading.value = true
-  await new Promise(r => setTimeout(r, 700))
-  try {
-    register(regName.value, regEmail.value, regPassword.value, regPlan.value)
-    await navigateTo('/dashboard')
-  } catch (e: any) {
-    regError.value = e.message
-  } finally {
-    regLoading.value = false
-  }
-}
+};
 </script>
 
 <style scoped>
