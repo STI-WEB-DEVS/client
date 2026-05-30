@@ -287,14 +287,13 @@
 
 
 
-
-
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { customerService } from "~/api/customer/CustomerService";
 
-interface Customer {    
+interface Customer {
   id: number | string;
+  uuid: string;
   name: string;
   email: string;
 }
@@ -305,9 +304,9 @@ const isLoading    = ref(false);
 const isSubmitting = ref(false);
 const searchQuery  = ref("");
 
-const showCreateModal = ref(false);
-const showEditModal   = ref(false);
-const showDeleteModal = ref(false);
+const showCreateModal  = ref(false);
+const showEditModal    = ref(false);
+const showDeleteModal  = ref(false);
 const selectedCustomer = ref<Customer | null>(null);
 
 const createForm = ref({ name: "", email: "" });
@@ -340,15 +339,23 @@ const openDelete = (customer: Customer) => {
   showDeleteModal.value = true;
 };
 
-// ── CRUD handlers — wire these to your service ─────
+// ── CRUD handlers ──────────────────────────────────
 const handleCreate = async () => {
   isSubmitting.value = true;
   createError.value  = "";
   try {
     const created = await customerService.create(createForm.value);
-    customers.value.push(created);
+    console.log(created);
+    const newCustomer: Customer = {
+      id: created.data.id,
+      uuid: created.data.uuid,
+      name: created.data.name,
+      email: created.data.email,
+    };
+    customers.value.push(newCustomer);
     createForm.value  = { name: "", email: "" };
     showCreateModal.value = false;
+
   } catch (err: any) {
     createError.value = err?.message || "Failed to create customer.";
   } finally {
@@ -361,10 +368,12 @@ const handleUpdate = async () => {
   isSubmitting.value = true;
   editError.value    = "";
   try {
-    // const updated = await customerService.update(selectedCustomer.value.id, editForm.value);
-    // const idx = customers.value.findIndex((c) => c.id === updated.id);
-    // if (idx !== -1) customers.value.splice(idx, 1, updated);
+
+    const updated = await customerService.update(selectedCustomer.value.uuid, editForm.value);
+    const idx = customers.value.findIndex((c) => c.uuid === selectedCustomer.value!.uuid);
+    if (idx !== -1) customers.value.splice(idx, 1, { ...customers.value[idx], ...updated.data });
     showEditModal.value = false;
+
   } catch (err: any) {
     editError.value = err?.message || "Failed to update customer.";
   } finally {
@@ -377,8 +386,8 @@ const handleDelete = async () => {
   isSubmitting.value = true;
   deleteError.value  = "";
   try {
-    // await customerService.delete(selectedCustomer.value.id);
-    // customers.value = customers.value.filter((c) => c.id !== selectedCustomer.value!.id);
+    await customerService.delete(selectedCustomer.value.uuid);
+    customers.value = customers.value.filter((c) => c.id !== selectedCustomer.value!.id);
     showDeleteModal.value = false;
   } catch (err: any) {
     deleteError.value = err?.message || "Failed to remove customer.";
@@ -387,14 +396,16 @@ const handleDelete = async () => {
   }
 };
 
-//── Fetch on mount ─────────────────────────────────
+// ── Fetch on mount ─────────────────────────────────
 onMounted(async () => {
   isLoading.value = true;
   try {
-    customers.value = await customerService.list();
+    const res = await customerService.list();
+    customers.value = res.data;
   } catch (err: any) {
     // handle error
   } finally {
     isLoading.value = false;
   }
 });
+</script>

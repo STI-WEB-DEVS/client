@@ -288,10 +288,12 @@
 
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { productService } from "~/api/product/ProductService";
 
 interface Product {
   id: number | string;
+  uuid: string;
   name: string;
   price: number;
 }
@@ -343,12 +345,19 @@ const handleCreate = async () => {
   isSubmitting.value = true;
   createError.value  = "";
   try {
-    // const created = await productService.create(createForm.value);
-    // products.value.push(created);
-    createForm.value = { name: "", price: "" };
+    const created = await productService.create(createForm.value);
+    const newProduct: Product = {
+      id: created.data.id,
+      uuid: created.data.uuid,
+      name: created.data.name,
+      price: created.data.price,
+    };
+    products.value.push(newProduct);
+    createForm.value  = { name: "", price: "" };
     showCreateModal.value = false;
+
   } catch (err: any) {
-    createError.value = err?.message || "Failed to create product.";
+    createError.value = err?.message || "Failed to create Product.";
   } finally {
     isSubmitting.value = false;
   }
@@ -359,12 +368,14 @@ const handleUpdate = async () => {
   isSubmitting.value = true;
   editError.value    = "";
   try {
-    // const updated = await productService.update(selectedProduct.value.id, editForm.value);
-    // const idx = products.value.findIndex((p) => p.id === updated.id);
-    // if (idx !== -1) products.value.splice(idx, 1, updated);
+
+    const updated = await productService.update(selectedProduct.value.uuid, editForm.value);
+    const idx = products.value.findIndex((p) => p.uuid === selectedProduct.value!.uuid);
+    if (idx !== -1) products.value.splice(idx, 1, { ...products.value[idx], ...updated.data });
     showEditModal.value = false;
+
   } catch (err: any) {
-    editError.value = err?.message || "Failed to update product.";
+    editError.value = err?.message || "Failed to update Product.";
   } finally {
     isSubmitting.value = false;
   }
@@ -375,8 +386,8 @@ const handleDelete = async () => {
   isSubmitting.value = true;
   deleteError.value  = "";
   try {
-    // await productService.delete(selectedProduct.value.id);
-    // products.value = products.value.filter((p) => p.id !== selectedProduct.value!.id);
+    await productService.delete(selectedProduct.value.uuid);
+    products.value = products.value.filter((c) => c.id !== selectedProduct.value!.id);
     showDeleteModal.value = false;
   } catch (err: any) {
     deleteError.value = err?.message || "Failed to remove product.";
@@ -386,12 +397,15 @@ const handleDelete = async () => {
 };
 
 // ── Fetch on mount ─────────────────────────────────
-// onMounted(async () => {
-//   isLoading.value = true;
-//   try {
-//     products.value = await productService.getAll();
-//   } finally {
-//     isLoading.value = false;
-//   }
-// });
+onMounted(async () => {
+  isLoading.value = true;
+  try {
+    const res = await productService.list();
+    products.value = res.data;
+  } catch (err: any) {
+    // handle error
+  } finally {
+    isLoading.value = false;
+  }
+});
 </script>
