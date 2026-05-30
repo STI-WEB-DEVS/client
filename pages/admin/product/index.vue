@@ -9,7 +9,7 @@
       <button
         type="button"
         @click="handleCreate"
-        class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+        class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 cursor-pointer"
       >
         <PlusIcon class="h-4 w-4" />
         <span>Create Product</span>
@@ -32,6 +32,8 @@
               <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
               <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Name</th>
               <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Price</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Description</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Stocks</th>
               <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
             </tr>
           </thead>
@@ -39,19 +41,25 @@
           <tbody class="divide-y divide-gray-100 bg-white">
             <tr v-for="product in products?.data" :key="product.id" class="transition hover:bg-gray-50">
               <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ product.id }}</td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ product.name }}</td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">₱{{ product.price }}</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-700">{{ product.name }}</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 font-mono">₱{{ product.price }}</td>
+              <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{{ product.description || 'No description provided' }}</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm">
+                <span :class="product.stocks > 0 ? 'text-green-600 font-semibold' : 'text-red-500 font-semibold bg-red-50 px-2.5 py-1 rounded-md'">
+                  {{ product.stocks }}
+                </span>
+              </td>
               <td class="whitespace-nowrap px-6 py-4">
                 <div class="flex items-center justify-end gap-2">
-                  <button @click="handleView(product)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                  <button @click="handleView(product)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer">
                     <EyeIcon class="h-4 w-4" />
                     <span>View</span>
                   </button>
-                  <button @click="handleEdit(product)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                  <button @click="handleEdit(product)" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer">
                     <PencilSquareIcon class="h-4 w-4" />
                     <span>Edit</span>
                   </button>
-                  <button @click="handleDelete(product)" class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50">
+                  <button @click="handleDelete(product)" class="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 cursor-pointer">
                     <TrashIcon class="h-4 w-4" />
                     <span>Delete</span>
                   </button>
@@ -59,7 +67,7 @@
               </td>
             </tr>
             <tr v-if="!products?.data?.length">
-              <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">No products found.</td>
+              <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">No products found.</td>
             </tr>
           </tbody>
         </table>
@@ -74,6 +82,7 @@
       </div>
     </div>
 
+    <!-- Modal Form container -->
     <div v-if="isFormModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
         <h2 class="mb-4 text-lg font-bold text-gray-900">{{ selectedProduct ? 'Edit' : 'Create' }} Product</h2>
@@ -87,6 +96,7 @@
       </div>
     </div>
 
+    <!-- Feedback alerts popup -->
     <FeedbackModal
       :open="isFeedbackModalOpen"
       :title="feedbackTitle"
@@ -99,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { PlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { productService } from '~/api/product/ProductService';
@@ -121,11 +131,29 @@ const isFormModalOpen = ref(false);
 const selectedProduct = ref<any>(null);
 const pendingDeleteUuid = ref<string | null>(null);
 
-// --- Form Config ---
-const productFormConfig = [
-  { key: 'name', label: 'Product Name', placeholder: 'Enter product name' },
-  { key: 'price', label: 'Price', type: 'number', placeholder: '0.00' },
-];
+// --- Dynamic Form configuration ---
+const productFormConfig = computed(() => {
+  const base = [
+    { key: 'name', label: 'Product Name', placeholder: 'Enter product name (No numbers/digits)' },
+    { key: 'price', label: 'Price (₱)', type: 'number', placeholder: '0.00' },
+    { key: 'description', label: 'Description', placeholder: 'Describe this product here...' },
+  ];
+
+  if (selectedProduct.value) {
+    // Edit mode: stocks cannot be manually changed, they are viewable and allow additions
+    return [
+      ...base,
+      { key: 'current_stocks', label: 'Current Stocks Balance', type: 'number', placeholder: '0', disabled: true },
+      { key: 'stock_addition', label: 'Add Extra Stocks', type: 'number', placeholder: 'Type quantity to add...' }
+    ];
+  }
+
+  // Create mode: allow entering initial stocks directly
+  return [
+    ...base,
+    { key: 'stocks', label: 'Initial Stocks Quantity', type: 'number', placeholder: '0' }
+  ];
+});
 
 const fetchProducts = async () => {
   pending.value = true;
@@ -176,7 +204,12 @@ const handleCreate = () => {
 };
 
 const handleEdit = (product: any) => {
-  selectedProduct.value = { ...product };
+  // Map current stocks into read-only layout and init additions at 0
+  selectedProduct.value = { 
+    ...product, 
+    current_stocks: product.stocks,
+    stock_addition: 0 
+  };
   isFormModalOpen.value = true;
 };
 
@@ -188,16 +221,34 @@ const closeFormModal = () => {
 const handleFormSubmit = async (formData: any) => {
   try {
     if (selectedProduct.value) {
-      await productService.update(selectedProduct.value.uuid, formData);
-      openFeedbackModal('Success', 'Product updated successfully!');
+      const payload = {
+        name: formData.name,
+        price: Number(formData.price),
+        description: formData.description || '',
+        stock_addition: formData.stock_addition ? parseInt(formData.stock_addition) : 0
+      };
+      await productService.update(selectedProduct.value.uuid, payload);
+      openFeedbackModal('Success', 'Product and stock balances modernized successfully!');
     } else {
-      await productService.create(formData);
-      openFeedbackModal('Success', 'Product created successfully!');
+      const payload = {
+        name: formData.name,
+        price: Number(formData.price),
+        description: formData.description || '',
+        stocks: formData.stocks ? parseInt(formData.stocks) : 0
+      };
+      await productService.create(payload);
+      openFeedbackModal('Success', 'Product saved successfully!');
     }
     closeFormModal();
     fetchProducts();
   } catch (err: any) {
-    const errorMessage = err.response?.data?.message || err.message || 'Unknown error';
+    // Elegant check to show detailed form field validations if any fail
+    let errorMessage = '';
+    if (err.response?.data?.errors) {
+      errorMessage = Object.values(err.response.data.errors).flat().join('\n');
+    } else {
+      errorMessage = err.response?.data?.message || err.message || 'An item validation error occurred.';
+    }
     openFeedbackModal('Error', errorMessage);
   }
 };

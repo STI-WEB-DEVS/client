@@ -130,7 +130,7 @@ const handleSubmit = async () => {
         await navigateTo('/customer/order');
       } else if (role === 'admin') {
         // Redirects to your file: pages/admin/index.vue
-        await navigateTo('/admin');
+        await navigateTo('/admin/customer/index');
       } else {
         // If the role is unknown, just go to the home page
         await navigateTo('/');

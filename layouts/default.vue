@@ -159,9 +159,9 @@ const router = useRouter()
 const authService = new AuthService()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
-  { name: 'Products', href: '/product', icon: FolderIcon },
+  { name: 'Products', href: '/admin/product', icon: FolderIcon },
 ]
 
 const userNavigation = [
