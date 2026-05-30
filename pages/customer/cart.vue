@@ -1,9 +1,35 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useCart } from '~/composables/useCart'
+import { orderService } from '~/api/order/OrderService'
 
 definePageMeta({ layout: 'customer' })
 
-const { cart, itemCount, totalPrice, updateQuantity, removeFromCart } = useCart()
+const { cart, itemCount, totalPrice, updateQuantity, removeFromCart, clearCart, buildOrderPayload } = useCart()
+
+const placing  = ref(false)
+const orderError = ref('')
+
+const handleCheckout = async () => {
+  placing.value    = true
+  orderError.value = ''
+
+  try {
+    const payload = buildOrderPayload()
+    await orderService.create(payload)
+    clearCart()
+    navigateTo('/customer/order')
+  } catch (err: any) {
+    // Surface the stock error message from the backend
+    const msg = err?.response?.data?.errors?.items?.[0]
+      ?? err?.response?.data?.message
+      ?? err?.message
+      ?? 'Something went wrong. Please try again.'
+    orderError.value = msg
+  } finally {
+    placing.value = false
+  }
+}
 </script>
 
 <template>
@@ -37,16 +63,22 @@ const { cart, itemCount, totalPrice, updateQuantity, removeFromCart } = useCart(
           @update-quantity="updateQuantity"
           @remove="removeFromCart"
         />
+
+        <!-- Checkout error -->
+        <div v-if="orderError" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {{ orderError }}
+        </div>
       </div>
 
       <!-- Order summary -->
       <OrderSummary
         :item-count="itemCount"
         :total-price="totalPrice"
-        primary-label="Checkout"
+        :primary-label="placing ? 'Placing Order...' : 'Checkout'"
+        :disabled="placing"
         secondary-label="Continue Shopping"
         secondary-to="/customer/catalog"
-        @primary-action="navigateTo('/customer/checkout')"
+        @primary-action="handleCheckout"
       />
     </div>
   </div>

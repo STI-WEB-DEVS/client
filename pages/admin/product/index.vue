@@ -31,6 +31,7 @@
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Name</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Price</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Stock</th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
               </tr>
             </thead>
@@ -42,7 +43,21 @@
               >
                 <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ product.id }}</td>
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700">{{ product.name }}</td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ product.price }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">₱{{ Number(product.price).toFixed(2) }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm">
+                  <span
+                    :class="[
+                      'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+                      product.stock_quantity === 0
+                        ? 'bg-red-100 text-red-700'
+                        : product.stock_quantity <= 10
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-green-100 text-green-700'
+                    ]"
+                  >
+                    {{ product.stock_quantity === 0 ? 'Out of Stock' : `${product.stock_quantity} in stock` }}
+                  </span>
+                </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
                     <button
@@ -73,7 +88,7 @@
                 </td>
               </tr>
               <tr v-if="!products?.data?.length">
-                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">No products found.</td>
+                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">No products found.</td>
               </tr>
             </tbody>
           </table>
@@ -128,7 +143,7 @@
   type FeedbackAction = 'create' | 'edit' | null
   const feedbackOpen = ref(false)
   const feedbackAction = ref<FeedbackAction>(null)
-  const pendingForm = ref<{ name: string; price: string } | null>(null)
+  const pendingForm = ref<{ name: string; price: string; stock_quantity: string } | null>(null)
 
   const fetchProducts = async () => {
     pending.value = true
@@ -154,11 +169,11 @@
     selectedProduct.value = null
   }
 
-  const onFormSubmit = (action: 'create' | 'edit', form: { name: string; price: string }) => {
+  const onFormSubmit = (action: 'create' | 'edit', form: { name: string; price: string; stock_quantity: string }) => {
     pendingForm.value = form
     feedbackAction.value = action
-    activeModal.value = null   
-    feedbackOpen.value = true  
+    activeModal.value = null
+    feedbackOpen.value = true
   }
 
   const runApiCall = async () => {

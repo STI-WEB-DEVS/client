@@ -17,7 +17,6 @@ if (import.meta.client && !cart.value.length) {
 const handlePlaceOrder = async () => {
   const payload = buildOrderPayload()
 
-  // Log payload to console as required
   console.log('📦 Order Payload:', JSON.stringify(payload, null, 2))
 
   loading.value = true
@@ -28,7 +27,11 @@ const handlePlaceOrder = async () => {
     clearCart()
     await navigateTo('/customer/order')
   } catch (err: any) {
-    error.value = err?.message || 'Failed to place order. Please try again.'
+    // Surface stock validation errors from the backend
+    error.value = err?.response?.data?.errors?.items?.[0]
+      ?? err?.response?.data?.message
+      ?? err?.message
+      ?? 'Failed to place order. Please try again.'
   } finally {
     loading.value = false
   }
@@ -69,7 +72,7 @@ const handlePlaceOrder = async () => {
 
       <!-- Right: summary + place order -->
       <div class="space-y-4">
-        <!-- Error -->
+        <!-- Stock / order error -->
         <div v-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4">
           <p class="text-sm text-red-700">{{ error }}</p>
         </div>

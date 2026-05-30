@@ -24,7 +24,7 @@
 const props = withDefaults(defineProps<{
   modelValue: number
   min?: number
-  max?: number
+  max?: number  // pass stock_quantity here to cap the selector
 }>(), {
   min: 1,
   max: undefined,

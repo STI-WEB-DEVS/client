@@ -1,8 +1,19 @@
 <template>
   <NuxtLink
     :to="`/customer/catalog/${product.uuid}`"
-    class="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md"
+    class="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md"
+    :class="{ 'pointer-events-none opacity-60': isOutOfStock }"
   >
+    <!-- Out of stock overlay -->
+    <div
+      v-if="isOutOfStock"
+      class="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/70"
+    >
+      <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+        Out of Stock
+      </span>
+    </div>
+
     <!-- Image placeholder -->
     <div class="aspect-square w-full bg-gray-100">
       <div class="flex h-full items-center justify-center text-gray-300">
@@ -23,8 +34,15 @@
         <span class="text-base font-bold text-gray-900">
           ₱{{ Number(product.price).toFixed(2) }}
         </span>
-        <span class="text-xs text-gray-400">
-          Stock: {{ product.stock ?? 'N/A' }}
+        <span
+          :class="[
+            'text-xs font-medium',
+            isOutOfStock ? 'text-red-500'
+            : isLowStock  ? 'text-yellow-600'
+            :               'text-gray-400'
+          ]"
+        >
+          {{ isOutOfStock ? 'Out of stock' : isLowStock ? `Only ${product.stock_quantity} left` : `${product.stock_quantity} in stock` }}
         </span>
       </div>
     </div>
@@ -32,13 +50,18 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue'
+
+const props = defineProps<{
   product: {
     uuid: string
     name: string
     price: number | string
     description?: string
-    stock?: number
+    stock_quantity: number
   }
 }>()
+
+const isOutOfStock = computed(() => props.product.stock_quantity <= 0)
+const isLowStock   = computed(() => props.product.stock_quantity > 0 && props.product.stock_quantity <= 10)
 </script>

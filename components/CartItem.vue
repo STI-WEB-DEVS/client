@@ -11,12 +11,14 @@
     <div class="flex-1">
       <p class="text-sm font-semibold text-gray-900">{{ item.name }}</p>
       <p class="text-sm text-gray-500">₱{{ Number(item.price).toFixed(2) }} each</p>
+      <p class="mt-0.5 text-xs text-gray-400">{{ item.stock_quantity }} available</p>
     </div>
 
-    <!-- Quantity selector -->
+    <!-- Quantity selector capped to stock -->
     <QuantitySelector
       :model-value="item.quantity"
       :min="1"
+      :max="item.stock_quantity"
       @update:model-value="(val) => $emit('update-quantity', item.product_uuid, val)"
     />
 

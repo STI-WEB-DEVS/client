@@ -1,5 +1,5 @@
 // composables/useCart.ts
-// Manages cart state: [ { product_uuid, name, price, quantity } ]
+// Manages cart state: [ { product_uuid, name, price, quantity, stock_quantity } ]
 // Persisted to localStorage so cart survives page refresh
 
 import { ref, computed } from 'vue'
@@ -9,6 +9,7 @@ export interface CartItem {
   name: string
   price: number
   quantity: number
+  stock_quantity: number  // tracked so cart can enforce stock limits
 }
 
 const CART_KEY = '_cart'
@@ -41,27 +42,47 @@ export const useCart = () => {
     cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
   )
 
-  const addToCart = (product: { uuid: string; name: string; price: number }, quantity: number) => {
+  /**
+   * Add a product to the cart, capped to available stock.
+   * Returns false if the product is out of stock.
+   */
+  const addToCart = (
+    product: { uuid: string; name: string; price: number; stock_quantity: number },
+    quantity: number
+  ): boolean => {
+    if (product.stock_quantity <= 0) return false
+
     const existing = cart.value.find(i => i.product_uuid === product.uuid)
+
     if (existing) {
-      existing.quantity += quantity
+      const newQty = existing.quantity + quantity
+      existing.quantity = Math.min(newQty, product.stock_quantity)
     } else {
       cart.value.push({
-        product_uuid: product.uuid,
-        name: product.name,
-        price: product.price,
-        quantity,
+        product_uuid:   product.uuid,
+        name:           product.name,
+        price:          product.price,
+        quantity:       Math.min(quantity, product.stock_quantity),
+        stock_quantity: product.stock_quantity,
       })
     }
+
     saveCart()
+    return true
   }
 
+  /**
+   * Update quantity of an item in the cart, capped to its stock.
+   */
   const updateQuantity = (product_uuid: string, quantity: number) => {
     const item = cart.value.find(i => i.product_uuid === product_uuid)
     if (item) {
-      item.quantity = quantity
-      if (item.quantity <= 0) removeFromCart(product_uuid)
-      else saveCart()
+      if (quantity <= 0) {
+        removeFromCart(product_uuid)
+      } else {
+        item.quantity = Math.min(quantity, item.stock_quantity)
+        saveCart()
+      }
     }
   }
 
@@ -83,7 +104,7 @@ export const useCart = () => {
       customer_uuid,
       items: cart.value.map(item => ({
         product_uuid: item.product_uuid,
-        quantity: item.quantity,
+        quantity:     item.quantity,
       })),
     }
   }

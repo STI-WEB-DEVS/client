@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { productService } from '~/api/product/ProductService'
 import { useCart } from '~/composables/useCart'
 
 definePageMeta({ layout: 'customer' })
 
-const route = useRoute()
+const route  = useRoute()
 const router = useRouter()
 const { addToCart } = useCart()
 
-const product = ref<any>(null)
-const pending = ref(true)
-const error = ref('')
+const product  = ref<any>(null)
+const pending  = ref(true)
+const error    = ref('')
 const quantity = ref(1)
-const added = ref(false)
+const added    = ref(false)
 
 onMounted(async () => {
   try {
-    const res = await productService.show(route.params.uuid as string)
+    const res   = await productService.show(route.params.uuid as string)
     product.value = res?.data ?? res
   } catch (err: any) {
     error.value = err.message
@@ -27,25 +27,40 @@ onMounted(async () => {
   }
 })
 
+// Derived stock state
+const stock        = computed(() => Number(product.value?.stock_quantity ?? 0))
+const isOutOfStock = computed(() => stock.value <= 0)
+const isLowStock   = computed(() => stock.value > 0 && stock.value <= 10)
+
 const handleAddToCart = () => {
-  if (!product.value) return
+  if (!product.value || isOutOfStock.value) return
+
   addToCart(
-    { uuid: product.value.uuid, name: product.value.name, price: Number(product.value.price) },
+    {
+      uuid:           product.value.uuid,
+      name:           product.value.name,
+      price:          Number(product.value.price),
+      stock_quantity: stock.value,
+    },
     quantity.value
   )
+
   added.value = true
-  setTimeout(() => added.value = false, 2000)
+  setTimeout(() => (added.value = false), 2000)
 }
 
 const handleBuyNow = () => {
   handleAddToCart()
-  router.push('/customer/cart')
+  if (!isOutOfStock.value) router.push('/customer/cart')
 }
 </script>
 
 <template>
   <div>
-    <button @click="$router.back()" class="mb-6 flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
+    <button
+      @click="$router.back()"
+      class="mb-6 flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900"
+    >
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
       </svg>
@@ -77,15 +92,30 @@ const handleBuyNow = () => {
 
         <div class="mt-6 flex items-center gap-4">
           <span class="text-3xl font-bold text-gray-900">₱{{ Number(product.price).toFixed(2) }}</span>
-          <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
-            Stock: {{ product.stock ?? 'N/A' }}
+
+          <!-- Stock badge -->
+          <span
+            :class="[
+              'rounded-full px-3 py-1 text-xs font-medium',
+              isOutOfStock ? 'bg-red-100 text-red-700'
+              : isLowStock  ? 'bg-yellow-100 text-yellow-700'
+              :               'bg-green-100 text-green-700'
+            ]"
+          >
+            {{ isOutOfStock ? 'Out of Stock' : `${stock} in stock` }}
           </span>
         </div>
 
-        <!-- Quantity selector component -->
-        <div class="mt-8">
+        <!-- Low stock warning -->
+        <p v-if="isLowStock" class="mt-2 text-xs text-yellow-600">
+          Only {{ stock }} left — order soon!
+        </p>
+
+        <!-- Quantity selector — capped to available stock -->
+        <div class="mt-8" v-if="!isOutOfStock">
           <label class="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
-          <QuantitySelector v-model="quantity" :min="1" />
+          <QuantitySelector v-model="quantity" :min="1" :max="stock" />
+          <p class="mt-1 text-xs text-gray-400">Max {{ stock }} available</p>
         </div>
 
         <!-- Added to cart feedback -->
@@ -93,8 +123,13 @@ const handleBuyNow = () => {
           ✓ Added to cart successfully!
         </div>
 
+        <!-- Out of stock notice -->
+        <div v-if="isOutOfStock" class="mt-8 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          This product is currently out of stock and cannot be ordered.
+        </div>
+
         <!-- Actions -->
-        <div class="mt-8 flex gap-3">
+        <div class="mt-8 flex gap-3" v-if="!isOutOfStock">
           <button
             @click="handleAddToCart"
             class="flex-1 rounded-lg border border-indigo-600 px-5 py-3 text-sm font-semibold text-indigo-600 transition hover:bg-indigo-50"
