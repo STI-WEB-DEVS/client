@@ -248,8 +248,8 @@ const route = useRoute()
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '/project', icon: FolderIcon },
+  { name: 'Customer', href: '/customer', icon: UsersIcon },
+  { name: 'Product', href: '/product', icon: FolderIcon },
   { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
   { name: 'Documents', href: '/document', icon: DocumentDuplicateIcon },
   { name: 'Reports', href: '/report', icon: ChartPieIcon },

@@ -25,6 +25,7 @@
             name="email"
             autocomplete="email"
             placeholder="you@example.com"
+            v-model="email"
             required
             class="w-full px-3 py-2.5 text-sm font-sans text-stone-900 bg-stone-50 border border-stone-300 rounded-sm outline-none focus:border-stone-900 focus:bg-white transition-colors placeholder:text-stone-300"
           />
@@ -40,6 +41,7 @@
             name="password"
             autocomplete="current-password"
             placeholder="••••••••"
+            v-model="password"
             required
             class="w-full px-3 py-2.5 text-sm font-sans text-stone-900 bg-stone-50 border border-stone-300 rounded-sm outline-none focus:border-stone-900 focus:bg-white transition-colors placeholder:text-stone-300"
           />
@@ -107,7 +109,49 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: false,
+});
+ 
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
+ 
+const email = ref("email");  
+const password = ref("password");
+const error = ref("");
+const isLoading = ref(false);
+ 
+const authService = new AuthService();
+ 
 const handleSubmit = async () => {
-  await navigateTo('/dashboard')
-}
+  error.value = "";
+  isLoading.value = true;
+  try {
+    const response = await authService.login(email.value, password.value);
+ 
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
+    }
+ 
+    // // if (response?.user.customer_uuid) {
+    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
+    // // } else if (response?.user.uuid) {
+    // //   localStorage.setItem("_uuid", response.user.uuid);
+    // // }
+ 
+    / /// if (response?.user.role) {
+    // //   localStorage.setItem("_role", response.user.role);
+    // // }
+ 
+    // await navigateTo("/admin/dashboard");
+ 
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
+    );
+  } catch (err: any) {
+    error.value = err?.message || "";
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
