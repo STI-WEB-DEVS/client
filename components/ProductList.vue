@@ -45,6 +45,17 @@
         </div>
       </div>
 
+      <div class="mt-3">
+        <span 
+          :class="[
+            'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+            p.quantity > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+          ]"
+        >
+          {{ p.quantity > 0 ? `${p.quantity} in stock` : 'Out of Stock' }}
+        </span>
+      </div>
+
       <div class="mt-6 space-y-3">
         <NuxtLink
           :to="`/customer/product/${p.uuid}`"
@@ -56,7 +67,8 @@
         <div class="flex gap-3">
           <button
             type="button"
-            class="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            :disabled="p.quantity === 0"
+            class="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
             @click="$emit('add', p)"
           >
             Add to Cart
@@ -64,7 +76,8 @@
 
           <button
             type="button"
-            class="flex-1 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            :disabled="p.quantity === 0"
+            class="flex-1 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
             @click="$emit('buyNow', p)"
           >
             Buy Now

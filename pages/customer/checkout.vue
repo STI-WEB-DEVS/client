@@ -4,13 +4,17 @@ definePageMeta({
 });
 
 import { orderService } from "~/api/order/OrderService";
+import { productService } from "~/api/product/ProductService";
 
-const { cart, totalPrice, clear } = useCart();
+const { cart, totalPrice, clear, removeItem, setQuantity } = useCart();
 
 const alert = ref<{
-  variant: "success" | "error" | "info";
+  variant: "success" | "error" | "info" | "warning";
   message: string;
 } | null>(null);
+
+const isValidating = ref(false);
+const isPlacingOrder = ref(false);
 
 const readCustomerUuid = () => {
   if (!process.client) return "";
@@ -38,22 +42,89 @@ const buildPayload = () => {
   };
 };
 
+const validateStock = async () => {
+  isValidating.value = true;
+  alert.value = null;
+  
+  try {
+    const stockIssues: string[] = [];
+    
+    // Check each cart item against current product stock
+    for (const item of cart.value) {
+      try {
+        const response = await productService.show(item.uuid);
+        const currentStock = response.data.quantity || 0;
+        
+        if (currentStock === 0) {
+          stockIssues.push(`${item.name} is now out of stock`);
+          removeItem(item.uuid);
+        } else if (currentStock < item.quantity) {
+          stockIssues.push(`${item.name}: Only ${currentStock} available (you have ${item.quantity} in cart)`);
+          setQuantity(item.uuid, currentStock);
+        }
+      } catch (error) {
+        console.error(`Error checking stock for ${item.name}:`, error);
+      }
+    }
+    
+    if (stockIssues.length > 0) {
+      alert.value = {
+        variant: "warning",
+        message: `Stock updated: ${stockIssues.join('; ')}. Please review your cart before proceeding.`,
+      };
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Stock validation error:", error);
+    return true; // Continue anyway if validation fails
+  } finally {
+    isValidating.value = false;
+  }
+};
+
 const placeOrder = async () => {
   alert.value = null;
+  isPlacingOrder.value = true;
 
   try {
+    // Validate stock before placing order
+    const stockValid = await validateStock();
+    if (!stockValid) {
+      isPlacingOrder.value = false;
+      return;
+    }
+    
     const payload = buildPayload();
     // Send to API
     const response = await orderService.create(payload);
     console.log("Order created response:", response);
-    alert.value = { variant: "success", message: "Order placed successfully." };
+    alert.value = { 
+      variant: "success", 
+      message: "Order placed successfully! Your items have been reserved and stock has been updated." 
+    };
     clear();
+    
+    // Redirect to orders page after 2 seconds
+    setTimeout(() => {
+      navigateTo("/customer/orders");
+    }, 2000);
   } catch (e: any) {
     console.error("Order create error:", e);
+    let errorMessage = e?.response?.data?.message || e?.message || "Unable to place order.";
+    
+    // Check if it's a stock-related error
+    if (errorMessage.includes("Insufficient stock") || errorMessage.includes("stock")) {
+      errorMessage += " Please refresh the page and review your cart.";
+    }
+    
     alert.value = {
       variant: "error",
-      message: e?.message || "Unable to place order.",
+      message: errorMessage,
     };
+  } finally {
+    isPlacingOrder.value = false;
   }
 };
 
@@ -164,10 +235,12 @@ const formatMoney = (value: number) => {
               <button
                 type="button"
                 class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
-                :disabled="!cart.length"
+                :disabled="!cart.length || isValidating || isPlacingOrder"
                 @click="placeOrder"
               >
-                Place Order
+                <span v-if="isValidating">Validating Stock...</span>
+                <span v-else-if="isPlacingOrder">Placing Order...</span>
+                <span v-else>Place Order</span>
               </button>
             </div>
           </div>

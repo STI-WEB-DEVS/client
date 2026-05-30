@@ -5,6 +5,7 @@ type ProductApiItem = {
   uuid?: string;
   name?: string;
   price?: number | string;
+  quantity?: number | string;
   description?: string | null;
   imageUrl?: string | null;
   image_url?: string | null;
@@ -27,6 +28,10 @@ const mapToProduct = (item: ProductApiItem): Product | null => {
     typeof item?.price === "string"
       ? Number.parseFloat(item.price)
       : Number(item?.price);
+  const quantity =
+    typeof item?.quantity === "string"
+      ? Number.parseInt(item.quantity, 10)
+      : Number(item?.quantity);
   const description =
     item?.description == null ? undefined : String(item.description);
   const imageUrl = (item?.imageUrl ||
@@ -41,6 +46,7 @@ const mapToProduct = (item: ProductApiItem): Product | null => {
     uuid,
     name,
     price: Number.isFinite(price) ? price : 0,
+    quantity: Number.isFinite(quantity) && quantity >= 0 ? quantity : 0,
     description,
     imageUrl: imageUrl ? String(imageUrl) : undefined,
   };

@@ -2,12 +2,18 @@ export type Product = {
   uuid: string;
   name: string;
   price: number;
+  quantity: number; // Stock quantity
   description?: string;
   imageUrl?: string;
 };
 
-export type CartItem = Product & {
-  quantity: number;
+export type CartItem = {
+  uuid: string;
+  name: string;
+  price: number;
+  quantity: number; // Cart quantity (how many in cart)
+  description?: string;
+  imageUrl?: string;
 };
 
 const CART_STORAGE_KEY = "customer_cart";
@@ -36,9 +42,9 @@ export const useCart = () => {
               uuid: String(i.uuid || ""),
               name: String(i.name || ""),
               price: Number(i.price || 0),
+              quantity: clampInt(i.quantity, 1, 999),
               description: i.description ? String(i.description) : undefined,
               imageUrl: i.imageUrl ? String(i.imageUrl) : undefined,
-              quantity: clampInt(i.quantity, 1, 999),
             }))
             .filter((i) => i.uuid && i.name);
         }
@@ -63,15 +69,33 @@ export const useCart = () => {
   const addItem = (product: Product, quantity = 1) => {
     const q = clampInt(quantity, 1, 999);
     const idx = cart.value.findIndex((i) => i.uuid === product.uuid);
+    
+    // Check stock availability
+    const availableStock = product.quantity || 0;
+    const currentCartQuantity = idx >= 0 ? cart.value[idx].quantity : 0;
+    const totalRequested = currentCartQuantity + q;
+
+    if (availableStock < totalRequested) {
+      throw new Error(`Cannot add ${q} units. Only ${availableStock - currentCartQuantity} units available.`);
+    }
+
     if (idx >= 0) {
       cart.value[idx] = {
         ...cart.value[idx],
-        quantity: clampInt(cart.value[idx].quantity + q, 1, 999),
+        quantity: clampInt(totalRequested, 1, Math.min(999, availableStock)),
       };
       return;
     }
 
-    cart.value.push({ ...product, quantity: q });
+    // Add new item to cart (without the stock quantity field in cart storage)
+    cart.value.push({ 
+      uuid: product.uuid,
+      name: product.name,
+      price: product.price,
+      quantity: q,
+      description: product.description,
+      imageUrl: product.imageUrl,
+    });
   };
 
   const removeItem = (productUuid: string) => {
@@ -82,6 +106,7 @@ export const useCart = () => {
     const q = clampInt(quantity, 1, 999);
     const idx = cart.value.findIndex((i) => i.uuid === productUuid);
     if (idx < 0) return;
+    
     cart.value[idx] = { ...cart.value[idx], quantity: q };
   };
 

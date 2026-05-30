@@ -21,13 +21,21 @@ const closeFeedback = () => {
 onMounted(refresh);
 
 const onAdd = (p: any) => {
-  addItem(p, 1);
-  openFeedback("Item has been successfully added to the cart.");
+  try {
+    addItem(p, 1);
+    openFeedback("Item has been successfully added to the cart.");
+  } catch (error: any) {
+    openFeedback(error.message || "Failed to add item to cart.");
+  }
 };
 
 const onBuyNow = async (p: any) => {
-  addItem(p, 1);
-  await navigateTo("/customer/checkout");
+  try {
+    addItem(p, 1);
+    await navigateTo("/customer/checkout");
+  } catch (error: any) {
+    openFeedback(error.message || "Failed to add item to cart.");
+  }
 };
 </script>
 

@@ -40,6 +40,9 @@
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Price
                 </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Stock
+                </th>
                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
                 </th>
@@ -61,8 +64,28 @@
                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                   {{ parseFloat(product.price).toFixed(2) }}
                 </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm">
+                  <span 
+                    :class="[
+                      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                      product.quantity > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    ]"
+                  >
+                    {{ product.quantity || 0 }}
+                  </span>
+                </td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      @click="handleRestock(product)"
+                      class="inline-flex items-center gap-2 rounded-md border border-indigo-200 px-3 py-1.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50"
+                      title="Restock"
+                    >
+                      <ArrowPathIcon class="h-4 w-4" />
+                      <span>Restock</span>
+                    </button>
+
                     <button
                       type="button"
                       @click="handleView(product)"
@@ -94,7 +117,7 @@
               </tr>
 
               <tr v-if="!products?.data?.length">
-                <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
+                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
                   No products found.
                 </td>
               </tr>
@@ -130,6 +153,13 @@
         :message="feedbackMessage"
         @close="closeFeedbackModal"
       />
+
+      <RestockModal
+        :open="isRestockModalOpen"
+        :product="selectedProductForRestock"
+        @close="isRestockModalOpen = false"
+        @restocked="handleRestocked"
+      />
     </div>
 </template>
 
@@ -142,9 +172,11 @@ import {
   PencilSquareIcon,
   TrashIcon,
   XMarkIcon,
+  ArrowPathIcon,
 } from '@heroicons/vue/24/outline';
 import { productService } from '~/api/product/ProductService';
 import ProductForm from '~/components/ProductForm.vue';
+import RestockModal from '~/components/RestockModal.vue';
 
 const router = useRouter();
 
@@ -159,6 +191,9 @@ const selectedProduct = ref<any>(null);
 const mode = ref<'create' | 'update'>('create');
 const isModalOpen = ref(false);
 const isLoading = ref(false);
+
+const isRestockModalOpen = ref(false);
+const selectedProductForRestock = ref<any>(null);
 
 const syncProductMetaWithTable = () => {
   if (!products.value?.meta || !products.value?.data) return;
@@ -204,7 +239,7 @@ const handleCreate = () => {
 };
 
 const handleView = (product: any) => {
-  router.push(`/product/${product.uuid}`);
+  router.push(`/admin/product/${product.uuid}`);
 };
 
 const handleEdit = (product: any) => {
@@ -251,5 +286,20 @@ const handleSubmitted = (data: {success: boolean, message: string, item?: any, a
     }
   }
   isModalOpen.value = false;
+};
+
+const handleRestock = (product: any) => {
+  selectedProductForRestock.value = product;
+  isRestockModalOpen.value = true;
+};
+
+const handleRestocked = (data: { success: boolean, message: string, product?: any }) => {
+  openFeedbackModal(data.message);
+  if (data.success && data.product) {
+    const index = products.value.data.findIndex(p => p.uuid === data.product.uuid);
+    if (index > -1) {
+      products.value.data[index] = data.product;
+    }
+  }
 };
 </script>

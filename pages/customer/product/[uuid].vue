@@ -72,8 +72,12 @@ const handleAdd = () => {
     alert.value = { variant: "error", message: "Product not found." };
     return;
   }
-  addItem(product.value, 1);
-  openFeedback("Item has been successfully added to the cart.");
+  try {
+    addItem(product.value, 1);
+    openFeedback("Item has been successfully added to the cart.");
+  } catch (error: any) {
+    alert.value = { variant: "error", message: error.message || "Failed to add item to cart." };
+  }
 };
 
 const handleBuyNow = async () => {
@@ -82,8 +86,12 @@ const handleBuyNow = async () => {
     alert.value = { variant: "error", message: "Product not found." };
     return;
   }
-  addItem(product.value, 1);
-  await navigateTo("/customer/checkout");
+  try {
+    addItem(product.value, 1);
+    await navigateTo("/customer/checkout");
+  } catch (error: any) {
+    alert.value = { variant: "error", message: error.message || "Failed to add item to cart." };
+  }
 };
 </script>
 
@@ -169,6 +177,17 @@ const handleBuyNow = async () => {
               </span>
             </div>
           </div>
+
+          <div class="mt-4">
+            <span 
+              :class="[
+                'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium',
+                product.quantity && product.quantity > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+              ]"
+            >
+              {{ product.quantity && product.quantity > 0 ? `${product.quantity} in stock` : 'Out of Stock' }}
+            </span>
+          </div>
         </div>
 
         <div class="grid gap-6 md:grid-cols-2">
@@ -202,7 +221,8 @@ const handleBuyNow = async () => {
         <div class="flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            class="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            :disabled="!product.quantity || product.quantity === 0"
+            class="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
             @click="handleAdd"
           >
             Add to Cart
@@ -210,7 +230,8 @@ const handleBuyNow = async () => {
 
           <button
             type="button"
-            class="flex-1 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            :disabled="!product.quantity || product.quantity === 0"
+            class="flex-1 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
             @click="handleBuyNow"
           >
             Buy Now

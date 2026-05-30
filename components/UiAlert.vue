@@ -7,7 +7,9 @@
         ? 'border-green-200 bg-green-50 text-green-800'
         : variant === 'error'
           ? 'border-red-200 bg-red-50 text-red-800'
-          : 'border-gray-200 bg-gray-50 text-gray-700'
+          : variant === 'warning'
+            ? 'border-yellow-200 bg-yellow-50 text-yellow-800'
+            : 'border-gray-200 bg-gray-50 text-gray-700'
     "
   >
     {{ message }}
@@ -15,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-type Variant = "success" | "error" | "info";
+type Variant = "success" | "error" | "info" | "warning";
 
 defineProps<{ message: string; variant?: Variant }>();
 </script>
