@@ -12,7 +12,9 @@
           @click="$emit('close')"
         />
 
-        <div class="relative z-10 w-full max-w-lg rounded-2xl bg-white shadow-2xl">
+        <div
+          class="relative z-10 w-full max-w-lg rounded-2xl bg-white shadow-2xl"
+        >
           <!-- Header -->
           <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
             <h2 class="text-lg font-semibold text-gray-900">
@@ -22,7 +24,9 @@
               type="button"
               class="rounded-md p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
               @click="$emit('close')"
-            >✕</button>
+            >
+              ✕
+            </button>
           </div>
 
           <!-- Form Body -->
@@ -30,49 +34,45 @@
             <div v-for="field in fields" :key="field.name" class="space-y-1">
               <label :for="'modal-' + field.name" class="text-sm font-medium text-gray-700">
                 {{ field.label }}
-                <span v-if="field.required" class="text-red-500 ml-0.5">*</span>
               </label>
 
-              <!-- Textarea -->
-              <textarea
-                v-if="field.type === 'textarea'"
-                v-model="formData[field.name]"
-                :id="'modal-' + field.name"
-                :required="field.required"
-                :placeholder="field.placeholder"
-                rows="3"
-                class="block w-full rounded-lg border px-4 py-2 text-sm shadow-sm transition focus:ring-1 resize-none"
-                :class="fieldErrors[field.name]
-                  ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:border-gray-900 focus:ring-gray-900'"
-                @input="clearError(field.name)"
-              />
+              <!-- Read-only display field (e.g. current stock) -->
+              <div
+                v-if="field.readonly"
+                class="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm"
+              >
+                <span class="font-semibold text-gray-800">{{ formData[field.name] ?? '—' }}</span>
+                <span class="text-xs text-gray-400 font-medium">(read-only)</span>
+              </div>
 
-              <!-- Regular input -->
-              <input
-                v-else
-                v-model="formData[field.name]"
-                :id="'modal-' + field.name"
-                :type="field.type || 'text'"
-                :required="field.required"
-                :placeholder="field.placeholder"
-                class="block w-full rounded-lg border px-4 py-2 text-sm shadow-sm transition focus:ring-1"
-                :class="fieldErrors[field.name]
-                  ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:border-gray-900 focus:ring-gray-900'"
-                @input="clearError(field.name)"
-              />
+              <!-- Normal editable input -->
+              <template v-else>
+                <textarea
+                  v-if="field.type === 'textarea'"
+                  v-model="formData[field.name]"
+                  :id="'modal-' + field.name"
+                  :required="field.required"
+                  :rows="field.rows || 4"
+                  class="block w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900 resize-none"
+                  :placeholder="field.placeholder"
+                />
+                <input
+                  v-else
+                  v-model="formData[field.name]"
+                  :id="'modal-' + field.name"
+                  :type="field.type || 'text'"
+                  :required="field.required"
+                  class="block w-full rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                  :placeholder="field.placeholder"
+                  @input="field.lettersOnly ? filterLetters(field.name, $event) : null"
+                />
+              </template>
 
-              <!-- Field error -->
-              <p v-if="fieldErrors[field.name]" class="text-xs text-red-600">
-                {{ fieldErrors[field.name] }}
+              <!-- Helper text -->
+              <p v-if="field.helper" class="flex items-center gap-1 text-xs font-medium text-indigo-600">
+                <span>ℹ</span> {{ field.helper }}
               </p>
             </div>
-
-            <!-- General error -->
-            <p v-if="generalError" class="rounded-lg bg-red-50 border border-red-100 px-4 py-2 text-sm text-red-600">
-              {{ generalError }}
-            </p>
 
             <!-- Footer -->
             <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
@@ -108,6 +108,10 @@ interface Field {
   type?: string;
   placeholder?: string;
   required?: boolean;
+  readonly?: boolean;
+  helper?: string;
+  rows?: number;
+  lettersOnly?: boolean;
 }
 
 const props = defineProps<{
@@ -128,58 +132,61 @@ const emit = defineEmits<{
 
 const formData = ref<any>({});
 const loading = ref(false);
-const fieldErrors = ref<Record<string, string>>({});
-const generalError = ref('');
+
+// Strips out anything that isn't a letter or space (for lettersOnly fields)
+const filterLetters = (fieldName: string, event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const cleaned = input.value.replace(/[^a-zA-Z\s]/g, '');
+  if (input.value !== cleaned) {
+    input.value = cleaned;
+    formData.value[fieldName] = cleaned;
+  }
+};
 
 const initForm = () => {
   const data: any = {};
   props.fields.forEach(field => {
-    data[field.name] = props.initialData?.[field.name] ?? '';
+    if (field.readonly) {
+      // Populate readonly fields from initialData for display only — not submitted
+      data[field.name] = props.initialData?.[field.name] ?? '';
+    } else {
+      data[field.name] = props.initialData?.[field.name] || '';
+    }
   });
   formData.value = data;
-  fieldErrors.value = {};
-  generalError.value = '';
 };
 
-watch(() => props.open, (val) => { if (val) initForm(); });
-watch(() => props.initialData, () => { if (props.open) initForm(); }, { deep: true });
+// Re-init form whenever modal opens or initialData changes
+watch(() => props.open, (val) => {
+  if (val) initForm();
+});
 
-const clearError = (fieldName: string) => {
-  fieldErrors.value[fieldName] = '';
-  generalError.value = '';
-};
+watch(() => props.initialData, () => {
+  if (props.open) initForm();
+}, { deep: true });
 
 const handleSubmit = async () => {
   loading.value = true;
-  fieldErrors.value = {};
-  generalError.value = '';
-
   try {
+    // Strip readonly fields — they are display-only and must not be submitted
+    const readonlyKeys = new Set(props.fields.filter(f => f.readonly).map(f => f.name));
+    const payload: any = {};
+    for (const key in formData.value) {
+      if (!readonlyKeys.has(key)) {
+        payload[key] = formData.value[key];
+      }
+    }
+
     if (props.isEdit && props.uuid) {
-      await props.service.update(props.uuid, formData.value);
+      await props.service.update(props.uuid, payload);
       emit('success', `${props.entityName} updated successfully!`);
     } else {
-      await props.service.create(formData.value);
+      await props.service.create(payload);
       emit('success', `${props.entityName} created successfully!`);
     }
     emit('close');
   } catch (err: any) {
-    // Laravel 422 validation errors
-    const errors = err?.response?.data?.errors || err?.data?.errors;
-    if (errors) {
-      const mapped: Record<string, string> = {};
-      Object.keys(errors).forEach(key => {
-        mapped[key] = Array.isArray(errors[key]) ? errors[key][0] : errors[key];
-      });
-      fieldErrors.value = mapped;
-    } else {
-      generalError.value =
-        err?.response?.data?.message ||
-        err?.data?.message ||
-        err?.message ||
-        `Failed to save ${props.entityName}`;
-      emit('error', generalError.value);
-    }
+    emit('error', err.message || `Failed to save ${props.entityName}`);
   } finally {
     loading.value = false;
   }
@@ -187,6 +194,13 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

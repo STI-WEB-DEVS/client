@@ -98,8 +98,8 @@
 <script setup>
 import { ref, provide } from 'vue'
 import { useRoute } from 'vue-router'
-import { AuthService } from '~/api/auth/AuthService'
-import { useCart } from '~/composables/useCart'
+import { AuthService } from '~/api/auth/AuthService.'
+import { useCart } from '~/composables/useCart.'
 
 const route = useRoute()
 const { cartCount } = useCart()

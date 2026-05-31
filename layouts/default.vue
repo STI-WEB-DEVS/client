@@ -162,7 +162,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import { useRoute, useRouter } from 'vue-router'
-import { AuthService } from '~/api/auth/AuthService'
+import { AuthService } from '~/api/auth/AuthService.'
 
 const route = useRoute()
 const router = useRouter()
@@ -171,7 +171,6 @@ const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
   { name: 'Customers', href: '/admin/customer', icon: UserGroupIcon },
   { name: 'Products', href: '/admin/product', icon: FolderIcon },
-  { name: 'Order Summary', href: '/admin/order/summary', icon: ChartPieIcon },
 ]
 
 const sidebarOpen = ref(false)

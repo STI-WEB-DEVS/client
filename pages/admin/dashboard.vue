@@ -131,7 +131,7 @@
                     index === 2 ? 'bg-orange-100 text-orange-700' : 'bg-gray-50 text-gray-400'
                   ]"
                 >
-                  0{{ index + 1 }}
+                  {{ String(Number(index) + 1).padStart(2, '0') }}
                 </div>
               </td>
               <td class="px-6 py-5 whitespace-nowrap text-sm font-bold text-gray-800">

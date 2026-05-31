@@ -123,7 +123,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { AuthService } from '~/api/auth/AuthService';
+import { AuthService } from '~/api/Auth/AuthService';
 
 definePageMeta({
   layout: false
