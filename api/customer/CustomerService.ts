@@ -10,7 +10,7 @@ class CustomerService extends BaseService {
         return CustomerService.instance;
     }
  
-    private resource = '/customers';
+    private resource = '/customer';
  
     async list(params: object = {}): Promise<any> {
         return await this.request(this.resource, 'GET', params);

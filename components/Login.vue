@@ -38,12 +38,13 @@
             </label>
             <div class="mt-2">
               <input
+                v-model="email"
                 type="email"
                 name="email"
                 id="email"
                 autocomplete="email"
                 required="true"
-                placeholder=""
+                placeholder=" "
                 class="block w-full rounded-md px-3 py-1.5 text-base sm:text-sm/6"
                 style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 10px; outline: none; padding: 0.75rem 1rem; font-size: 0.9rem; transition: border-color 0.2s, box-shadow 0.2s;"
                 onfocus="this.style.borderColor='#e74c3c'; this.style.boxShadow='0 0 0 3px rgba(231,76,60,0.15)'"
@@ -59,12 +60,13 @@
             </label>
             <div class="mt-2">
               <input
+                v-model="password"
                 type="password"
                 name="password"
-                id="password"
+              id="password"
                 autocomplete="current-password"
                 required="true"
-                placeholder=" "
+                placeholder=""
                 class="block w-full rounded-md px-3 py-1.5 text-base sm:text-sm/6"
                 style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 10px; outline: none; padding: 0.75rem 1rem; font-size: 0.9rem; transition: border-color 0.2s, box-shadow 0.2s;"
                 onfocus="this.style.borderColor='#e74c3c'; this.style.boxShadow='0 0 0 3px rgba(231,76,60,0.15)'"
@@ -164,51 +166,74 @@
   </div>
 </template>
 
+```ts
 <script setup lang="ts">
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
+
 definePageMeta({
   layout: false,
 });
- 
-import { ref } from "vue";
-import { AuthService } from "~/api/auth/AuthService";
- 
+
 const email = ref("");
 const password = ref("");
 const error = ref("");
-const isLoading = ref(false);
- 
+const loading = ref(false);
+
 const authService = new AuthService();
- 
+
 const handleSubmit = async () => {
+  if (loading.value) return;
+
   error.value = "";
-  isLoading.value = true;
- 
+  loading.value = true;
+
   try {
-    const response = await authService.login(email.value, password.value);
- 
+    const response = await authService.login(
+      email.value,
+      password.value
+    );
+
     if (response?.token) {
       localStorage.setItem("_token", response.token);
     }
- 
-    // // if (response?.user.customer_uuid) {
-    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
-    // // } else if (response?.user.uuid) {
-    // //   localStorage.setItem("_uuid", response.user.uuid);
-    // // }
- 
-    / /// if (response?.user.role) {
-    // //   localStorage.setItem("_role", response.user.role);
-    // // }
- 
-   //  await navigateTo("/admin/dashboard");
- 
-    await navigateTo(
-      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
-    );
+
+    if (response?.user?.customer_uuid) {
+      localStorage.setItem(
+        "_uuid",
+        response.user.customer_uuid
+      );
+    } else if (response?.user?.uuid) {
+      localStorage.setItem(
+        "_uuid",
+        response.user.uuid
+      );
+    }
+
+    if (response?.user?.role) {
+      localStorage.setItem(
+        "_role",
+        response.user.role
+      );
+    }
+
+await navigateTo("/admin/dashboard");
+await navigateTo("/customer/shops");
+
+await navigateTo(
+  response.user.role === "admin"
+    ? "/admin/dashboard"
+    : "/customer/shops"
+);
+
   } catch (err: any) {
-    error.value = err?.message || "";
+    error.value =
+      err?.response?.data?.message ||
+      err?.message ||
+      "Invalid credentials. Please try again.";
   } finally {
-    isLoading.value = false;
+    loading.value = false;
   }
 };
 </script>
+```
