@@ -77,16 +77,15 @@
             </label>
             <a href="#" class="text-xs text-[#c9a84c] hover:text-[#a07c3a] font-semibold transition-colors">Forgot password?</a>
           </div>
-
-          <button
-            type="submit"
-            class="w-full py-4 bg-[#1a1108] text-[#f5e6c8] font-bold text-sm tracking-[0.15em] uppercase rounded-lg hover:bg-[#2a1f0f] transition-all duration-200 flex items-center justify-center gap-3 group"
-          >
-            <span>Sign In to Atelier</span>
-            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </button>
+          
+<button
+  type="submit"
+  :disabled="isLoading"
+  class="w-full py-4 bg-[#1a1108] text-[#f5e6c8] font-bold text-sm tracking-[0.15em] uppercase rounded-lg hover:bg-[#2a1f0f] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-3 group"
+>
+  <span v-if="!isLoading">Sign In to Atelier</span>
+  <span v-else>Signing In...</span>
+</button>
         </form>
 
         <div class="mt-8 flex items-center gap-4">
@@ -117,52 +116,23 @@
   </div>
 </template>
 
-<script setup lang="ts">
-definePageMeta({
-  layout: false,
-});
- 
-import { ref } from "vue";
-import { AuthService } from "~/api/auth/AuthService";
- 
-const email = ref("");
-const password = ref("");
-const error = ref("");
-const isLoading = ref(false);
- 
-const authService = new AuthService();
- 
+<script setup>
+import { ref } from 'vue';
+
+const email = ref('');
+const password = ref('');
+const showPassword = ref(false);
+
+const features = [
+  'Job Order & Production Tracking',
+  'Client Measurement Profiles',
+  'Fabric & Inventory Monitoring',
+  'Fitting Appointment Scheduling',
+  'Revenue & Business Analytics',
+];
+
 const handleSubmit = async () => {
-  error.value = "";
-  isLoading.value = true;
- 
-  try {
-    const response = await authService.login(email.value, password.value);
- 
-    if (response?.token) {
-      localStorage.setItem("_token", response.token);
-    }
- 
-    // // if (response?.user.customer_uuid) {
-    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
-    // // } else if (response?.user.uuid) {
-    // //   localStorage.setItem("_uuid", response.user.uuid);
-    // // }
- 
-    / /// if (response?.user.role) {
-    // //   localStorage.setItem("_role", response.user.role);
-    // // }
- 
-    // await navigateTo("/admin/dashboard");
- 
-    await navigateTo(
-      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
-    );
-  } catch (err: any) {
-    error.value = err?.message || "";
-  } finally {
-    isLoading.value = false;
-  }
+  await navigateTo('/dashboard');
 };
 </script>
  

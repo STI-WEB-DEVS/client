@@ -9,6 +9,11 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "make:service": "node scripts/make-service.js"
+<<<<<<< HEAD
+=======
+
+    
+>>>>>>> 8ed19785 (Can Add Customer and Product)
   },
   
   "dependencies": {
