@@ -1,5 +1,9 @@
 <template>
   <div>
+    <!-- Render child pages (e.g. /admin/products, /admin/customers) -->
+    <NuxtPage v-if="$route.path !== '/admin'" />
+    <!-- Dashboard content: only shown on the /admin index page -->
+    <div v-else>
     <!-- Greeting banner -->
     <div class="nm-banner mb-6">
       <div>
@@ -127,6 +131,7 @@
         </div>
       </div>
     </div>
+    </div><!-- end v-else dashboard -->
   </div>
 </template>
 

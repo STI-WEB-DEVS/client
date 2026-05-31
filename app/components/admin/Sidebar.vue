@@ -22,7 +22,6 @@
     <div class="nm-sidebar-sep"/>
     <p class="nm-sidebar-label">Navigation</p>
 
-    <!-- 6 Navigation links -->
     <nav class="flex-1 py-1">
       <NuxtLink
         v-for="link in navLinks"
@@ -51,7 +50,6 @@
         </div>
       </div>
 
-      <!-- Sign Out — redirects to / (login) -->
       <NuxtLink
         to="/"
         class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg
@@ -72,6 +70,7 @@ import {
   HomeIcon,
   UsersIcon,
   UserGroupIcon,
+  ShoppingBagIcon,
   IdentificationIcon,
   Cog6ToothIcon,
   UserCircleIcon,
@@ -79,12 +78,13 @@ import {
 } from '@heroicons/vue/24/outline'
 
 const navLinks = [
-  { to: '/admin',       label: 'Dashboard',  icon: HomeIcon,              badge: null },
-  { to: '/teams',       label: 'Team',        icon: UsersIcon,             badge: '7'  },
-  { to: '/clients',     label: 'Clients',     icon: UserGroupIcon,         badge: null },
-  { to: '/dietitians',  label: 'Dietitians',  icon: IdentificationIcon,    badge: '1'  },
-  { to: '/settings',    label: 'Settings',    icon: Cog6ToothIcon,         badge: null },
-  { to: '/profile',     label: 'My Profile',  icon: UserCircleIcon,        badge: null },
+  { to: '/admin',             label: 'Dashboard',  icon: HomeIcon,           badge: null },
+  { to: '/admin/products',    label: 'Products',   icon: ShoppingBagIcon,    badge: null },
+  { to: '/admin/customers',   label: 'Customers',  icon: UserGroupIcon,      badge: null },
+  { to: '/teams',             label: 'Team',       icon: UsersIcon,          badge: '7'  },
+  { to: '/dietitians',        label: 'Dietitians', icon: IdentificationIcon, badge: '1'  },
+  { to: '/settings',          label: 'Settings',   icon: Cog6ToothIcon,      badge: null },
+  { to: '/profile',           label: 'My Profile', icon: UserCircleIcon,     badge: null },
 ]
 </script>
 
