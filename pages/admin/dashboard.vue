@@ -131,7 +131,7 @@
                     index === 2 ? 'bg-orange-100 text-orange-700' : 'bg-gray-50 text-gray-400'
                   ]"
                 >
-                  {{ String(Number(index) + 1).padStart(2, '0') }}
+                  0{{ index + 1 }}
                 </div>
               </td>
               <td class="px-6 py-5 whitespace-nowrap text-sm font-bold text-gray-800">
@@ -158,7 +158,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { 
   ChartBarIcon, 
   UserGroupIcon, 
@@ -185,6 +185,8 @@ const formatCurrency = (val: any) => {
   });
 };
 
+let refreshInterval: number | null = null;
+
 const fetchDashboardData = async () => {
   pending.value = true;
   error.value = null;
@@ -202,5 +204,15 @@ const fetchDashboardData = async () => {
   }
 };
 
-onMounted(fetchDashboardData);
+onMounted(() => {
+  fetchDashboardData();
+  refreshInterval = window.setInterval(fetchDashboardData, 15000);
+});
+
+onBeforeUnmount(() => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+  }
+});
 </script>

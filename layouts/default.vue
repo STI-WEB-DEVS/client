@@ -162,7 +162,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import { useRoute, useRouter } from 'vue-router'
-import { AuthService } from '~/api/auth/AuthService.'
+import { AuthService } from '~/api/auth/AuthService'
 
 const route = useRoute()
 const router = useRouter()

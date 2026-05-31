@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, inject } from 'vue'
 import { productsService } from '~/api/product/ProductsService'
-import { useCart } from '~/composables/useCart.'
+import { useCart } from '~/composables/useCart'
 
 definePageMeta({
   layout: 'customer'
@@ -166,4 +166,3 @@ const handleBuyNow = (product) => {
     </div>
   </section>
 </template>
-

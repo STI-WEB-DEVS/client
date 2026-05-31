@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { orderService } from '~/api/order/OrderService'
-import { AuthService } from '~/api/auth/AuthService.'
+import { AuthService } from '~/api/auth/AuthService'
 
 definePageMeta({
   layout: 'customer'
