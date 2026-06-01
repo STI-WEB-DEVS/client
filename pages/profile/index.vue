@@ -9,12 +9,12 @@
             <div class="flex flex-col sm:flex-row items-center gap-6">
               <img 
                 src="https://www.apple.com/leadership/images/bio/tim-cook_image.png.og.png" 
-                alt="Tom Cook" 
+                alt="Gio Matindo" 
                 class="w-24 h-24 rounded-full object-cover border border-gray-200 bg-gray-50"
               />
               
               <div class="text-center sm:text-left flex-1">
-                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Tom Cook</h1>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Gio Matindo</h1>
                 <p class="text-gray-500 font-medium">Chief Executive Officer</p>
                 <div class="mt-2 flex flex-wrap justify-center sm:justify-start gap-3">
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">

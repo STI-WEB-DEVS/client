@@ -86,9 +86,9 @@
 
             <Menu as="div" class="relative">
               <MenuButton class="-m-1.5 flex items-center p-1.5">
-                <img class="size-8 rounded-full bg-gray-50" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                <img class="size-8 rounded-full bg-gray-50" :src="`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Admin')}`" alt="" />
                 <span class="hidden lg:flex lg:items-center ml-4">
-                  <span class="text-sm font-semibold text-gray-900" aria-hidden="true">Tom Cook</span>
+                  <span class="text-sm font-semibold text-gray-900" aria-hidden="true">{{ user?.name || 'Admin' }}</span>
                   <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
                 </span>
               </MenuButton>
@@ -114,13 +114,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Dialog, DialogPanel, Menu, MenuButton, MenuItem, MenuItems, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { Bars3Icon, BellIcon, CalendarIcon, ChartPieIcon, Cog6ToothIcon, DocumentDuplicateIcon, FolderIcon, HomeIcon, UsersIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
+import { useAuthStore } from '~/stores/auth'
 
 const route = useRoute()
 const sidebarOpen = ref(false)
+const authStore = useAuthStore()
+
+// Load user data
+onMounted(() => {
+  authStore.loadUser()
+})
+
+const user = computed(() => authStore.currentUser)
 
 // Active link helper for Nuxt
 const isLinkActive = (href) => {
@@ -129,14 +138,9 @@ const isLinkActive = (href) => {
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/Dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Projects', href: '/project', icon: FolderIcon },
-  { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
-  { name: 'Documents', href: '/document', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '/reports', icon: ChartPieIcon },
-  { name: 'Customers', href: '/customers', icon: UsersIcon },
-  { name: 'Products', href: '/products', icon: FolderIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Customers', href: '/admin/customers', icon: UsersIcon },
+  { name: 'Products', href: '/admin/products', icon: FolderIcon },
 ]
 
 const userNavigation = [

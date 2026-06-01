@@ -4,8 +4,11 @@ export interface LoginResponse {
   token: string;
   user: {
     customer_uuid: string;
+    customer_id: number;
     uuid: string;
     role: string;
+    name: string;
+    email: string;
   };
 }
  

@@ -100,21 +100,29 @@
 import { ref, onMounted } from 'vue';
 import CustomerService from '@/api/customer/CustomerService';
 
-// Page States
+interface Customer {
+  id: number | string;
+  uuid?: string;
+  name: string;
+  email: string;
+  role?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 const showAddModal = ref(false);
 const showViewModal = ref(false);
-const selectedCustomer = ref(null);
-const customers = ref([]); // Start with an empty list
+const selectedCustomer = ref<Customer | null>(null);
 
-// Form State
+const customers = ref<Customer[]>([]); 
 const newCustomer = ref({ name: '', email: '' });
 
-// 1. Fetch data from backend on load
 const fetchCustomers = async () => {
   try {
     const response = await CustomerService.getAll();
-    // Assuming your BaseService/Backend returns data in a 'data' field or direct array
-    customers.value = response.data || response; 
+    customers.value = (response && typeof response === 'object' && 'data' in response) 
+      ? (response.data as Customer[]) 
+      : (response as Customer[]); 
   } catch (error) {
     console.error("Failed to fetch customers:", error);
   }
@@ -124,31 +132,42 @@ onMounted(() => {
   fetchCustomers();
 });
 
-// 2. View Details (Local state is fine here)
-const viewDetails = (customer: any) => {
+// View Details
+const viewDetails = (customer: Customer) => {
   selectedCustomer.value = customer;
   showViewModal.value = true;
 };
 
-// 3. Add Customer to Backend
+// Add Customer to Backend
 const addCustomer = async () => {
   if (newCustomer.value.name && newCustomer.value.email) {
     try {
-      await CustomerService.create(newCustomer.value);
+      const response = await CustomerService.create(newCustomer.value);
+      console.log('Customer created successfully:', response);
       
       // Refresh list and reset form
       await fetchCustomers();
       newCustomer.value = { name: '', email: '' };
       showAddModal.value = false;
-    } catch (error) {
-      alert("Error adding customer. Check console for details.");
-      console.error(error);
+      alert('Customer added successfully!');
+    } catch (error: any) {
+      console.error('Error adding customer:', error);
+      
+      // Extract error message
+      const errorMessage = error?.data?.message 
+        || error?.message 
+        || error?.response?.data?.message
+        || 'Unknown error occurred';
+      
+      alert(`Error adding customer: ${errorMessage}`);
     }
+  } else {
+    alert('Please fill in all fields');
   }
 };
 
-// 4. Delete from Backend
-const confirmDelete = async (id: number) => {
+// Delete from Backend
+const confirmDelete = async (id: number | string) => {
   if (!id) {
     alert("Error: Customer ID is undefined. Check your table binding.");
     return;
@@ -156,12 +175,13 @@ const confirmDelete = async (id: number) => {
 
   if (confirm("Are you sure you want to delete this customer?")) {
     try {
-      await CustomerService.deleteCustomer(id);
-      await fetchCustomers(); // Refresh the UI
+      // Use "as number" to reassure TypeScript that the runtime value fits your service method parameter
+      await CustomerService.deleteCustomer(id as number);
+
+      await fetchCustomers(); // Refresh the UI list
     } catch (error: any) {
-      // Log the full error to see if it's a 404 or something else
       console.error("Delete failed for ID " + id, error);
-      alert("Backend Error: " + error.message);
+      alert("Backend Error: " + (error.message || "Failed to execute delete action."));
     }
   }
 };

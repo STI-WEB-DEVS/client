@@ -30,17 +30,21 @@ export class BaseService {
     try {
       return await $fetch<T>(url, config);
     } catch (error: any) {
-      const status = error?.response?.status;
-      const message = error?.response?._data?.message || error?.data?.message || error?.message;
+      const status = error?.response?.status || error?.status;
+      const responseData = error?.response?._data || error?.data || {};
+      const message = responseData?.message 
+        || error?.response?._data?.error
+        || error?.data?.error
+        || error?.message;
       
-      switch (status) {
-        case 400: case 401: case 404: case 422: case 429:
-          throw new Error(message || "Validation or Request Error");
-        case 500:
-          throw new Error("Server error. Please try again.");
-        default:
-          throw new Error(message || "Something went wrong.");
-      }
+      console.error('API Error:', { status, message, error });
+      
+      // Create error object with data property to pass through custom error codes
+      const apiError: any = new Error(message || "Something went wrong.");
+      apiError.data = responseData;
+      apiError.status = status;
+      
+      throw apiError;
     }
   }
 

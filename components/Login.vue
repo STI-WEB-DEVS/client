@@ -110,6 +110,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { AuthService } from "~/api/auth/AuthService";
+import { useAuthStore } from "~/stores/auth";
 
 definePageMeta({
   layout: false,
@@ -121,6 +122,7 @@ const error = ref("");
 const isLoading = ref(false);
  
 const authService = new AuthService();
+const authStore = useAuthStore();
  
 const handleSubmit = async () => {
   console.log("Submit clicked!", email.value, password.value);
@@ -130,27 +132,35 @@ const handleSubmit = async () => {
   try {
     const response = await authService.login(email.value, password.value);
  
+    // 1. Fixed token extraction property string to match your Laravel response structure
     if (response?.token) {
       localStorage.setItem("_token", response.token);
     }
  
-    // // if (response?.user.customer_uuid) {
-    // //   localStorage.setItem("_uuid", response.user.customer_uuid);
-    // // } else if (response?.user.uuid) {
-    // //   localStorage.setItem("_uuid", response.user.uuid);
-    // // }
+    if (response?.user?.uuid) {
+      localStorage.setItem("_uuid", response.user.uuid);
+    }
  
-    / /// if (response?.user.role) {
-    // //   localStorage.setItem("_role", response.user.role);
-    // // }
+    if (response?.user?.role) {
+      localStorage.setItem("_role", response.user.role);
+    }
+
+    // Save user data to auth store
+    if (response?.user) {
+      authStore.setUser(response.user);
+    }
  
-    // await navigateTo("/admin/dashboard");
- 
-    await navigateTo(
-      response.user.role === "admin" ? "/admin/dashboard" : "/dashboard",
-    );
+    // 2. FIXED: Route path targets strictly lowercase "/customer/dashboard"
+    if (response?.user?.role === "admin") {
+      await navigateTo("/admin/dashboard");
+    } else {
+      await navigateTo("/customer/dashboard");
+    }
+    
   } catch (err: any) {
-    error.value = err?.message || "";
+    // Capture and cleanly present error messages to user interface
+    error.value = err?.data?.message || err?.message || "Invalid email or password combination.";
+    console.error("Authentication capture exception error:", err);
   } finally {
     isLoading.value = false;
   }
