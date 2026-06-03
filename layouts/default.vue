@@ -128,11 +128,11 @@ const sidebarOpen = ref(false)
 
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: "Customers", href: '/admin/customer', icon: UsersIcon },
+  { name: 'Products', href: '/admin/Product', icon: TagIcon },
   { name: 'Reservations', href: '/admin/bookings', icon: TicketIcon },
   { name: 'Travel Packages', href: '/admin/packages', icon: BriefcaseIcon },
   { name: 'Destinations', href: '/admin/destinations', icon: GlobeAmericasIcon },
-  { name: 'Special Promos', href: '/admin/promos', icon: TagIcon },
-  { name: 'Travel Agents', href: '/admin/team', icon: UsersIcon },
 ]
 const userNavigation = [
   { name: 'Your profile', href: '/admin/Profile' },
