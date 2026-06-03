@@ -89,7 +89,8 @@
                 <rect x="1" y="4" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/>
               </svg>
               <input
-                id="email"
+              v-model="email"
+              id="email"
                 type="email"
                 name="email"
                 autocomplete="email"
@@ -108,7 +109,8 @@
                 <path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
               <input
-                id="password"
+              v-model="password"
+              id="password"
                 type="password"
                 name="password"
                 autocomplete="current-password"

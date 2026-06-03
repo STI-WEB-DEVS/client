@@ -221,6 +221,8 @@ const route = useRoute()
 
 const navigation = [
   { name: 'Dashboard',       href: '/dashboard', icon: HomeIcon },
+  { name: 'Customers',       href: '/Customer', icon: UsersIcon },
+  { name: 'Products',        href: '/Product',   icon: BeakerIcon },
   { name: 'Blood Inventory', href: '/inventory',  icon: BeakerIcon },
   { name: 'Donors',          href: '/donors',     icon: UserGroupIcon },
   { name: 'Team',            href: '/team',       icon: UsersIcon },
