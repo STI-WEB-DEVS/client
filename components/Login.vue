@@ -11,14 +11,14 @@
           <div>
             <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
             <div class="mt-2">
-              <input type="email" name="email" id="email" autocomplete="email" required="" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6" />
+              <input v-model="email" type="email" name="email" id="email" autocomplete="email"  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6" />
             </div>
           </div>
 
           <div>
             <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
             <div class="mt-2">
-              <input type="password" name="password" id="password" autocomplete="current-password" required="" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6" />
+              <input v-model="password" type="password" name="password" id="password" autocomplete="current-password" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6" />
             </div>
           </div>
 
@@ -42,7 +42,8 @@
           </div>
 
           <div>
-            <button type="submit" class="flex w-full justify-center rounded-md bg-sky-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">Sign in</button>
+            <button type="submit" class="flex w-full justify-center 
+            rounded-md bg-sky-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">Sign in</button>
           </div>
         </form>
 
@@ -84,8 +85,48 @@
 </template>
 
 <script setup lang="ts">
-    const handleSubmit = async () => {
-    // Since there is no BE, we just trigger the redirect immediately
-    await navigateTo('/dashboard') 
+definePageMeta({
+  layout: false,
+});
+ 
+import { ref } from "vue";
+import { AuthService } from "~/api/auth/AuthService";
+ 
+const email = ref("");
+const password = ref("");
+const error = ref("");
+const isLoading = ref(false);
+ 
+const authService = new AuthService();
+ 
+const handleSubmit = async () => {
+  error.value = "";
+  isLoading.value = true;
+ 
+  try {
+    const response = await authService.login(email.value, password.value);
+ 
+    if (response?.token) {
+      localStorage.setItem("_token", response.token);
     }
+ 
+    if (response?.user.customer_uuid) {
+      localStorage.setItem("_uuid", response.user.customer_uuid);
+    } else if (response?.user.uuid) {
+      localStorage.setItem("_uuid", response.user.uuid);
+    }
+ 
+      if (response?.user.role) {
+      localStorage.setItem("_role", response.user.role);
+    }
+ 
+    await navigateTo(
+      response.user.role === "admin" ? "/admin/dashboard" : "/customer/Order",
+    );
+  } catch (err: any) {
+    error.value = err?.message || "";
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>

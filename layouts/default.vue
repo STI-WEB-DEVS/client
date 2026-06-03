@@ -123,19 +123,20 @@ import {
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 
 const route = useRoute()
-const router = useRouter()
 const sidebarOpen = ref(false)
 
-const handleSignOut = () => {
-  router.push('/')
-}
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Reservations', href: '/bookings', icon: TicketIcon },
-  { name: 'Travel Packages', href: '/packages', icon: BriefcaseIcon },
-  { name: 'Destinations', href: '/destinations', icon: GlobeAmericasIcon },
-  { name: 'Special Promos', href: '/promos', icon: TagIcon },
-  { name: 'Travel Agents', href: '/team', icon: UsersIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Reservations', href: '/admin/bookings', icon: TicketIcon },
+  { name: 'Travel Packages', href: '/admin/packages', icon: BriefcaseIcon },
+  { name: 'Destinations', href: '/admin/destinations', icon: GlobeAmericasIcon },
+  { name: 'Special Promos', href: '/admin/promos', icon: TagIcon },
+  { name: 'Travel Agents', href: '/admin/team', icon: UsersIcon },
 ]
+const userNavigation = [
+  { name: 'Your profile', href: '/admin/Profile' },
+  { name: 'Sign out', href: '/' },
+]
+
 </script>
