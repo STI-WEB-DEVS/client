@@ -1,200 +1,387 @@
 <template>
+  <div class="space-y-6 bg-[#F8FAFC] min-h-screen p-6">
 
-        <div class="mb-8">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h1 class="text-3xl font-bold text-[#2E4DA7] mb-2">Products</h1>
-                    <p class="text-gray-600">Manage and track all your products</p>
-                </div>
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-8">
 
-                <button @click="openAddModal"
-                    class="bg-[#2E4DA7] text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-                    + Add Product
-                </button>
-            </div>
-        </div>
+      <div>
+        <h1
+          class="text-4xl font-extrabold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent"
+        >
+          Products
+        </h1>
 
-        <!-- Search and Filter -->
-        <div class="mb-6 bg-white rounded-lg shadow-md p-4">
-            <div class="flex flex-col md:flex-row gap-4">
-                <div class="flex-1">
-                    <input v-model="searchQuery" type="text" placeholder="Search products..."
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2E4DA7]" />
-                </div>
-            </div>
-        </div>
+        <p class="text-slate-500 mt-2">
+        </p>
+      </div>
 
-        <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-lg shadow-md p-12 text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2E4DA7] mx-auto"></div>
-            <p class="text-gray-600 mt-4">Loading products...</p>
-        </div>
+      <button
+        @click="openAddModal"
+        class="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+      >
+        + Add Product
+      </button>
 
-        <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg shadow-md p-6">
-            <p class="text-red-800 font-semibold">Error loading products</p>
-            <p class="text-red-600 text-sm">{{ error }}</p>
-        </div>
+    </div>
 
-        <div v-else class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full">
+    <!-- SEARCH -->
+    <div
+      class="bg-white/80 backdrop-blur-md rounded-3xl border border-white shadow-xl p-5 mb-8"
+    >
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search products..."
+        class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+      />
+    </div>
 
-                    <thead class="bg-gray-50 border-b border-gray-200">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Product</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Price</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Created</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Actions</th>
-                        </tr>
-                    </thead>
+    <!-- LOADING -->
+    <div
+      v-if="loading"
+      class="bg-white rounded-3xl shadow-xl border border-slate-100 p-16 text-center"
+    >
+      <div
+        class="animate-spin h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto"
+      ></div>
 
-                    <tbody class="divide-y divide-gray-200">
+      <p class="text-slate-500 mt-5 font-medium">
+        Loading products...
+      </p>
+    </div>
 
-                        <tr v-for="product in filteredProducts" :key="product.uuid" class="hover:bg-gray-50 transition">
+    <!-- ERROR -->
+    <div
+      v-else-if="error"
+      class="bg-rose-50 border border-rose-200 rounded-3xl p-6 shadow-sm"
+    >
+      <p class="text-rose-600 font-semibold">
+        Error loading products
+      </p>
 
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
+      <p class="text-rose-500 text-sm mt-1">
+        {{ error }}
+      </p>
+    </div>
 
-                                    <div
-                                        class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold">
-                                        {{ product.name.charAt(0) }}
-                                    </div>
+    <!-- PRODUCT TABLE -->
+    <div
+      v-else
+      class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden"
+    >
 
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900">{{ product.name }}</p>
-                                    </div>
+      <div class="overflow-x-auto">
 
-                                </div>
-                            </td>
+        <table class="w-full">
 
-                            <td class="px-6 py-4 text-sm text-gray-600">
-                                ₱ {{ product.price }}
-                            </td>
+          <!-- TABLE HEADER -->
+          <thead
+            class="bg-gradient-to-r from-indigo-50 to-violet-50 text-slate-600 text-xs uppercase tracking-wider"
+          >
+            <tr>
+              <th class="text-left px-6 py-5 font-semibold">
+                Product
+              </th>
 
-                            <td class="px-6 py-4 text-sm text-gray-600">
-                                {{ formatDate(product.created_at) }}
-                            </td>
+              <th class="text-left px-6 py-5 font-semibold">
+                Price
+              </th>
 
-                            <td class="px-6 py-4 text-sm font-medium space-x-2">
+              <th class="text-left px-6 py-5 font-semibold">
+                Created
+              </th>
 
-                                <button @click="openViewModal(product)" class="text-blue-600 hover:text-blue-900">
-                                    View
-                                </button>
+              <th class="text-left px-6 py-5 font-semibold">
+                Actions
+              </th>
+            </tr>
+          </thead>
 
-                                <button @click="openEditModal(product)" class="text-green-600 hover:text-green-900">
-                                    Edit
-                                </button>
+          <!-- TABLE BODY -->
+          <tbody>
 
-                                <button @click="openDeleteConfirm(product)" class="text-red-600 hover:text-red-900">
-                                    Delete
-                                </button>
+            <tr
+              v-for="product in filteredProducts"
+              :key="product.uuid"
+              class="border-t border-slate-100 hover:bg-indigo-50/50 transition-all duration-200"
+            >
 
-                            </td>
+              <!-- PRODUCT -->
+              <td class="px-6 py-5">
 
-                        </tr>
+                <div class="flex items-center gap-4">
 
-                    </tbody>
+                  <div
+                    class="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center font-bold shadow-md"
+                  >
+                    {{ product.name.charAt(0).toUpperCase() }}
+                  </div>
 
-                </table>
-            </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">
+                      {{ product.name }}
+                    </p>
 
-            <div v-if="filteredProducts.length === 0" class="text-center py-12">
-                <p class="text-gray-600">No products found</p>
-            </div>
-
-        </div>
-
-        <!-- ADD / EDIT MODAL -->
-        <div v-if="showModal"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-
-            <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
-
-                <div class="flex justify-between items-center px-6 py-4 border-b">
-
-                    <h2 class="text-xl font-bold">
-                        {{ modalMode === 'add' ? 'Add Product' : 'Edit Product' }}
-                    </h2>
-
-                    <button @click="closeModal" class="text-gray-500 hover:text-gray-700">✕</button>
-
-                </div>
-
-                <form @submit.prevent="saveProduct" class="p-6 space-y-4">
-
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Product Name</label>
-                        <input v-model="formData.name" type="text" required
-                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2E4DA7]" />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Price</label>
-                        <input v-model="formData.price" type="number" required
-                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2E4DA7]" />
-                    </div>
-
-                    <div class="flex gap-2 pt-4">
-
-                        <button type="button" @click="closeModal"
-                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                            Cancel
-                        </button>
-
-                        <button type="submit" :disabled="saving"
-                            class="flex-1 px-4 py-2 bg-[#2E4DA7] text-white rounded-lg hover:bg-blue-700">
-                            {{ saving ? 'Saving...' : 'Save' }}
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-        </div>
-
-        <!-- VIEW MODAL -->
-        <div v-if="showViewModal"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-
-            <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
-
-                <div class="flex justify-between items-center px-6 py-4 border-b">
-                    <h2 class="text-xl font-bold">Product Details</h2>
-                    <button @click="closeViewModal">✕</button>
-                </div>
-
-                <div v-if="selectedProduct" class="p-6 space-y-4">
-
-                    <div class="flex items-center gap-4">
-                        <div
-                            class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-2xl font-semibold">
-                            {{ selectedProduct.name.charAt(0) }}
-                        </div>
-
-                        <div>
-                            <p class="text-lg font-bold">{{ selectedProduct.name }}</p>
-                            <p class="text-gray-600">₱ {{ selectedProduct.price }}</p>
-                        </div>
-                    </div>
-
-                    <div>
-                        <p class="text-sm text-gray-600">Created</p>
-                        <p>{{ formatDate(selectedProduct.created_at) }}</p>
-                    </div>
-
-                    <button @click="closeViewModal"
-                        class="w-full px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
-                        Close
-                    </button>
+                    <p class="text-xs text-slate-400">
+                      Product Item
+                    </p>
+                  </div>
 
                 </div>
 
+              </td>
+
+              <!-- PRICE -->
+              <td class="px-6 py-5">
+                <span
+                  class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-sm font-semibold"
+                >
+                  ₱ {{ product.price }}
+                </span>
+              </td>
+
+              <!-- DATE -->
+              <td class="px-6 py-5 text-slate-500 text-sm">
+                {{ formatDate(product.created_at) }}
+              </td>
+
+              <!-- ACTIONS -->
+              <td class="px-6 py-5">
+
+                <div class="flex flex-wrap gap-2">
+
+                  <button
+                    @click="openViewModal(product)"
+                    class="px-3 py-2 rounded-xl bg-indigo-50 text-indigo-600 font-medium hover:bg-indigo-100 transition"
+                  >
+                    View
+                  </button>
+
+                  <button
+                    @click="openEditModal(product)"
+                    class="px-3 py-2 rounded-xl bg-emerald-50 text-emerald-600 font-medium hover:bg-emerald-100 transition"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    @click="openDeleteConfirm(product)"
+                    class="px-3 py-2 rounded-xl bg-rose-50 text-rose-600 font-medium hover:bg-rose-100 transition"
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div
+        v-if="filteredProducts.length === 0"
+        class="py-20 text-center"
+      >
+
+        <div
+          class="w-20 h-20 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center"
+        >
+          <svg
+            class="w-10 h-10 text-slate-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"
+            />
+          </svg>
+        </div>
+
+        <h3 class="text-lg font-semibold text-slate-700">
+          No Products Found
+        </h3>
+
+        <p class="text-slate-500 mt-2">
+          Try adjusting your search or add a new product.
+        </p>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div
+        class="px-6 py-5 border-t border-slate-100 bg-slate-50 flex items-center justify-between"
+      >
+
+        <span class="text-sm text-slate-500">
+          Showing
+          <span class="font-semibold text-slate-700">
+            {{ filteredProducts.length }}
+          </span>
+          of
+          <span class="font-semibold text-slate-700">
+            {{ products.length }}
+          </span>
+          products
+        </span>
+
+      </div>
+
+    </div>
+
+    <!-- ADD / EDIT MODAL -->
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+      <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+
+        <div class="px-6 py-5 border-b flex justify-between items-center">
+          <h2 class="text-xl font-bold text-slate-800">
+            {{ modalMode === 'add' ? 'Add Product' : 'Edit Product' }}
+          </h2>
+
+          <button
+            @click="closeModal"
+            class="text-slate-400 hover:text-slate-700"
+          >
+            ✕
+          </button>
+        </div>
+
+        <form @submit.prevent="saveProduct" class="p-6 space-y-5">
+
+          <div>
+            <label class="block text-sm font-medium text-slate-600 mb-2">
+              Product Name
+            </label>
+
+            <input
+              v-model="formData.name"
+              type="text"
+              required
+              class="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-600 mb-2">
+              Price
+            </label>
+
+            <input
+              v-model="formData.price"
+              type="number"
+              required
+              class="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div class="flex gap-3 pt-2">
+
+            <button
+              type="button"
+              @click="closeModal"
+              class="flex-1 py-3 rounded-2xl border border-slate-200 hover:bg-slate-50"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              :disabled="saving"
+              class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold"
+            >
+              {{ saving ? 'Saving...' : 'Save Product' }}
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
+    <!-- VIEW MODAL -->
+    <div
+      v-if="showViewModal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+
+      <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+
+        <div class="px-6 py-5 border-b flex justify-between items-center">
+          <h2 class="text-xl font-bold text-slate-800">
+            Product Details
+          </h2>
+
+          <button
+            @click="closeViewModal"
+            class="text-slate-400 hover:text-slate-700"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div
+          v-if="selectedProduct"
+          class="p-6"
+        >
+
+          <div class="flex items-center gap-4 mb-6">
+
+            <div
+              class="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center text-xl font-bold"
+            >
+              {{ selectedProduct.name.charAt(0).toUpperCase() }}
             </div>
+
+            <div>
+              <h3 class="font-bold text-slate-800 text-lg">
+                {{ selectedProduct.name }}
+              </h3>
+
+              <p class="text-emerald-600 font-semibold">
+                ₱ {{ selectedProduct.price }}
+              </p>
+            </div>
+
+          </div>
+
+          <div class="space-y-4">
+
+            <div>
+              <p class="text-sm text-slate-500">Created Date</p>
+              <p class="font-medium text-slate-800">
+                {{ formatDate(selectedProduct.created_at) }}
+              </p>
+            </div>
+
+          </div>
+
+          <button
+            @click="closeViewModal"
+            class="w-full mt-6 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 font-medium"
+          >
+            Close
+          </button>
 
         </div>
 
+      </div>
+
+    </div>
+
+  </div>
 </template>
 
 <script setup lang="ts">

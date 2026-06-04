@@ -1,226 +1,365 @@
 <template>
-        <div class="mb-8">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h1 class="text-3xl font-bold text-[#2E4DA7] mb-2">Customers</h1>
-                    <p class="text-gray-600">Manage and track all your customer information</p>
-                </div>
-                <button @click="openAddModal" class="bg-[#2E4DA7] text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-                    + Add Customer
-                </button>
-            </div>
-        </div>
+  <div class="space-y-6 bg-[#F8FAFC] min-h-screen p-6">
 
-        <!-- Search and Filter -->
-        <div class="mb-6 bg-white rounded-lg shadow-md p-4">
-            <div class="flex flex-col md:flex-row gap-4">
-                <div class="flex-1">
-                    <input 
-                        v-model="searchQuery"
-                        type="text" 
-                        placeholder="Search customers by name or email..." 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2E4DA7]"
-                    />
-                </div>
-            </div>
-        </div>
+    <!-- HEADER -->
 
-        <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-lg shadow-md p-12 text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2E4DA7] mx-auto"></div>
-            <p class="text-gray-600 mt-4">Loading customers...</p>
-        </div>
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-8">
 
-        <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg shadow-md p-6">
-            <p class="text-red-800 font-semibold">Error loading customers</p>
-            <p class="text-red-600 text-sm">{{ error }}</p>
-        </div>
+      <div>
+        <h1
+          class="text-4xl font-extrabold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent"
+        >
+          Customers
+        </h1>
 
-        <div v-else class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-gray-200">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Customer</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Joined</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        <tr v-for="customer in filteredCustomers" :key="customer.uuid" class="hover:bg-gray-50 transition">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold">
-                                        {{ customer.name.charAt(0) }}
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900">{{ customer.name }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ customer.email }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ formatDate(customer.created_at) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                <button @click="openViewModal(customer)" class="text-blue-600 hover:text-blue-900 transition">View</button>
-                                <button @click="openEditModal(customer)" class="text-green-600 hover:text-green-900 transition">Edit</button>
-                                <button @click="openDeleteConfirm(customer)" class="text-red-600 hover:text-red-900 transition">Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <p class="text-slate-500 mt-2">
+        </p>
+      </div>
 
-            <!-- Empty State -->
-            <div v-if="filteredCustomers.length === 0" class="text-center py-12">
-                <p class="text-gray-600">No customers found</p>
-            </div>
+      <button
+        @click="openAddModal"
+        class="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+      >
+        + Add Customer
+      </button>
 
-            <!-- Pagination -->
-            <div v-if="filteredCustomers.length > 0" class="bg-white px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                <p class="text-sm text-gray-600">Showing {{ filteredCustomers.length }} of {{ customers.length }} customers</p>
-            </div>
-        </div>
+    </div>
 
-        <!-- Add/Edit Modal -->
-        <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
-                <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-900">{{ modalMode === 'add' ? 'Add New Customer' : 'Edit Customer' }}</h2>
-                    <button @click="closeModal" class="text-gray-500 hover:text-gray-700">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
+    <!-- SEARCH -->
+    <div
+      class="bg-white/80 backdrop-blur-md rounded-3xl border border-white shadow-xl p-5 mb-8"
+    >
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search customers by name or email..."
+        class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+      />
+    </div>
 
-                <form @submit.prevent="saveCustomer" class="p-6 space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Customer Name</label>
-                        <input 
-                            v-model="formData.name"
-                            type="text" 
-                            required
-                            placeholder="Enter customer name" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2E4DA7]"
-                        />
-                    </div>
+    <!-- LOADING -->
+    <div
+      v-if="loading"
+      class="bg-white rounded-3xl shadow-xl border border-slate-100 p-16 text-center"
+    >
+      <div
+        class="animate-spin h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto"
+      ></div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                        <input 
-                            v-model="formData.email"
-                            type="email" 
-                            required
-                            placeholder="Enter email address" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2E4DA7]"
-                        />
-                    </div>
+      <p class="text-slate-500 mt-5 font-medium">
+        Loading customers...
+      </p>
+    </div>
 
-                    <div class="flex gap-2 pt-4">
-                        <button 
-                            type="button"
-                            @click="closeModal"
-                            class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                        >
-                            Cancel
-                        </button>
-                        <button 
-                            type="submit"
-                            :disabled="saving"
-                            class="flex-1 px-4 py-2 bg-[#2E4DA7] text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-                        >
-                            {{ saving ? 'Saving...' : 'Save' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+    <!-- ERROR -->
+    <div
+      v-else-if="error"
+      class="bg-rose-50 border border-rose-200 rounded-3xl p-6 shadow-sm"
+    >
+      <p class="text-rose-600 font-semibold">
+        Error loading customers
+      </p>
 
-        <!-- View Modal -->
-        <div v-if="showViewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
-                <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-900">Customer Details</h2>
-                    <button @click="closeViewModal" class="text-gray-500 hover:text-gray-700">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
+      <p class="text-rose-500 text-sm mt-1">
+        {{ error }}
+      </p>
+    </div>
 
-                <div v-if="selectedCustomer" class="p-6 space-y-4">
-                    <div class="flex items-center space-x-4 pb-4 border-b border-gray-200">
-                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-2xl font-semibold">
-                            {{ selectedCustomer.name.charAt(0) }}
-                        </div>
-                        <div>
-                            <p class="text-lg font-bold text-gray-900">{{ selectedCustomer.name }}</p>
-                            <p class="text-sm text-gray-500">{{ selectedCustomer.email }}</p>
-                        </div>
-                    </div>
+    <!-- CUSTOMER TABLE -->
+    <div
+      v-else
+      class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden"
+    >
 
-                    <div>
-                        <p class="text-sm text-gray-600 font-medium">Email Address</p>
-                        <p class="text-gray-900">{{ selectedCustomer.email }}</p>
-                    </div>
+      <div class="overflow-x-auto">
 
-                    <div>
-                        <p class="text-sm text-gray-600 font-medium">Joined Date</p>
-                        <p class="text-gray-900">{{ formatDate(selectedCustomer.created_at) }}</p>
-                    </div>
+        <table class="w-full">
 
-                    <div class="pt-4 border-t border-gray-200">
-                        <button 
-                            @click="closeViewModal"
-                            class="w-full px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition"
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+          <!-- TABLE HEADER -->
+          <thead
+            class="bg-gradient-to-r from-indigo-50 to-violet-50 text-slate-600 text-xs uppercase tracking-wider"
+          >
+            <tr>
+              <th class="text-left px-6 py-5 font-semibold">
+                Customer
+              </th>
 
-        <!-- Delete Confirmation Modal -->
-        <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-lg max-w-sm w-full mx-4">
-                <div class="p-6">
-                    <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
-                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold text-center text-gray-900 mb-2">Delete Customer</h3>
-                    <p class="text-center text-gray-600 mb-6">
-                        Are you sure you want to delete <strong>{{ selectedCustomer?.name }}</strong>? This action cannot be undone.
+              <th class="text-left px-6 py-5 font-semibold">
+                Email
+              </th>
+
+              <th class="text-left px-6 py-5 font-semibold">
+                Joined
+              </th>
+
+              <th class="text-left px-6 py-5 font-semibold">
+                Actions
+              </th>
+            </tr>
+          </thead>
+
+          <!-- TABLE BODY -->
+          <tbody>
+
+            <tr
+              v-for="customer in filteredCustomers"
+              :key="customer.uuid"
+              class="border-t border-slate-100 hover:bg-indigo-50/50 transition-all duration-200"
+            >
+
+              <!-- CUSTOMER -->
+              <td class="px-6 py-5">
+
+                <div class="flex items-center gap-4">
+
+                  <div
+                    class="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center font-bold shadow-md"
+                  >
+                    {{ customer.name.charAt(0).toUpperCase() }}
+                  </div>
+
+                  <div>
+                    <p class="font-semibold text-slate-800">
+                      {{ customer.name }}
                     </p>
-                    <div class="flex gap-2">
-                        <button 
-                            @click="closeDeleteConfirm"
-                            class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                        >
-                            Cancel
-                        </button>
-                        <button 
-                            @click="deleteCustomer"
-                            :disabled="deleting"
-                            class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50"
-                        >
-                            {{ deleting ? 'Deleting...' : 'Delete' }}
-                        </button>
-                    </div>
+
+                    <p class="text-xs text-slate-400">
+                      Customer Account
+                    </p>
+                  </div>
+
                 </div>
-            </div>
+
+              </td>
+
+              <!-- EMAIL -->
+              <td class="px-6 py-5 text-slate-600">
+                {{ customer.email }}
+              </td>
+
+              <!-- DATE -->
+              <td class="px-6 py-5 text-slate-500 text-sm">
+                {{ formatDate(customer.created_at) }}
+              </td>
+
+              <!-- ACTIONS -->
+              <td class="px-6 py-5">
+
+                <div class="flex flex-wrap gap-2">
+
+                  <button
+                    @click="openViewModal(customer)"
+                    class="px-3 py-2 rounded-xl bg-indigo-50 text-indigo-600 font-medium hover:bg-indigo-100 transition"
+                  >
+                    View
+                  </button>
+
+                  <button
+                    @click="openEditModal(customer)"
+                    class="px-3 py-2 rounded-xl bg-emerald-50 text-emerald-600 font-medium hover:bg-emerald-100 transition"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    @click="openDeleteConfirm(customer)"
+                    class="px-3 py-2 rounded-xl bg-rose-50 text-rose-600 font-medium hover:bg-rose-100 transition"
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div
+        v-if="filteredCustomers.length === 0"
+        class="py-20 text-center"
+      >
+
+        <div
+          class="w-20 h-20 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center"
+        >
+          <svg
+            class="w-10 h-10 text-slate-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-4-4H11a4 4 0 00-4 4v2m10 0H7m10-10a4 4 0 11-8 0 4 4 0 018 0z"
+            />
+          </svg>
         </div>
 
-        <!-- Toast Notification -->
-        <div v-if="showToast" :class="[
-            'fixed bottom-4 right-4 px-6 py-4 rounded-lg text-white font-medium shadow-lg z-50 transition-all duration-300',
-            toastType === 'success' ? 'bg-green-500' : 'bg-red-500'
-        ]">
-            {{ toastMessage }}
+        <h3 class="text-lg font-semibold text-slate-700">
+          No Customers Found
+        </h3>
+
+        <p class="text-slate-500 mt-2">
+          Try adjusting your search or add a new customer.
+        </p>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div
+        class="px-6 py-5 border-t border-slate-100 bg-slate-50 flex items-center justify-between"
+      >
+
+        <span class="text-sm text-slate-500">
+          Showing
+          <span class="font-semibold text-slate-700">
+            {{ filteredCustomers.length }}
+          </span>
+          of
+          <span class="font-semibold text-slate-700">
+            {{ customers.length }}
+          </span>
+          customers
+        </span>
+
+      </div>
+
+    </div>
+
+    <!-- TOAST -->
+    <transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="translate-y-3 opacity-0"
+      enter-to-class="translate-y-0 opacity-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="showToast"
+        :class="[
+          'fixed top-6 right-6 px-6 py-4 rounded-2xl text-white shadow-2xl z-50',
+          toastType === 'success'
+            ? 'bg-emerald-500'
+            : 'bg-rose-500'
+        ]"
+      >
+        {{ toastMessage }}
+      </div>
+    </transition>
+
+        <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-2xl shadow-lg max-w-md w-full mx-4">
+
+        <div class="flex justify-between items-center px-6 py-4 border-b">
+          <h2 class="text-lg font-bold text-slate-800">
+            {{ modalMode === 'add' ? 'Add Customer' : 'Edit Customer' }}
+          </h2>
+          <button @click="closeModal" class="text-slate-500 hover:text-slate-700">✕</button>
         </div>
+
+        <form @submit.prevent="saveCustomer" class="p-6 space-y-4">
+
+          <div>
+            <label class="text-sm text-slate-600">Customer Name</label>
+            <input
+              v-model="formData.name"
+              type="text"
+              required
+              class="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#14B8A6]"
+            />
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-600">Price</label>
+            <input
+              v-model="formData.email"
+              type="email"
+              required
+              class="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#14B8A6]"
+            />
+          </div>
+
+          <div class="flex gap-2 pt-4">
+
+            <button
+              type="button"
+              @click="closeModal"
+              class="flex-1 px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              :disabled="saving"
+              class="flex-1 px-4 py-2 bg-[#14B8A6] text-white rounded-xl hover:bg-[#0d9488]"
+            >
+              {{ saving ? 'Saving...' : 'Save' }}
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
+    <!-- VIEW MODAL -->
+    <div v-if="showViewModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+      <div class="bg-white rounded-2xl shadow-lg max-w-md w-full mx-4">
+
+        <div class="flex justify-between items-center px-6 py-4 border-b">
+          <h2 class="text-lg font-bold text-slate-800">Customer Details</h2>
+          <button @click="closeViewModal" class="text-slate-500">✕</button>
+        </div>
+
+        <div v-if="selectedCustomer" class="p-6 space-y-4">
+
+          <div class="flex items-center gap-4">
+
+            <div
+              class="h-14 w-14 rounded-full bg-gradient-to-br from-[#14B8A6] to-[#0f766e] flex items-center justify-center text-white text-xl font-bold"
+            >
+              {{ selectedCustomer.name.charAt(0) }}
+            </div>
+
+            <div>
+              <p class="font-bold text-slate-800">{{ selectedCustomer.name }}</p>
+            </div>
+
+          </div>
+
+          <div>
+            <p class="text-sm text-slate-500">Created</p>
+            <p class="text-slate-800">{{ formatDate(selectedCustomer.created_at) }}</p>
+          </div>
+
+          <button
+            @click="closeViewModal"
+            class="w-full mt-4 px-4 py-2 bg-slate-100 rounded-xl hover:bg-slate-200"
+          >
+            Close
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -2,7 +2,6 @@
   <div class="min-h-screen bg-gray-50">
 
     <header class="border-b border-gray-200 bg-white">
-      ...
     </header>
 
     <main>
@@ -12,7 +11,6 @@
     </main>
 
     <footer class="border-t border-gray-200 bg-white">
-      ...
     </footer>
 
   </div>

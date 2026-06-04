@@ -133,7 +133,6 @@ const getTotal = () => {
 <template>
   <div>
 
-    <!-- HERO -->
     <section class="bg-white">
       <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
 
@@ -176,120 +175,148 @@ const getTotal = () => {
       </div>
     </section>
 
-    <!-- PRODUCTS MODAL -->
-    <div
-      v-if="showProductsModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-    >
-      <div class="w-full max-w-4xl rounded-2xl bg-white shadow-xl">
+<div
+  v-if="showProductsModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+>
+  <div class="w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl">
 
-        <!-- HEADER -->
-        <div class="flex items-center justify-between border-b p-5">
-          <h2 class="text-lg font-bold">Shop Products</h2>
+    <!-- HEADER -->
+    <div class="flex items-center justify-between border-b bg-white px-6 py-5">
+      <div>
+        <h2 class="text-xl font-semibold text-gray-900">Shop Products</h2>
+        <p class="text-sm text-gray-500">Select items and manage your cart</p>
+      </div>
 
-          <button @click="showProductsModal = false">
-            ✕
-          </button>
+      <button
+        @click="showProductsModal = false"
+        class="rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- BODY -->
+    <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-3">
+
+      <!-- PRODUCT LIST -->
+      <div class="md:col-span-2">
+        <div class="mb-3 flex items-center justify-between">
+          <h3 class="text-sm font-semibold text-gray-700">Products</h3>
         </div>
 
-        <!-- BODY -->
-        <div class="grid grid-cols-1 gap-4 p-5 md:grid-cols-2">
+        <div class="max-h-[460px] space-y-4 overflow-y-auto pr-2">
 
-          <!-- PRODUCT LIST -->
-          <div class="max-h-[420px] space-y-3 overflow-y-auto">
+          <div v-if="loadingProducts" class="py-10 text-center text-gray-500">
+            Loading products...
+          </div>
 
-            <div v-if="loadingProducts" class="text-center text-gray-500">
-              Loading...
+          <div
+            v-for="product in products"
+            :key="product.uuid"
+            class="group rounded-2xl border border-gray-100 bg-white p-4 transition hover:border-gray-200 hover:shadow-md"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-base font-semibold text-gray-900">
+                  {{ product.name }}
+                </p>
+                <p class="text-sm text-gray-500">
+                  ₱ {{ product.price }}
+                </p>
+              </div>
+
+              <div class="text-xs text-gray-400">
+                Stock item
+              </div>
             </div>
 
-            <div
-              v-for="product in products"
-              :key="product.uuid"
-              class="rounded-xl border p-4"
-            >
-              <p class="font-semibold">{{ product.name }}</p>
-              <p class="text-sm text-gray-500">₱ {{ product.price }}</p>
-
-              <div class="mt-3 flex items-center gap-2">
+            <div class="mt-4 flex items-center justify-between">
+              <div class="flex items-center gap-2">
                 <input
                   type="number"
                   min="0"
-                  class="w-24 rounded border px-2 py-1 text-center"
+                  class="w-24 rounded-xl border border-gray-200 px-3 py-2 text-center text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100"
                   :value="cart[product.uuid]?.quantity || 0"
                   @input="updateCart(product, Number(($event.target as HTMLInputElement).value))"
                 />
-
-                <span class="text-xs text-gray-400">
-                  0 = remove
-                </span>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- SUMMARY -->
-          <div class="rounded-xl border bg-gray-50 p-4">
-
-            <h3 class="font-semibold">Cart Summary</h3>
-
-            <div v-if="Object.keys(cart).length" class="mt-4 space-y-3">
-
-              <div
-                v-for="item in Object.values(cart)"
-                :key="item.product.uuid"
-                class="text-sm"
-              >
-                <p class="font-semibold">
-                  {{ item.product.name }}
-                </p>
-
-                <p>
-                  {{ item.quantity }} × ₱ {{ item.product.price }}
-                </p>
-
-                <p class="font-medium">
-                  ₱ {{ item.quantity * item.product.price }}
-                </p>
               </div>
 
-              <hr />
-
-              <p class="font-bold">
-                Total: ₱ {{ getTotal() }}
-              </p>
-
+              <span class="text-xs text-gray-400">
+                Set 0 to remove
+              </span>
             </div>
-
-            <div v-else class="mt-4 text-sm text-gray-500">
-              Cart is empty
-            </div>
-
           </div>
 
         </div>
-
-        <!-- ACTIONS -->
-        <div class="flex justify-end gap-3 border-t p-5">
-
-          <button
-            @click="showProductsModal = false"
-            class="rounded border px-4 py-2"
-          >
-            Cancel
-          </button>
-
-          <button
-            :disabled="loadingOrder"
-            @click="placeOrder"
-            class="rounded bg-green-600 px-4 py-2 text-white disabled:opacity-50"
-          >
-            {{ loadingOrder ? 'Placing...' : 'Place Order' }}
-          </button>
-
-        </div>
-
       </div>
+
+      <!-- SUMMARY -->
+      <div class="rounded-2xl border border-gray-100 bg-gray-50 p-5">
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-gray-800">Cart Summary</h3>
+          <p class="text-xs text-gray-500">Review your selected items</p>
+        </div>
+
+        <div v-if="Object.keys(cart).length" class="space-y-3">
+
+          <div
+            v-for="item in Object.values(cart)"
+            :key="item.product.uuid"
+            class="rounded-xl border bg-white p-3 shadow-sm"
+          >
+            <p class="text-sm font-medium text-gray-800">
+              {{ item.product.name }}
+            </p>
+
+            <p class="text-xs text-gray-500">
+              {{ item.quantity }} × ₱ {{ item.product.price }}
+            </p>
+
+            <p class="mt-1 text-sm font-semibold text-gray-900">
+              ₱ {{ item.quantity * item.product.price }}
+            </p>
+          </div>
+
+          <div class="border-t pt-3">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Total</span>
+              <span class="text-lg font-bold text-gray-900">
+                ₱ {{ getTotal() }}
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <div v-else class="py-10 text-center text-sm text-gray-500">
+          Your cart is empty
+        </div>
+      </div>
+
     </div>
 
+    <!-- ACTIONS -->
+    <div class="flex items-center justify-end gap-3 border-t bg-white px-6 py-5">
+
+      <button
+        @click="showProductsModal = false"
+        class="rounded-xl border border-gray-200 px-5 py-2 text-sm text-gray-700 transition hover:bg-gray-100"
+      >
+        Cancel
+      </button>
+
+      <button
+        :disabled="loadingOrder"
+        @click="placeOrder"
+        class="rounded-xl bg-green-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-50"
+      >
+        {{ loadingOrder ? 'Placing Order...' : 'Place Order' }}
+      </button>
+
+    </div>
+
+  </div>
+</div>
   </div>
 </template>

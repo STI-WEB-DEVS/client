@@ -52,7 +52,7 @@
     <div class="hidden bg-gray-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
       <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
         <div class="flex h-16 shrink-0 items-center">
-          <img class="h-16 w-auto" src="/Logo.png" alt="Your Company" />
+          <img class="h-16 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
         </div>
         <nav class="flex flex-1 flex-col">
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -99,9 +99,10 @@
               <MenuButton class="relative flex items-center">
                 <span class="absolute -inset-1.5"></span>
                 <span class="sr-only">Open user menu</span>
-                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" 
+                src="https://scontent.fdvo8-1.fna.fbcdn.net/v/t39.30808-1/669425178_1951637815715091_8242840325403852218_n.jpg?stp=dst-jpg_s100x100_tt6&_nc_cat=105&ccb=1-7&_nc_sid=e99d92&_nc_ohc=tt7eX5Ko8QIQ7kNvwGsQUYz&_nc_oc=AdrcHiD6wW5zqu1PzAOzLn0ACNPGI5dTpmXGmO2AoA5K-BvvjvcE1F8Izgip-PGvOqw&_nc_zt=24&_nc_ht=scontent.fdvo8-1.fna&_nc_gid=LTtkiDmLFH4HVE6SZPHj8w&_nc_ss=7a2a8&oh=00_Af9rzea2I9j19LygE1OX7GipRLsjPnH56YMe553tYR17ZA&oe=6A274580" alt="" />
                 <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Tom Cook</span>
+                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Princess Fernando</span>
                   <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
                 </span>
               </MenuButton>
@@ -159,10 +160,6 @@ const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
   { name: 'Customer', href: '/admin/Customer', icon: UsersIcon },
   { name: 'Products', href: '/admin/Products', icon: UsersIcon },
-  { name: 'Projects', href: '/admin/Projects', icon: FolderIcon },
-  { name: 'Calendar', href: '/admin/Calendar', icon: CalendarIcon },
-  { name: 'Documents', href: '/admin/Documents', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '/admin/Reports', icon: ChartPieIcon },
 
 ]
 
