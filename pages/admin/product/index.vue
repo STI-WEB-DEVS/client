@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <Heading
         title="Products"
@@ -134,7 +133,6 @@
         @close="feedback.open = false"
       />
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="space-y-6">
       <Heading
         title="Customers"
@@ -121,7 +120,6 @@
           </div>
         </div>
       </BaseModal>
-
       <FeedbackModal
         :open="feedback.open"
         :type="feedback.type"
@@ -130,7 +128,6 @@
         @close="feedback.open = false"
       />
     </div>
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
