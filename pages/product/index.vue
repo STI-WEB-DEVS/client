@@ -21,11 +21,7 @@
                     <table class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-semibold text-gray-500"
-                                >
-                                    ID
-                                </th>
+
                                 <th
                                     class="px-6 py-3 text-left text-xs font-semibold text-gray-500"
                                 >
@@ -36,16 +32,7 @@
                                 >
                                     Price
                                 </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-semibold text-gray-500"
-                                >
-                                    UUID
-                                </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-semibold text-gray-500"
-                                >
-                                    Created
-                                </th>
+
                                 <th
                                     class="px-6 py-3 text-left text-xs font-semibold text-gray-500"
                                 >
@@ -60,7 +47,6 @@
                                 :key="data.id"
                                 class="border-t hover:bg-gray-50"
                             >
-                                <td class="px-6 py-4">#{{ data.id }}</td>
 
                                 <td class="px-6 py-4 font-medium">
                                     {{ data.name }}
@@ -72,21 +58,6 @@
                                     ₱{{ data.price }}
                                 </td>
 
-                                <td class="px-6 py-4">
-                                    <code
-                                        class="text-xs bg-gray-100 px-2 py-1 rounded"
-                                    >
-                                        {{ data.uuid }}
-                                    </code>
-                                </td>
-
-                                <td class="px-6 py-4 text-gray-600">
-                                    {{
-                                        new Date(
-                                            data.created_at,
-                                        ).toLocaleString()
-                                    }}
-                                </td>
 
                                 <td class="px-6 py-4">
                                     <div class="flex gap-2">

@@ -134,10 +134,10 @@
                 <div
                     class="flex h-20 mt-3 shrink-0 items-center justify-center"
                 >
-                    <img
-                        class="h-[100px] w-auto"
-                        src="../assets/image/tempLogo.png"
-                        alt="Your Company"
+                <img
+                    class="h-8 w-auto"
+                    src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
+                    alt="Your Company"
                     />
                 </div>
                 <nav class="flex flex-1 flex-col">
@@ -222,13 +222,14 @@
                                 <div
                                     class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg"
                                 >
-                                    PS
+                                    MK
                                 </div>
                                 <span class="hidden lg:flex lg:items-center">
                                     <span
                                         class="ml-4 text-sm/6 font-semibold text-gray-900"
                                         aria-hidden="true"
-                                        >Prince Sestoso</span
+                                        >Mamale Kareem
+                                    </span
                                     >
                                     <ChevronDownIcon
                                         class="ml-2 size-5 text-gray-400"
@@ -310,13 +311,10 @@ const route = useRoute();
 
 const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
-    { name: "Services", href: "/service", icon: FolderIcon },
-    { name: "Patients", href: "/patient", icon: CalendarIcon },
-    { name: "Schedules", href: "/schedule", icon: ChartPieIcon },
-    { name: "Records", href: "/record", icon: DocumentDuplicateIcon },
-    { name: "Team", href: "/team", icon: UsersIcon },
-    { name: "Product", href: "/product", icon: UsersIcon },
+    { name: "Product", href: "/product", icon: FolderIcon },
     { name: "Customer", href: "/customer", icon: UsersIcon },
+
+
 ];
 
 const userNavigation = [

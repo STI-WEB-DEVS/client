@@ -5,6 +5,7 @@ export interface Product {
     uuid: string;
     name: string;
     price: number;
+    category_id?: string;
     created_at: string;
 }
 
@@ -18,30 +19,30 @@ class ProductService extends BaseService {
         return ProductService.instance;
     }
 
-    private resource = '/products';
+    private resource = "/products";
 
     async list(params: object = {}): Promise<any> {
-        return await this.request(this.resource, 'GET', params);
+        return await this.request(this.resource, "GET", params);
     }
 
     async create(payload: object): Promise<any> {
-        return await this.request(this.resource, 'POST', payload);
+        return await this.request(this.resource, "POST", payload);
     }
 
     async show(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'GET');
+        return await this.request(`${this.resource}/${uuid}`, "GET");
     }
 
     async update(uuid: string, payload: object): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'PUT', payload);
+        return await this.request(`${this.resource}/${uuid}`, "PUT", payload);
     }
 
     async delete(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}`, 'DELETE');
+        return await this.request(`${this.resource}/${uuid}`, "DELETE");
     }
 
     async restore(uuid: string): Promise<any> {
-        return await this.request(`${this.resource}/${uuid}/restore`, 'POST');
+        return await this.request(`${this.resource}/${uuid}/restore`, "POST");
     }
 }
 
