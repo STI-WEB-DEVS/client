@@ -6,7 +6,8 @@
         <div class="text-xl font-bold text-gray-900">
           My Store
         </div>
-
+ 
+        
         <div class="hidden items-center gap-8 text-sm font-medium text-gray-600 md:flex">
           <span>Shop</span>
           <span>Categories</span>
