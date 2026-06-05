@@ -68,14 +68,13 @@ import { useRoute, navigateTo } from '#app';
 
 // Navigation Definition - Updated to 8 links
 const navLinks = [
-  { name: 'Dashboard', path: '/dashboard', icon: '📊' },
-  { name: 'Parking Zones', path: '/zones', icon: '🗺️' },
-  { name: 'Real-time Occupancy', path: '/occupancy', icon: '📡' },
-  { name: 'Customers', path: '/customers', icon: '👥' },
-  { name: 'Products', path: '/products', icon: '📦' },
-  { name: 'Team Members', path: '/team', icon: '👔' },
-  { name: 'System Settings', path: '/settings', icon: '⚙️' },
-  { name: 'User Profile', path: '/profile', icon: '👤' }
+  { name: 'Dashboard', path: '/admin/dashboard', icon: '📊' },
+  { name: 'Parking Zones', path: '/admin/zones', icon: '🗺️' },
+  { name: 'Real-time Occupancy', path: '/admin/occupancy', icon: '📡' },
+  { name: 'Customers', path: '/admin/customers', icon: '👥' },
+  { name: 'Products', path: '/admin/products', icon: '📦' },
+  { name: 'System Settings', path: '/admin/settings', icon: '⚙️' },
+  { name: 'User Profile', path: '/admin/profile', icon: '👤' }
 ];
 
 const route = useRoute();
@@ -85,7 +84,7 @@ const currentRouteName = computed(() => {
 });
 
 const handleSignOut = () => {
-  navigateTo('/login');
+  navigateTo('/');
 };
 </script>
 
