@@ -1,146 +1,101 @@
 <template>
-  <div class="p-8 bg-[#FDFCFB] min-h-screen font-sans text-slate-900">
-    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+  <div class="min-h-screen bg-[#FDFCFB] p-8 font-sans text-slate-900">
+    <header class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
-        <h1 class="text-3xl font-black text-[#2D2424] tracking-tight">Furniture Products</h1>
-        <p class="text-gray-500 mt-1">Manage products, pricing, and stock availability.</p>
+        <h1 class="text-3xl font-black tracking-tight text-[#2D2424]">Furniture Products</h1>
+        <p class="mt-1 text-gray-500">Manage product details, pricing, and stock availability.</p>
       </div>
 
-      <div class="flex items-center gap-3">
-        <div class="relative">
-          <MagnifyingGlassIcon class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            v-model="search"
-            type="text"
-            placeholder="Search products..."
-            class="pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none w-64 transition-all"
-          />
-        </div>
-        <button
-          class="bg-[#5D4037] hover:bg-[#4E342E] text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center gap-2"
-          @click="openProductForm"
-        >
-          <PlusIcon class="w-5 h-5" />
-          <span>Add New Product</span>
-        </button>
-      </div>
+      <button class="flex items-center gap-2 rounded-xl bg-[#5D4037] px-5 py-3 text-sm font-bold text-white shadow-lg hover:bg-[#4E342E]" @click="openCreateForm">
+        <PlusIcon class="size-5" />
+        Add Product
+      </button>
     </header>
 
-    <div class="flex gap-4 mb-8 overflow-x-auto pb-2">
-      <button
-        v-for="cat in categories"
-        :key="cat"
-        :class="[
-          'px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all',
-          cat === selectedCategory ? 'bg-[#FFB300] text-[#2D2424]' : 'bg-white text-gray-500 border border-gray-200 hover:border-amber-500',
-        ]"
-        @click="selectedCategory = cat"
-      >
-        {{ cat }}
-      </button>
+    <div class="mb-6 rounded-xl border border-gray-200 bg-white p-4">
+      <div class="relative max-w-md">
+        <MagnifyingGlassIcon class="absolute left-3 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
+        <input v-model="search" type="text" placeholder="Search products..." class="w-full rounded-lg border border-gray-200 py-2.5 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-amber-500" />
+      </div>
     </div>
 
     <div v-if="errorMessage" class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
       {{ errorMessage }}
     </div>
 
-    <div v-if="isLoading" class="py-16 text-center text-sm font-bold text-gray-400">
+    <div v-if="isLoading" class="rounded-xl border border-gray-200 bg-white p-10 text-center text-sm font-bold text-gray-400">
       Loading products...
     </div>
 
-    <div v-else-if="filteredProducts.length === 0" class="py-16 text-center text-sm font-bold text-gray-400">
+    <div v-else-if="filteredProducts.length === 0" class="rounded-xl border border-gray-200 bg-white p-10 text-center text-sm font-bold text-gray-400">
       No products found.
     </div>
 
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-      <div
-        v-for="product in filteredProducts"
-        :key="product.uuid || product.id"
-        class="group bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300"
-      >
-        <div class="aspect-[4/3] bg-stone-100 relative overflow-hidden flex items-center justify-center">
-          <img
-            :src="product.image"
-            :alt="product.name"
-            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-          />
-          <div class="absolute inset-0 bg-[#5D4037]/10 group-hover:bg-transparent transition-colors"></div>
-
-          <div class="absolute top-4 left-4">
-            <span
-              :class="[
-                'px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm',
-                product.stock > 0 ? 'bg-white text-emerald-600' : 'bg-red-500 text-white',
-              ]"
-            >
-              {{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}
-            </span>
-          </div>
-        </div>
-
-        <div class="p-6">
-          <div class="flex justify-between items-start mb-2">
-            <div>
-              <p class="text-[10px] font-bold text-amber-600 uppercase tracking-widest">{{ product.category }}</p>
-              <h3 class="text-lg font-bold text-[#2D2424] leading-tight">{{ product.name }}</h3>
-            </div>
-            <p class="text-sm font-black text-[#2D2424]">{{ formatMoney(product.price) }}</p>
-          </div>
-
-          <p class="text-xs text-gray-500 line-clamp-2 mb-4">
-            Material: {{ product.material }}
-          </p>
-
-          <div class="flex items-center justify-between pt-4 border-t border-gray-50">
-            <div class="flex flex-col">
-              <span class="text-[9px] font-bold text-gray-400 uppercase leading-none">Quantity</span>
-              <span class="text-sm font-bold text-[#2D2424]">{{ product.stock }} units</span>
-            </div>
-            <div class="flex gap-2">
-              <button class="p-2 bg-gray-50 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all">
-                <PencilSquareIcon class="w-5 h-5" />
-              </button>
-              <button class="p-2 bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
-                <TrashIcon class="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div v-else class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-5 py-3 text-left text-xs font-black uppercase tracking-widest text-gray-400">Product</th>
+            <th class="px-5 py-3 text-left text-xs font-black uppercase tracking-widest text-gray-400">Description</th>
+            <th class="px-5 py-3 text-left text-xs font-black uppercase tracking-widest text-gray-400">Price</th>
+            <th class="px-5 py-3 text-left text-xs font-black uppercase tracking-widest text-gray-400">Stock</th>
+            <th class="px-5 py-3 text-right text-xs font-black uppercase tracking-widest text-gray-400">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr v-for="product in filteredProducts" :key="product.uuid">
+            <td class="px-5 py-4 text-sm font-bold text-gray-900">{{ product.name }}</td>
+            <td class="max-w-md px-5 py-4 text-sm text-gray-600">{{ product.description || 'No description' }}</td>
+            <td class="px-5 py-4 text-sm font-semibold text-gray-900">{{ formatMoney(product.price) }}</td>
+            <td class="px-5 py-4">
+              <span :class="['rounded-full px-3 py-1 text-xs font-bold', product.stock > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700']">
+                {{ product.stock > 0 ? `${product.stock} available` : 'Out of stock' }}
+              </span>
+            </td>
+            <td class="px-5 py-4">
+              <div class="flex justify-end gap-2">
+                <button class="rounded-lg bg-gray-50 p-2 text-gray-500 hover:bg-amber-50 hover:text-amber-700" @click="openEditForm(product)">
+                  <PencilSquareIcon class="size-5" />
+                </button>
+                <button class="rounded-lg bg-gray-50 p-2 text-gray-500 hover:bg-red-50 hover:text-red-700" @click="deleteProduct(product)">
+                  <TrashIcon class="size-5" />
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <div v-if="showProductForm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl border border-gray-100">
-        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-          <h2 class="text-lg font-black text-[#2D2424]">Add New Product</h2>
+      <div class="w-full max-w-lg rounded-2xl border border-gray-100 bg-white shadow-2xl">
+        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
+          <h2 class="text-lg font-black text-[#2D2424]">{{ editingProduct ? 'Edit Product' : 'Add Product' }}</h2>
           <button class="text-gray-400 hover:text-gray-700" @click="closeProductForm">
-            <XMarkIcon class="w-5 h-5" />
+            <XMarkIcon class="size-5" />
           </button>
         </div>
 
-        <form class="p-6 space-y-4" @submit.prevent="saveProduct">
+        <form class="space-y-4 p-6" @submit.prevent="saveProduct">
           <div>
-            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Product Name</label>
-            <input
-              v-model.trim="productForm.name"
-              type="text"
-              required
-              class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-amber-500"
-              placeholder="Example: Narra Dining Table"
-            />
+            <label class="mb-2 block text-xs font-black uppercase tracking-widest text-gray-400">Product Name</label>
+            <input v-model.trim="productForm.name" type="text" required class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-amber-500" placeholder="Example: Narra Table" />
           </div>
 
           <div>
-            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Price</label>
-            <input
-              v-model.number="productForm.price"
-              type="number"
-              min="0"
-              step="0.01"
-              required
-              class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-amber-500"
-              placeholder="0.00"
-            />
+            <label class="mb-2 block text-xs font-black uppercase tracking-widest text-gray-400">Description</label>
+            <textarea v-model.trim="productForm.description" rows="3" class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-amber-500" placeholder="Example: Handcrafted solid wood dining table"></textarea>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label class="mb-2 block text-xs font-black uppercase tracking-widest text-gray-400">Price</label>
+              <input v-model.number="productForm.price" type="number" min="0" step="0.01" required class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-amber-500" />
+            </div>
+            <div>
+              <label class="mb-2 block text-xs font-black uppercase tracking-widest text-gray-400">Stock</label>
+              <input v-model.number="productForm.stock" type="number" min="0" step="1" required class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-amber-500" />
+            </div>
           </div>
 
           <div v-if="formError" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
@@ -148,14 +103,10 @@
           </div>
 
           <div class="flex justify-end gap-3 pt-2">
-            <button type="button" class="px-5 py-3 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-50" @click="closeProductForm">
+            <button type="button" class="rounded-xl px-5 py-3 text-sm font-bold text-gray-500 hover:bg-gray-50" @click="closeProductForm">
               Cancel
             </button>
-            <button
-              type="submit"
-              class="px-5 py-3 rounded-xl text-sm font-bold text-white bg-[#5D4037] hover:bg-[#4E342E] disabled:opacity-60"
-              :disabled="isSaving"
-            >
+            <button type="submit" class="rounded-xl bg-[#5D4037] px-5 py-3 text-sm font-bold text-white hover:bg-[#4E342E] disabled:opacity-60" :disabled="isSaving">
               {{ isSaving ? 'Saving...' : 'Save Product' }}
             </button>
           </div>
@@ -166,96 +117,90 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
-  PlusIcon,
   MagnifyingGlassIcon,
   PencilSquareIcon,
+  PlusIcon,
   TrashIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { productService } from '~/api/product/ProductService'
 
-const defaultImage = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=500&auto=format&fit=crop'
-const seedProducts = [
-  {
-    id: 1,
-    name: 'Heritage Narra Table',
-    category: 'Dining',
-    price: 45000,
-    stock: 3,
-    material: 'Solid Narra Wood, Glossy Finish',
-    image: 'https://www.jahroc.com.au/wp-content/uploads/2014/10/Nara-Dining-Table-2400L-2-deep-etched.jpg',
-  },
-  {
-    id: 2,
-    name: 'Cloud Comfort Sofa',
-    category: 'Living Room',
-    price: 32500,
-    stock: 5,
-    material: 'Velvet Upholstery, Mahogany Base',
-    image: defaultImage,
-  },
-]
-
-const categories = ['All Works', 'Living Room', 'Bedroom', 'Dining', 'Office', 'Custom Orders']
 const products = ref([])
-const selectedCategory = ref('All Works')
 const search = ref('')
 const isLoading = ref(false)
 const isSaving = ref(false)
 const showProductForm = ref(false)
+const editingProduct = ref(null)
 const errorMessage = ref('')
 const formError = ref('')
-const productForm = ref({ name: '', price: null })
+const productForm = ref({ name: '', description: '', price: 0, stock: 0 })
+let refreshTimer = null
 
 const filteredProducts = computed(() => {
   const keyword = search.value.toLowerCase()
 
   return products.value.filter((product) => {
-    const matchesCategory = selectedCategory.value === 'All Works' || product.category === selectedCategory.value
-    const matchesSearch = product.name.toLowerCase().includes(keyword)
-
-    return matchesCategory && matchesSearch
+    return [product.name, product.description].some((value) => String(value || '').toLowerCase().includes(keyword))
   })
 })
 
-onMounted(fetchProducts)
+onMounted(() => {
+  fetchProducts()
+  refreshTimer = window.setInterval(() => fetchProducts(true), 10000)
+})
 
-async function fetchProducts() {
-  isLoading.value = true
+onBeforeUnmount(() => {
+  if (refreshTimer) {
+    window.clearInterval(refreshTimer)
+  }
+})
+
+async function fetchProducts(silent = false) {
+  if (!silent) {
+    isLoading.value = true
+  }
   errorMessage.value = ''
 
   try {
     const response = await productService.list()
-    const list = Array.isArray(response?.data) ? response.data : []
-    products.value = list.map(normalizeProduct)
-
-    if (products.value.length === 0) {
-      products.value = seedProducts
-    }
+    products.value = Array.isArray(response?.data) ? response.data.map(normalizeProduct) : []
   } catch (error) {
-    errorMessage.value = error.message || 'Unable to load products.'
-    products.value = seedProducts
+    if (!silent) {
+      errorMessage.value = error.message || 'Unable to load products.'
+    }
   } finally {
-    isLoading.value = false
+    if (!silent) {
+      isLoading.value = false
+    }
   }
 }
 
 function normalizeProduct(product) {
   return {
     ...product,
-    category: product.category || 'Custom Orders',
     price: Number(product.price || 0),
     stock: Number(product.stock || 0),
-    material: product.material || 'Product details pending',
-    image: product.image || defaultImage,
   }
 }
 
-function openProductForm() {
+function openCreateForm() {
+  editingProduct.value = null
   formError.value = ''
-  productForm.value = { name: '', price: null }
+  productForm.value = { name: '', description: '', price: 0, stock: 0 }
+  showProductForm.value = true
+}
+
+function openEditForm(product) {
+  editingProduct.value = product
+  formError.value = ''
+  productForm.value = {
+    name: product.name,
+    description: product.description || '',
+    price: Number(product.price || 0),
+    stock: Number(product.stock || 0),
+  }
   showProductForm.value = true
 }
 
@@ -263,23 +208,72 @@ function closeProductForm() {
   showProductForm.value = false
 }
 
+function validateForm() {
+  if (/\d/.test(productForm.value.name || '')) {
+    return 'Product name cannot contain numbers.'
+  }
+
+  if (/\d/.test(productForm.value.description || '')) {
+    return 'Description cannot contain numbers.'
+  }
+
+  if (Number(productForm.value.price) < 0) {
+    return 'Price cannot be negative.'
+  }
+
+  if (Number(productForm.value.stock) < 0) {
+    return 'Stock cannot be negative.'
+  }
+
+  return ''
+}
+
 async function saveProduct() {
+  const validationMessage = validateForm()
+
+  if (validationMessage) {
+    formError.value = validationMessage
+    return
+  }
+
   isSaving.value = true
   formError.value = ''
 
-  try {
-    const response = await productService.create({
-      name: productForm.value.name,
-      price: Number(productForm.value.price),
-    })
+  const payload = {
+    name: productForm.value.name,
+    description: productForm.value.description,
+    price: Number(productForm.value.price),
+    stock: Number(productForm.value.stock),
+  }
 
-    const created = response?.data || response
-    products.value = [normalizeProduct(created), ...products.value]
+  try {
+    const response = editingProduct.value
+      ? await productService.update(editingProduct.value.uuid, payload)
+      : await productService.create(payload)
+    const savedProduct = normalizeProduct(response?.data || response)
+
+    if (editingProduct.value) {
+      products.value = products.value.map((product) => product.uuid === savedProduct.uuid ? savedProduct : product)
+    } else {
+      products.value = [savedProduct, ...products.value]
+    }
+
     closeProductForm()
   } catch (error) {
     formError.value = error.message || 'Unable to save product.'
   } finally {
     isSaving.value = false
+  }
+}
+
+async function deleteProduct(product) {
+  if (!confirm(`Delete ${product.name}?`)) return
+
+  try {
+    await productService.delete(product.uuid)
+    products.value = products.value.filter((item) => item.uuid !== product.uuid)
+  } catch (error) {
+    errorMessage.value = error.message || 'Unable to delete product.'
   }
 }
 

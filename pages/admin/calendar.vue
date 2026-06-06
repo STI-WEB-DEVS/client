@@ -1,7 +1,5 @@
 <template>
-    <NuxtLayout>
-        <Calendar/>
-    </NuxtLayout>
+  <Calendar/>
 </template>
 
 

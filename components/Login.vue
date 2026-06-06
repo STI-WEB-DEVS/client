@@ -103,7 +103,7 @@ const handleSubmit = async () => {
       localStorage.setItem("_role", response.user?.role || "");
       localStorage.setItem("_customer_uuid", response.user?.customer_uuid || "");
 
-      const targetPath = "/dashboard";
+      const targetPath = response.user?.role === "customer" ? "/customer" : "/admin/dashboard";
       await navigateTo(targetPath);
     } else {
       throw new Error("Login failed: No token received.");

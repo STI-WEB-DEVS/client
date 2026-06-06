@@ -8,6 +8,10 @@ export interface LoginResponse {
     role: string;
   };
 }
+
+export interface LogoutResponse {
+  message: string;
+}
  
 export class AuthService extends BaseService {
   async login(email: string, password: string): Promise<LoginResponse> {
@@ -48,7 +52,36 @@ export class AuthService extends BaseService {
       }
     }
   }
-  async logout(): Promise<void> {
-    await this.request<void>("/logout", "DELETE");
+  async logout(): Promise<LogoutResponse> {
+    const runtimeConfig = useRuntimeConfig();
+    const token = localStorage.getItem("_token");
+
+    if (!token) {
+      throw new Error("Unauthenticated");
+    }
+
+    try {
+      const response = await $fetch.raw<LogoutResponse>("/logout", {
+        baseURL: runtimeConfig.public.apiBaseURL,
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status < 200 || response.status >= 300) {
+        throw new Error("Logout failed.");
+      }
+
+      return response._data as LogoutResponse;
+    } catch (error: any) {
+      const message =
+        error?.response?._data?.message ||
+        error?.data?.message ||
+        error?.message;
+
+      throw new Error(message || "Logout failed.");
+    }
   }
 }

@@ -35,10 +35,10 @@
                       </ul>
                     </li>
                     <li class="mt-auto">
-                      <a href="profile" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+                      <NuxtLink to="/admin/profile" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                         <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                         Settings
-                      </a>
+                      </NuxtLink>
                     </li>
                   </ul>
                 </nav>
@@ -67,10 +67,10 @@
               </ul>
             </li>
             <li class="mt-auto">
-              <a href="/settings" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
+              <NuxtLink to="/admin/settings" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
                 <Cog6ToothIcon class="size-6 shrink-0" aria-hidden="true" />
                 Settings
-              </a>
+              </NuxtLink>
             </li>
           </ul>
         </nav>
@@ -101,14 +101,17 @@
                 <span class="sr-only">Open user menu</span>
                 <img class="size-8 rounded-full bg-gray-50 outline outline-1 -outline-offset-1 outline-black/5" src="" alt="" />
                 <span class="hidden lg:flex lg:items-center">
-                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Justine Mantua</span>
+                  <span class="ml-4 text-sm/6 font-semibold text-gray-900" aria-hidden="true">Admin</span>
                   <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
                 </span>
               </MenuButton>
               <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
                 <MenuItems class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-1 outline-gray-900/5">
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
-                    <a :href="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</a>
+                    <button v-if="item.action === 'logout'" type="button" :class="[active ? 'bg-gray-50 outline-none' : '', 'block w-full px-3 py-1 text-left text-sm/6 text-gray-900']" @click="handleLogout">
+                      {{ item.name }}
+                    </button>
+                    <NuxtLink v-else :to="item.href" :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{ item.name }}</NuxtLink>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -128,6 +131,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { AuthService } from '~/api/auth/AuthService'
 import {
   Dialog,
   DialogPanel,
@@ -156,19 +160,35 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Team', href: '/team', icon: UsersIcon },
-  { name: 'Customers', href: '/customers', icon: UsersIcon },
-  { name: 'Products', href: '/products', icon: FolderIcon },
-  { name: 'Calendar', href: '/calendar', icon: CalendarIcon },
-  { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
-  { name: 'Reports', href: '/reports', icon: ChartPieIcon }, 
+  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
+  { name: 'Team', href: '/admin/team', icon: UsersIcon },
+  { name: 'Customers', href: '/admin/customers', icon: UsersIcon },
+  { name: 'Products', href: '/admin/products', icon: FolderIcon },
+  { name: 'Calendar', href: '/admin/calendar', icon: CalendarIcon },
+  { name: 'Documents', href: '/admin/documents', icon: DocumentDuplicateIcon },
+  { name: 'Reports', href: '/admin/reports', icon: ChartPieIcon }, 
 ]
 
 const userNavigation = [
-  { name: 'Your profile', href: '/profile' },
-  { name: 'Sign out', href: '/' },
+  { name: 'Your profile', href: '/admin/profile' },
+  { name: 'Sign out', href: '/', action: 'logout' },
 ]
 
 const sidebarOpen = ref(false)
+const authService = new AuthService()
+
+const clearLocalAuth = () => {
+  localStorage.clear()
+  sessionStorage.clear()
+}
+
+const handleLogout = async () => {
+  try {
+    await authService.logout()
+    clearLocalAuth()
+    await navigateTo('/')
+  } catch (error) {
+    console.warn('Logout request failed. Local session was not cleared.', error)
+  }
+}
 </script>

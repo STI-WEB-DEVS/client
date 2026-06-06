@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout>
   <div class="p-8 bg-[#FDFCFB] min-h-screen font-sans">
     <div class="relative mb-24">
       <div class="h-48 w-full bg-[#5D4037] rounded-[2.5rem] shadow-inner flex items-center justify-center overflow-hidden">
@@ -96,7 +95,6 @@
       </div>
     </div>
   </div>
-    </NuxtLayout>
 </template>
 
 <script setup>

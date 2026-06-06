@@ -1,5 +1,4 @@
 <template>
-    <NuxtLayout>
         <div class="p-8 bg-[#FDFCFB] min-h-screen font-sans">
     <header class="mb-10">
       <h1 class="text-3xl font-black text-[#2D2424] tracking-tight">System Settings</h1>
@@ -84,7 +83,6 @@
       </div>
     </div>
   </div>
-    </NuxtLayout>
 </template>
 
 <script setup>
