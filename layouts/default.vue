@@ -149,9 +149,10 @@ import {
   FolderIcon,
   HomeIcon,
   MapPinIcon,
+  UsersIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
+import { ChevronDownIcon, MagnifyingGlassIcon, ChartPieIcon } from '@heroicons/vue/20/solid'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -163,6 +164,8 @@ const navigation = [
   { name: 'Schedule', href: '/Schedule', icon: CalendarIcon },
   { name: 'Fare', href: '/Fare', icon: CurrencyDollarIcon },
   { name: 'News', href: '/News', icon: NewspaperIcon },
+  { name: 'Customer', href: '/Customer', icon: UsersIcon },
+  { name: 'Product', href: '/Product', icon: ChartPieIcon },
 ]
 
 const userNavigation = [
