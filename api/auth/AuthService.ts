@@ -6,6 +6,8 @@ export interface LoginResponse {
     customer_uuid: string;
     uuid: string;
     role: string;
+    email: string;
+    name: string;
   };
 }
  

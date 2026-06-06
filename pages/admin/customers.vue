@@ -2,22 +2,22 @@
   <NuxtLayout>
     <div>
       <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900">Products</h1>
-        <p class="mt-1 text-sm text-gray-500">Manage your care service products.</p>
+        <h1 class="text-2xl font-bold text-gray-900">Customers</h1>
+        <p class="mt-1 text-sm text-gray-500">Manage your registered customers.</p>
       </div>
 
-      <!-- Add Product Form -->
+      <!-- Add Customer Form -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4">{{ editMode ? 'Edit Product' : 'Add Product' }}</h2>
+        <h2 class="text-sm font-semibold text-gray-900 mb-4">{{ editMode ? 'Edit Customer' : 'Add Customer' }}</h2>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Product Name</label>
-            <input v-model="form.name" type="text" placeholder="e.g. Basic Care Package"
+            <label class="block text-xs font-medium text-gray-500 mb-1">Customer Name</label>
+            <input v-model="form.name" type="text" placeholder="e.g. Juan Dela Cruz"
               class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Price (₱)</label>
-            <input v-model="form.price" type="number" placeholder="0.00"
+            <label class="block text-xs font-medium text-gray-500 mb-1">Email</label>
+            <input v-model="form.email" type="email" placeholder="e.g. juan@email.com"
               class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
         </div>
@@ -25,7 +25,7 @@
           <button @click="handleSubmit" :disabled="submitting"
             class="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition"
             style="background: linear-gradient(135deg, #000000, #000000);">
-            {{ submitting ? 'Saving...' : editMode ? 'Update Product' : 'Add Product' }}
+            {{ submitting ? 'Saving...' : editMode ? 'Update Customer' : 'Add Customer' }}
           </button>
           <button v-if="editMode" @click="cancelEdit"
             class="px-6 py-2.5 rounded-xl text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition">
@@ -36,27 +36,26 @@
         <p v-if="formSuccess" class="text-green-600 text-xs mt-2">{{ formSuccess }}</p>
       </div>
 
-      <!-- Products Table -->
+      <!-- Customers Table -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 class="text-sm font-semibold text-gray-900">Products</h2>
-          <span class="text-xs text-gray-400">{{ products.length }} item(s)</span>
+          <h2 class="text-sm font-semibold text-gray-900">Customers</h2>
+          <span class="text-xs text-gray-400">{{ customers.length }} item(s)</span>
         </div>
 
         <div v-if="loading" class="p-8 text-center text-sm text-gray-400">Loading...</div>
 
         <ul v-else class="divide-y divide-gray-50">
-          <li v-for="product in products" :key="product.uuid"
+          <li v-for="customer in customers" :key="customer.uuid"
             class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition">
             <div>
-              <p class="text-sm font-semibold text-gray-900">{{ product.name }}</p>
-              <p class="text-xs text-gray-400 mt-0.5">{{ product.uuid }}</p>
+              <p class="text-sm font-semibold text-gray-900">{{ customer.name }}</p>
+              <p class="text-xs text-gray-400 mt-0.5">{{ customer.email }}</p>
             </div>
             <div class="flex items-center gap-4">
-              <span class="text-sm font-bold text-blue-700">₱{{ Number(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 }) }}</span>
-              <button @click="viewProduct(product)" class="text-xs text-gray-500 hover:text-gray-700">View</button>
-              <button @click="editProduct(product)" class="text-xs text-blue-600 hover:text-blue-800">Edit</button>
-              <button @click="deleteProduct(product.uuid)" class="text-xs text-red-500 hover:text-red-700">Delete</button>
+              <button @click="viewCustomer(customer)" class="text-xs text-gray-500 hover:text-gray-700">View</button>
+              <button @click="editCustomer(customer)" class="text-xs text-blue-600 hover:text-blue-800">Edit</button>
+              <button @click="deleteCustomer(customer.uuid)" class="text-xs text-red-500 hover:text-red-700">Delete</button>
             </div>
           </li>
         </ul>
@@ -66,17 +65,17 @@
       <div v-if="viewModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
         <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
           <div class="flex justify-between items-center mb-4">
-            <h3 class="text-base font-bold text-gray-900">Product Details</h3>
+            <h3 class="text-base font-bold text-gray-900">Customer Details</h3>
             <button @click="viewModal = false" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
           </div>
           <div class="space-y-3">
             <div>
-              <p class="text-xs text-gray-400">Product Name</p>
+              <p class="text-xs text-gray-400">Customer Name</p>
               <p class="text-sm font-semibold text-gray-900">{{ selected?.name }}</p>
             </div>
             <div>
-              <p class="text-xs text-gray-400">Price</p>
-              <p class="text-sm font-bold text-blue-700">₱{{ Number(selected?.price).toLocaleString('en-PH', { minimumFractionDigits: 2 }) }}</p>
+              <p class="text-xs text-gray-400">Email</p>
+              <p class="text-sm text-gray-700">{{ selected?.email }}</p>
             </div>
             <div>
               <p class="text-xs text-gray-400">UUID</p>
@@ -84,7 +83,7 @@
             </div>
           </div>
           <div class="flex gap-3 mt-6">
-            <button @click="editProduct(selected)" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white" style="background: linear-gradient(135deg, #000000, #000000);">Edit</button>
+            <button @click="editCustomer(selected)" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white" style="background: linear-gradient(135deg, #000000, #000000);">Edit</button>
             <button @click="viewModal = false" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-gray-600 bg-gray-100">Close</button>
           </div>
         </div>
@@ -97,7 +96,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 
-const products = ref<any[]>([]);
+const customers = ref<any[]>([]);
 const loading = ref(true);
 const submitting = ref(false);
 const editMode = ref(false);
@@ -107,7 +106,7 @@ const formError = ref("");
 const formSuccess = ref("");
 const editUuid = ref("");
 
-const form = ref({ name: "", price: "" });
+const form = ref({ name: "", email: "" });
 
 const runtimeConfig = useRuntimeConfig();
 const token = localStorage.getItem("_token");
@@ -117,11 +116,11 @@ const headers = {
   Accept: "application/json",
 };
 
-const fetchProducts = async () => {
+const fetchCustomers = async () => {
   loading.value = true;
   try {
-    const data = await $fetch<any>("products", { baseURL: runtimeConfig.public.apiBaseURL, headers });
-    products.value = data.data || data;
+    const data = await $fetch<any>("customers", { baseURL: runtimeConfig.public.apiBaseURL, headers });
+    customers.value = data.data || data;
   } catch (e) {
     console.error(e);
   } finally {
@@ -132,33 +131,33 @@ const fetchProducts = async () => {
 const handleSubmit = async () => {
   formError.value = "";
   formSuccess.value = "";
-  if (!form.value.name || !form.value.price) {
+  if (!form.value.name || !form.value.email) {
     formError.value = "Please fill in all fields.";
     return;
   }
   submitting.value = true;
   try {
     if (editMode.value) {
-      await $fetch(`products/${editUuid.value}`, {
+      await $fetch(`customers/${editUuid.value}`, {
         baseURL: runtimeConfig.public.apiBaseURL,
         method: "PUT",
         headers,
         body: form.value,
       });
-      formSuccess.value = "Product updated successfully!";
+      formSuccess.value = "Customer updated successfully!";
     } else {
-      await $fetch("products", {
+      await $fetch("customers", {
         baseURL: runtimeConfig.public.apiBaseURL,
         method: "POST",
         headers,
         body: form.value,
       });
-      formSuccess.value = "Product added successfully!";
+      formSuccess.value = "Customer added successfully!";
     }
-    form.value = { name: "", price: "" };
+    form.value = { name: "", email: "" };
     editMode.value = false;
     editUuid.value = "";
-    await fetchProducts();
+    await fetchCustomers();
   } catch (e: any) {
     formError.value = e?.message || "Something went wrong.";
   } finally {
@@ -166,39 +165,39 @@ const handleSubmit = async () => {
   }
 };
 
-const editProduct = (product: any) => {
-  form.value = { name: product.name, price: product.price };
-  editUuid.value = product.uuid;
+const editCustomer = (customer: any) => {
+  form.value = { name: customer.name, email: customer.email };
+  editUuid.value = customer.uuid;
   editMode.value = true;
   viewModal.value = false;
 };
 
 const cancelEdit = () => {
-  form.value = { name: "", price: "" };
+  form.value = { name: "", email: "" };
   editMode.value = false;
   editUuid.value = "";
   formError.value = "";
   formSuccess.value = "";
 };
 
-const viewProduct = (product: any) => {
-  selected.value = product;
+const viewCustomer = (customer: any) => {
+  selected.value = customer;
   viewModal.value = true;
 };
 
-const deleteProduct = async (uuid: string) => {
-  if (!confirm("Are you sure you want to delete this product?")) return;
+const deleteCustomer = async (uuid: string) => {
+  if (!confirm("Are you sure you want to delete this customer?")) return;
   try {
-    await $fetch(`products/${uuid}`, {
+    await $fetch(`customers/${uuid}`, {
       baseURL: runtimeConfig.public.apiBaseURL,
       method: "DELETE",
       headers,
     });
-    await fetchProducts();
+    await fetchCustomers();
   } catch (e: any) {
-    alert("Failed to delete product.");
+    alert("Failed to delete customer.");
   }
 };
 
-onMounted(fetchProducts);
+onMounted(fetchCustomers);
 </script>

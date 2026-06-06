@@ -1,282 +1,80 @@
-```vue
 <template>
   <NuxtLayout>
-    <div class="min-h-screen bg-[#0d0608] p-8">
-
-      <!-- HEADER -->
+    <div>
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-white">
-          Orders
-        </h1>
-
-        <p class="mt-2 text-sm text-gray-400">
-          View all customer orders
-        </p>
+        <h1 class="text-2xl font-bold text-gray-900">Orders</h1>
+        <p class="mt-1 text-sm text-gray-500">View all customer orders.</p>
       </div>
 
-      <!-- ORDERS TABLE -->
-      <div
-        class="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl"
-      >
-        <div
-          class="flex items-center justify-between border-b border-white/10 px-6 py-5"
-        >
-          <h2 class="font-semibold text-white">
-            Customer Orders
-          </h2>
-
-          <span
-            class="rounded-full bg-red-500/20 px-3 py-1 text-xs text-red-300"
-          >
-            {{ orders.length }} Order(s)
-          </span>
+      <!-- Orders Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-gray-900">Orders</h2>
+          <span class="text-xs text-gray-400">{{ orders.length }} item(s)</span>
         </div>
 
-        <!-- LOADING -->
-        <div
-          v-if="loading"
-          class="p-12 text-center text-gray-400"
-        >
-          Loading orders...
-        </div>
+        <div v-if="loading" class="p-8 text-center text-sm text-gray-400">Loading...</div>
 
-        <!-- EMPTY -->
-        <div
-          v-else-if="orders.length === 0"
-          class="p-12 text-center text-gray-400"
-        >
+        <div v-else-if="orders.length === 0" class="p-8 text-center text-sm text-gray-400">
           No orders yet.
         </div>
 
-        <!-- ORDERS -->
-        <ul
-          v-else
-          class="divide-y divide-white/5"
-        >
-          <li
-            v-for="order in orders"
-            :key="order.uuid"
-            class="flex items-center justify-between px-6 py-5 transition hover:bg-white/5"
-          >
-            <div class="flex items-center gap-4">
-
-              <div
-                class="flex h-12 w-12 items-center justify-center rounded-full text-white font-bold"
-                style="background:linear-gradient(135deg,#c0392b,#e74c3c)"
-              >
-                #
-              </div>
-
-              <div>
-                <p class="font-semibold text-white">
-                  Order #{{ order.id }}
-                </p>
-
-                <p class="mt-1 text-xs text-gray-500 break-all">
-                  {{ order.uuid }}
-                </p>
-
-                <p class="mt-1 text-xs text-gray-400">
-                  {{
-                    new Date(order.created_at).toLocaleDateString(
-                      'en-PH',
-                      {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      }
-                    )
-                  }}
-                </p>
-              </div>
+        <ul v-else class="divide-y divide-gray-50">
+          <li v-for="order in orders" :key="order.uuid"
+            class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition">
+            <div>
+              <p class="text-sm font-semibold text-gray-900">Order #{{ order.id }}</p>
+              <p class="text-xs text-gray-400 mt-0.5">{{ order.uuid }}</p>
+              <p class="text-xs text-gray-400 mt-0.5">{{ new Date(order.created_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' }) }}</p>
             </div>
-
             <div class="flex items-center gap-4">
-
-              <span
-                class="text-lg font-bold text-red-400"
-              >
-                ₱{{
-                  Number(order.total_amount).toLocaleString(
-                    'en-PH',
-                    {
-                      minimumFractionDigits: 2
-                    }
-                  )
-                }}
-              </span>
-
-              <button
-                @click="viewOrder(order)"
-                class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs text-gray-300 hover:bg-white/10"
-              >
-                View
-              </button>
-
-              <button
-                @click="deleteOrder(order.uuid)"
-                class="rounded-xl px-4 py-2 text-xs font-semibold text-white"
-                style="background:linear-gradient(135deg,#b91c1c,#ef4444)"
-              >
-                Delete
-              </button>
-
+              <span class="text-sm font-bold text-blue-700">₱{{ Number(order.total_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 }) }}</span>
+              <button @click="viewOrder(order)" class="text-xs text-gray-500 hover:text-gray-700">View</button>
+              <button @click="deleteOrder(order.uuid)" class="text-xs text-red-500 hover:text-red-700">Delete</button>
             </div>
           </li>
         </ul>
       </div>
 
-      <!-- VIEW MODAL -->
-      <div
-        v-if="viewModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-      >
-        <div
-          class="w-full max-w-xl rounded-3xl border border-white/10 bg-[#12090c] p-8 shadow-2xl"
-        >
-
-          <div class="mb-6 flex items-center justify-between">
-            <h3 class="text-xl font-bold text-white">
-              Order Details
-            </h3>
-
-            <button
-              @click="viewModal = false"
-              class="text-2xl text-gray-400 hover:text-white"
-            >
-              ×
-            </button>
+      <!-- View Modal -->
+      <div v-if="viewModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-base font-bold text-gray-900">Order Details</h3>
+            <button @click="viewModal = false" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
           </div>
-
-          <div class="space-y-5">
-
+          <div class="space-y-3">
             <div>
-              <p class="text-xs uppercase tracking-wider text-gray-500">
-                Order ID
-              </p>
-
-              <p class="mt-1 text-white font-semibold">
-                #{{ selected?.id }}
-              </p>
+              <p class="text-xs text-gray-400">Order ID</p>
+              <p class="text-sm font-semibold text-gray-900">#{{ selected?.id }}</p>
             </div>
-
             <div>
-              <p class="text-xs uppercase tracking-wider text-gray-500">
-                UUID
-              </p>
-
-              <p class="mt-1 break-all text-gray-300">
-                {{ selected?.uuid }}
-              </p>
+              <p class="text-xs text-gray-400">UUID</p>
+              <p class="text-xs text-gray-400 break-all">{{ selected?.uuid }}</p>
             </div>
-
             <div>
-              <p class="text-xs uppercase tracking-wider text-gray-500">
-                Customer ID
-              </p>
-
-              <p class="mt-1 text-white">
-                {{ selected?.customer_id }}
-              </p>
+              <p class="text-xs text-gray-400">Customer ID</p>
+              <p class="text-sm text-gray-700">{{ selected?.customer_id }}</p>
             </div>
-
             <div>
-              <p class="text-xs uppercase tracking-wider text-gray-500">
-                Total Amount
-              </p>
-
-              <p class="mt-1 text-2xl font-bold text-red-400">
-                ₱{{
-                  Number(selected?.total_amount).toLocaleString(
-                    'en-PH',
-                    {
-                      minimumFractionDigits: 2
-                    }
-                  )
-                }}
-              </p>
+              <p class="text-xs text-gray-400">Total Amount</p>
+              <p class="text-lg font-bold text-blue-700">₱{{ Number(selected?.total_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 }) }}</p>
             </div>
-
             <div>
-              <p class="text-xs uppercase tracking-wider text-gray-500">
-                Date Ordered
-              </p>
-
-              <p class="mt-1 text-gray-300">
-                {{
-                  selected
-                    ? new Date(
-                        selected.created_at
-                      ).toLocaleDateString(
-                        'en-PH',
-                        {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        }
-                      )
-                    : ''
-                }}
-              </p>
+              <p class="text-xs text-gray-400">Date</p>
+              <p class="text-sm text-gray-700">{{ selected ? new Date(selected.created_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '' }}</p>
             </div>
-
-            <!-- ITEMS -->
             <div v-if="selected?.order_items?.length">
-              <p
-                class="mb-3 text-xs uppercase tracking-wider text-gray-500"
-              >
-                Ordered Items
-              </p>
-
-              <div
-                class="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4"
-              >
-                <div
-                  v-for="(item, i) in selected.order_items"
-                  :key="i"
-                  class="flex items-center justify-between"
-                >
-                  <div>
-                    <p class="text-sm text-white">
-                      {{ item.product?.name || 'Product' }}
-                    </p>
-
-                    <p class="text-xs text-gray-500">
-                      Quantity: {{ item.quantity }}
-                    </p>
-                  </div>
-
-                  <span
-                    class="font-semibold text-red-400"
-                  >
-                    ₱{{
-                      Number(
-                        item.unit_price *
-                        item.quantity
-                      ).toLocaleString(
-                        'en-PH',
-                        {
-                          minimumFractionDigits: 2
-                        }
-                      )
-                    }}
-                  </span>
+              <p class="text-xs text-gray-400 mb-2">Items Ordered</p>
+              <div class="bg-gray-50 rounded-xl p-3 space-y-2">
+                <div v-for="(item, i) in selected.order_items" :key="i" class="flex justify-between text-sm">
+                  <span class="text-gray-700">{{ item.product?.name || 'Product' }} <span class="text-gray-400">x{{ item.quantity }}</span></span>
+                  <span class="font-semibold text-gray-900">₱{{ Number(item.unit_price * item.quantity).toLocaleString('en-PH', { minimumFractionDigits: 2 }) }}</span>
                 </div>
               </div>
             </div>
-
           </div>
-
-          <button
-            @click="viewModal = false"
-            class="mt-8 w-full rounded-2xl py-3 font-semibold text-white"
-            style="background:linear-gradient(135deg,#c0392b,#e74c3c)"
-          >
-            Close
-          </button>
-
+          <button @click="viewModal = false" class="w-full mt-6 py-2.5 rounded-xl text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200">Close</button>
         </div>
       </div>
 
