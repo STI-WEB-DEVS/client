@@ -1,6 +1,6 @@
 <template>
     <NuxtLayout>
-        <Projects/>
+        <Products/>
     </NuxtLayout>
 </template>
 
@@ -19,7 +19,7 @@
 
 
 <script setup lang="ts">
-import Projects from '~/components/Projects.vue';
+import Products from '~/components/Products.vue';
 
 
 </script>

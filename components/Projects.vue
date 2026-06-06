@@ -3,21 +3,21 @@
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
       <div>
         <h1 class="text-3xl font-black text-[#2D2424] tracking-tight">Furniture Projects</h1>
-        <p class="text-gray-500 mt-1">Manage designs, material specifications, and stock availability.</p>
+        <p class="text-gray-500 mt-1">Manage products, material specifications, and stock availability.</p>
       </div>
-      
+       
       <div class="flex items-center gap-3">
         <div class="relative">
           <MagnifyingGlassIcon class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input 
             type="text" 
-            placeholder="Search designs..." 
+            placeholder="Search products..." 
             class="pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none w-64 transition-all"
           />
         </div>
         <button class="bg-[#5D4037] hover:bg-[#4E342E] text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg active:scale-95 flex items-center gap-2">
           <PlusIcon class="w-5 h-5" />
-          <span>Add New Design</span>
+          <span>Add New Product</span>
         </button>
       </div>
     </header>

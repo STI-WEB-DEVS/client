@@ -100,8 +100,10 @@ const handleSubmit = async () => {
     if (response?.token) {
       localStorage.setItem("_token", response.token);
       
-      // Handle navigation based on role
-      const targetPath = response.user?.role === "admin" ? "/admin/dashboard" : "/dashboard";
+      localStorage.setItem("_role", response.user?.role || "");
+      localStorage.setItem("_customer_uuid", response.user?.customer_uuid || "");
+
+      const targetPath = "/dashboard";
       await navigateTo(targetPath);
     } else {
       throw new Error("Login failed: No token received.");

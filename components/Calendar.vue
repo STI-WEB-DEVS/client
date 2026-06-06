@@ -61,7 +61,7 @@ const calendarGrid = [
     { type: 'Restock', title: 'Wood Varnish Arrival', style: 'bg-emerald-50 border-emerald-500 text-emerald-900' }
   ]},
   { id: 12, date: 6, current: true, events: [
-    { type: 'Client', title: 'Meeting: SM Seaside Project', style: 'bg-purple-50 border-purple-500 text-purple-900' }
+    { type: 'Client', title: 'Meeting: SM Seaside Product', style: 'bg-purple-50 border-purple-500 text-purple-900' }
   ]},
   { id: 13, date: 7, current: true, events: [] },
   { id: 14, date: 8, current: true, events: [
